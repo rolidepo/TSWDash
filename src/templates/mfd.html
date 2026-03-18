@@ -1,0 +1,1761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TSW MFD - Multi-Functional Display</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+    <script src="./canvas-renderers.js"></script>
+    <script src="./components.js"></script>
+    <style>
+        :root {
+            /* --- CORE COLOR SCHEME --- */
+            --color-light-gray: #E0E0E0;
+            --color-dark-blue: #1A3E5F;
+            
+            /* Day Mode (Default) */
+            --current-screen-bg: var(--color-light-gray);
+            --current-screen-text-color: var(--color-dark-blue);
+            --current-screen-border-color: var(--color-dark-blue);
+            
+            /* STATIC BUTTON COLORS */
+            --button-bg-color: #292626;
+            --button-text-color: white;
+            --button-border-color: white;
+            
+            /* Brightness Steps */
+            --color-step-1: var(--color-dark-blue);
+            --color-step-2: #335473;
+            --color-step-3: #5C7A99;
+            --color-step-4: #859FB7;
+            --color-step-5: #9DB3C7;
+            
+            /* Dimensions */
+            --border-thickness: 40px;
+            --button-size: 65px;
+            --button-radius: 6px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            height: 100%;
+            width: 100%;
+            background-color: #333333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+        
+        /* MAIN DISPLAY CONTAINER - Fits to screen with 16:10 ratio */
+        .display-container {
+            width: min(calc(100vh * 16 / 10), 100vw);
+            height: 100vh;
+            background-color: #222;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.9), inset 0 0 20px #000, 0 10px 20px rgba(0, 0, 0, 0.8);
+            background-image: linear-gradient(135deg, #333 0%, #111 100%);
+            padding: var(--border-thickness);
+            border-radius: 12px;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            grid-template-rows: auto 1fr auto;
+            gap: 0;
+        }
+        
+        /* TOP BORDER - Button Area */
+        .top-border {
+            grid-column: 2;
+            grid-row: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 0 5px 0;
+            gap: 8px;
+        }
+        
+        /* BOTTOM BORDER - Number buttons */
+        .bottom-border {
+            grid-column: 2;
+            grid-row: 3;
+            display: grid;
+            grid-template-columns: repeat(10, minmax(0, 1fr));
+            gap: 0;
+            align-items: center;
+            padding: 5px 0 0 0;
+            padding-left: 5%;
+        }
+        
+        /* LEFT BORDER - LED indicators */
+        .left-border {
+            grid-column: 1;
+            grid-row: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 5px 5px 0 0;
+            gap: 15px;
+        }
+        
+        /* RIGHT BORDER - Vertical buttons */
+        .right-border {
+            grid-column: 3;
+            grid-row: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 5px;
+            gap: 5px;
+        }
+        
+        /* MAIN SCREEN */
+        .main-screen {
+            grid-column: 2;
+            grid-row: 2;
+            background-color: var(--current-screen-bg);
+            border: none;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+            color: var(--current-screen-text-color);
+            padding: 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 15px;
+        }
+        
+
+        .screen-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            gap: 12px;
+            height: 100%;
+        }
+        
+        /* NIGHT MODE */
+        .main-screen.night-mode {
+            --current-screen-bg: var(--color-dark-blue);
+            --current-screen-text-color: var(--color-light-gray);
+            --current-screen-border-color: var(--color-light-gray);
+            
+            --color-step-5: #999999;
+            --color-step-4: #B3B3B3;
+            --color-step-3: var(--color-light-gray);
+            --color-step-2: #F0F0F0;
+            --color-step-1: #FFFFFF;
+        }
+        
+        /* BUTTON STYLING */
+        .btn {
+            height: var(--button-size);
+            width: var(--button-size);
+            border: 3px solid var(--button-border-color);
+            border-radius: var(--button-radius);
+            background-color: var(--button-bg-color);
+            color: var(--button-text-color);
+            font-size: calc(var(--button-size) * 0.4);
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            user-select: none;
+            padding: 5px;
+            word-break: break-word;
+            line-height: 1.1;
+        }
+        
+        .btn:hover {
+            background-color: #3a3a37;
+            border-color: #e0e0e0;
+        }
+        
+        .btn:active {
+            background-color: #000;
+            opacity: 0.8;
+            transform: scale(0.95);
+        }
+        
+        /* Small buttons for top row - SQUARE */
+        .btn-small {
+            height: var(--button-size);
+            width: var(--button-size);
+            font-size: calc(var(--button-size) * 0.4);
+            flex-shrink: 0;
+        }
+        
+        /* Special button - wider 2:1 ratio */
+        .btn-special {
+            width: calc(var(--button-size) * 2);
+            height: var(--button-size);
+            font-size: calc(var(--button-size) * 0.4);
+        }
+        
+        /* Number buttons - SQUARE */
+        .btn-number {
+            width: var(--button-size);
+            height: var(--button-size);
+            flex: 0 0 auto;
+        }
+        
+        /* Right border buttons - SQUARE */
+        .btn-right {
+            width: var(--button-size);
+            height: var(--button-size);
+            flex-shrink: 0;
+        }
+        
+        /* E button - taller 1:2 ratio */
+        .btn-right.btn-e {
+            height: calc(var(--button-size) * 2);
+        }
+        
+        /* Triangle arrows using CSS */
+        .arrow-up::before {
+            content: '';
+            display: block;
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 20px solid white;
+        }
+        
+        .arrow-down::before {
+            content: '';
+            display: block;
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 20px solid white;
+        }
+        
+        .arrow-left::before {
+            content: '';
+            display: block;
+            width: 0;
+            height: 0;
+            border-top: 15px solid transparent;
+            border-bottom: 15px solid transparent;
+            border-right: 20px solid white;
+        }
+        
+        .arrow-right::before {
+            content: '';
+            display: block;
+            width: 0;
+            height: 0;
+            border-top: 15px solid transparent;
+            border-bottom: 15px solid transparent;
+            border-left: 20px solid white;
+        }
+        
+        /* Arrow button text hide */
+        .btn.arrow-up, .btn.arrow-down, .btn.arrow-left, .btn.arrow-right {
+            font-size: 0;
+            color: transparent;
+        }
+        
+        /* Icon buttons */
+        .btn-icon {
+            font-size: 0;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-icon svg {
+            width: 60%;
+            height: 60%;
+            stroke: white;
+            fill: none;
+            stroke-width: 2;
+        }
+        
+        .btn-icon.brightness-btn svg {
+            fill: white;
+        }
+        
+        
+        /* LED Indicators */
+        .indicator-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .led-label {
+            font-size: 10px;
+            color: white;
+            text-align: center;
+            max-width: 40px;
+        }
+        
+        .led-light {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid #999;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
+            background-color: #444;
+        }
+        
+        .led-light[data-state="green"] {
+            background-color: #0f0;
+            box-shadow: 0 0 10px #0f0, inset 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+        
+        .led-light[data-state="red"] {
+            background-color: #f00;
+            box-shadow: 0 0 10px #f00, inset 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* Screen content */
+        .screen-title {
+            font-size: clamp(18px, 3.6vh, 32px);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 2px solid var(--current-screen-border-color);
+            padding-bottom: 10px;
+            flex-shrink: 0;
+        }
+        
+        .main-screen.no-title .screen-title {
+            border-bottom: none;
+        }
+        
+        .main-screen.no-title .menu-strip {
+            border: none;
+        }
+        
+        /* Schedule Browser Overlay */
+        .schedule-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50%;
+            height: 50%;
+            background: var(--current-screen-bg);
+            border: 3px solid var(--current-screen-border-color);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            padding: 15px;
+            gap: 10px;
+        }
+        
+        .schedule-overlay.active {
+            display: flex;
+        }
+        
+        .schedule-search-bar {
+            width: 100%;
+            padding: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            background: white;
+            color: black;
+            border: 3px solid var(--current-screen-border-color);
+            outline: none;
+            text-align: left;
+            letter-spacing: 1px;
+        }
+        
+        .schedule-search-bar.highlighted {
+            box-shadow: 0 0 0 3px var(--current-screen-border-color);
+        }
+        
+        .schedule-list {
+            flex: 1;
+            overflow-y: auto;
+            border: 2px solid var(--current-screen-border-color);
+            background: var(--current-screen-bg);
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .schedule-list::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .schedule-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--current-screen-border-color);
+            cursor: pointer;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .schedule-item:hover {
+            background: var(--current-screen-text-color);
+            color: var(--current-screen-bg);
+        }
+        
+        .schedule-item.selected {
+            background: var(--current-screen-text-color);
+            color: var(--current-screen-bg);
+            font-weight: bold;
+        }
+        
+        .schedule-item-code {
+            font-size: 14px;
+            font-weight: bold;
+            min-width: 60px;
+        }
+        
+        .schedule-item-number {
+            font-size: 16px;
+            font-weight: bold;
+            min-width: 80px;
+        }
+        
+        .schedule-item-destination {
+            font-size: 14px;
+            flex: 1;
+            opacity: 0.9;
+        }
+
+        .ebula-data-table {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+            padding: 0;
+            border: none;
+        }
+
+        .component.ebula-data-table {
+            border: 1px solid var(--current-screen-text-color) !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .ebula-data-table > div {
+            overflow: hidden !important;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .ebula-data-table > div::-webkit-scrollbar {
+            display: none;
+        }
+
+        .screen-content {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0;
+            min-height: 0;
+            border-left: 1px solid var(--current-screen-text-color);
+            border-top: 1px solid var(--current-screen-text-color);
+        }
+
+        .menu-strip {
+            display: grid;
+            grid-template-columns: repeat(10, minmax(0, 1fr));
+            gap: 0;
+            padding: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: auto;
+            min-height: 45px;
+            align-content: center;
+        }
+
+        .menu-item {
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-right: 1px solid var(--current-screen-text-color);
+        }
+        
+        .menu-item:last-child {
+            border-right: none;
+        }
+        
+        .component {
+            padding: 12px;
+            background: transparent;
+            border-right: 1px solid var(--current-screen-text-color);
+            border-bottom: 1px solid var(--current-screen-text-color);
+            display: flex;
+            flex-direction: column;
+            margin: -1px -1px 0 0;
+            align-self: stretch;
+            justify-self: stretch;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .component.no-padding {
+            padding: 0;
+        }
+        
+        .component-title {
+            font-size: clamp(12px, 2.4vh, 18px);
+            font-weight: bold;
+            margin-bottom: 6px;
+            opacity: 0.7;
+            flex-shrink: 0;
+        }
+        
+        .component-value {
+            font-size: clamp(24px, 4.5vh, 44px);
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            flex-shrink: 0;
+        }
+        
+        .component-unit {
+            font-size: clamp(14px, 2vh, 18px);
+            opacity: 0.6;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+        
+        /* Hide content but keep borders visible and space occupied */
+        .component.hidden-content * {
+            visibility: hidden;
+        }
+                /* Responsive design */
+        @media (max-width: 1200px) {
+            :root {
+                --button-size: 60px;
+                --border-thickness: 40px;
+            }
+        }
+        
+        @media (max-width: 900px) {
+            :root {
+                --button-size: 55px;
+                --border-thickness: 35px;
+            }
+        }
+
+        /* Blinking animations for text indicators */
+        @keyframes blink-opacity {
+            0%, 49% {
+                opacity: 1;
+            }
+            50%, 100% {
+                opacity: 0;
+            }
+        }
+
+        @keyframes blink-bg {
+            0%, 49% {
+                background-color: var(--blink-bg-color, transparent);
+            }
+            50%, 100% {
+                background-color: transparent;
+            }
+        }
+
+        @keyframes blink-text-color {
+            0%, 49% {
+                color: var(--blink-text-color-on, currentColor);
+            }
+            50%, 100% {
+                color: var(--blink-text-color-off, currentColor);
+            }
+        }
+
+        .blinking-text {
+            animation: blink-opacity 1s steps(2) infinite;
+        }
+
+        .blinking-bg,
+        .blinking-both {
+            animation: blink-bg 1s steps(2) infinite;
+        }
+
+        .blinking-bg-text {
+            animation: blink-text-color 1s steps(2) infinite;
+        }
+
+        .blinking-both > * {
+            animation: blink-opacity 1s steps(2) infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- MFD Physical Frame -->
+    <div class="display-container">
+        <!-- LEFT BORDER - LED Indicators -->
+        <div class="left-border" id="leftBorder"></div>
+        
+        <!-- TOP BORDER - Buttons -->
+        <div class="top-border" id="topBorder"></div>
+        
+        <!-- MAIN SCREEN -->
+        <div class="main-screen" id="mainScreen">
+            <div class="screen-column" id="screenColumn">
+                <div class="screen-title" id="screenTitle">TSW MFD</div>
+                <div class="screen-content" id="screenContent">
+                    <!-- Page content will be rendered here -->
+                </div>
+                <div class="menu-strip" id="menuStrip"></div>
+            </div>
+            
+            <!-- Schedule Browser Overlay -->
+            <div class="schedule-overlay" id="scheduleOverlay">
+                <input type="text" class="schedule-search-bar highlighted" id="scheduleSearch" placeholder="ENTER TRAIN NUMBER..." readonly />
+                <div class="schedule-list" id="scheduleList"></div>
+            </div>
+        </div>
+        
+        <!-- BOTTOM BORDER - Number Buttons -->
+        <div class="bottom-border" id="bottomBorder"></div>
+        
+        <!-- RIGHT BORDER - Vertical Buttons -->
+        <div class="right-border" id="rightBorder"></div>
+    </div>
+
+    <script>
+        /**
+         * Helper function to resolve value with fallback support
+         * Accepts a single value key or an array of keys, returns the first value found in data
+         */
+        function resolveValue(valueKey, data) {
+            // If it's a single string, return the value directly
+            if (typeof valueKey === 'string') {
+                const value = data[valueKey];
+                // Skip undefined, null, and empty strings
+                if (value !== undefined && value !== null && value !== '') {
+                    return value;
+                }
+                return undefined;
+            }
+            
+            // If it's an array, try each key or literal in order
+            if (Array.isArray(valueKey)) {
+                for (const key of valueKey) {
+                    if (typeof key === 'string') {
+                        if (Object.prototype.hasOwnProperty.call(data, key)) {
+                            const value = data[key];
+                            // Skip undefined, null, and empty strings
+                            if (value !== undefined && value !== null && value !== '') {
+                                return value;
+                            }
+                        }
+                    } else if (key !== undefined && key !== null && key !== '') {
+                        return key;
+                    }
+                }
+            }
+            
+            return undefined;
+        }
+        
+        // SVG Icon generators
+        function createSunIcon() {
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('viewBox', '0 0 24 24');
+            
+            // Center circle
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', '12');
+            circle.setAttribute('cy', '12');
+            circle.setAttribute('r', '5');
+            circle.setAttribute('fill', 'white');
+            svg.appendChild(circle);
+            
+            // Rays
+            for (let i = 0; i < 8; i++) {
+                const angle = (i * 45) * Math.PI / 180;
+                const x1 = 12 + 8 * Math.cos(angle);
+                const y1 = 12 + 8 * Math.sin(angle);
+                const x2 = 12 + 12 * Math.cos(angle);
+                const y2 = 12 + 12 * Math.sin(angle);
+                
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', x1);
+                line.setAttribute('y1', y1);
+                line.setAttribute('x2', x2);
+                line.setAttribute('y2', y2);
+                line.setAttribute('stroke', 'white');
+                line.setAttribute('stroke-width', '1.5');
+                svg.appendChild(line);
+            }
+            
+            return svg;
+        }
+        
+        function createContrastIcon() {
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('viewBox', '0 0 24 24');
+            
+            // Outer circle
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', '12');
+            circle.setAttribute('cy', '12');
+            circle.setAttribute('r', '10');
+            svg.appendChild(circle);
+            
+            // Left half (dark)
+            const leftPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            leftPath.setAttribute('d', 'M 12 2 A 10 10 0 0 0 12 22 Z');
+            leftPath.setAttribute('fill', 'white');
+            svg.appendChild(leftPath);
+            
+            return svg;
+        }
+        
+        // Global MFD State
+        let MFDState = {
+            currentPage: null,
+            pagesConfig: null,
+            apiData: {},
+            displayData: {},
+            runtimeVariables: {
+                GNT_active: false,
+                alt_timetable: false,
+                speed_unit_mph: false
+            },
+            timetableData: {},  // Loaded timetable from schedule file
+            serviceTimetableData: {},  // Loaded service timetable from route file
+            sessionActive: false,
+            components: [],
+            brightness: 100,
+            contrast: 100,
+            nightMode: false,
+            pageHistory: [],  // Track visited pages for back navigation
+            scheduleOverlayActive: false,
+            scheduleList: [],
+            scheduleSearchQuery: '',
+            scheduleSelectedIndex: -1,
+            scheduleSearchBarFocused: true
+        };
+        
+        // Initialize page history from localStorage
+        try {
+            const savedHistory = localStorage.getItem('pageHistory');
+            if (savedHistory) {
+                MFDState.pageHistory = JSON.parse(savedHistory);
+                console.log('Loaded page history:', MFDState.pageHistory);
+            }
+        } catch (e) {
+            console.error('Error loading page history:', e);
+        }
+
+        // Toggle night mode function (placeholder for MFD template)
+        function toggle_night_mode() {
+            MFDState.nightMode = !MFDState.nightMode;
+            console.log('Night mode:', MFDState.nightMode ? 'ON' : 'OFF');
+            // MFD template doesn't have visual mode switching yet
+            // This function exists for button action compatibility
+        }
+
+        function initializeRuntimeVariables(pagesConfig) {
+            const configuredRuntimeVariables = pagesConfig?.settings?.runtime_variables || {};
+            MFDState.runtimeVariables = {
+                GNT_active: false,
+                ...configuredRuntimeVariables
+            };
+        }
+
+        function evaluateVisibleWhen(visibleWhen, data) {
+            if (!visibleWhen) return true;
+
+            if (typeof visibleWhen === 'object' && !Array.isArray(visibleWhen)) {
+                const variable = visibleWhen.variable;
+                const conditionValue = resolveValue(variable, data);
+
+                if (Object.prototype.hasOwnProperty.call(visibleWhen, 'equals')) {
+                    return conditionValue == visibleWhen.equals;
+                }
+
+                if (Object.prototype.hasOwnProperty.call(visibleWhen, 'not_equals')) {
+                    return conditionValue != visibleWhen.not_equals;
+                }
+
+                return Boolean(conditionValue);
+            }
+
+            return Boolean(resolveValue(visibleWhen, data));
+        }
+
+        function rebuildDisplayData() {
+            const transformedApiData = applyTransforms(MFDState.apiData);
+
+            MFDState.displayData = {
+                ...transformedApiData,
+                ...(MFDState.timetableData ? flattenTimetableData(MFDState.timetableData) : {}),
+                ...(MFDState.serviceTimetableData ? flattenServiceTimetable(MFDState.serviceTimetableData) : {}),
+                ...(MFDState.runtimeVariables || {})
+            };
+        }
+
+        function updateRuntimeVariableFromAction(action) {
+            const variableName = action?.variable || action?.name || action?.key;
+            if (!variableName) return false;
+
+            const operation = action?.operation
+                || action?.mode
+                || (action?.action === 'toggle_runtime_variable' ? 'toggle' : 'set');
+
+            const currentValue = MFDState.runtimeVariables[variableName];
+            let nextValue;
+
+            switch (operation) {
+                case 'toggle':
+                    nextValue = !Boolean(currentValue);
+                    break;
+                case 'set':
+                    nextValue = action.value;
+                    break;
+                case 'increment':
+                    nextValue = Number(currentValue || 0) + Number(action.step || 1);
+                    break;
+                case 'decrement':
+                    nextValue = Number(currentValue || 0) - Number(action.step || 1);
+                    break;
+                default:
+                    nextValue = action.value;
+                    break;
+            }
+
+            MFDState.runtimeVariables[variableName] = nextValue;
+            rebuildDisplayData();
+
+            const currentPageConfig = MFDState.pagesConfig?.pages?.[MFDState.currentPage];
+            if (currentPageConfig) {
+                updateMenuStrip(currentPageConfig);
+            }
+
+            return true;
+        }
+
+        // Global helper function for components to set runtime variables directly
+        window.setComponentRuntimeVariable = (variableName, value) => {
+            if (!variableName) return false;
+            MFDState.runtimeVariables[variableName] = value;
+            rebuildDisplayData();
+            const currentPageConfig = MFDState.pagesConfig?.pages?.[MFDState.currentPage];
+            if (currentPageConfig) {
+                updateMenuStrip(currentPageConfig);
+            }
+            return true;
+        };
+        
+        // Delete loaded schedules and service timetables
+        function deleteLoadedSchedules() {
+            MFDState.timetableData = {};
+            MFDState.serviceTimetableData = {};
+
+            // Rebuild display data to preserve runtime variables
+            rebuildDisplayData();
+        }
+
+        // Save completed schedule with recorded ATA/ATD timestamps
+        async function saveCompletedSchedule() {
+            if (!window.ebulaTableState) {
+                console.error('No ebula table state available');
+                return;
+            }
+
+            // Find the ebula table component
+            const tableContainer = document.querySelector('[id$="-table"]');
+            if (!tableContainer) {
+                console.error('Ebula table not found');
+                return;
+            }
+
+            const componentId = tableContainer.id.replace('-table', '');
+            const state = window.ebulaTableState[componentId];
+            if (!state || !state.scheduleData) {
+                console.error('No schedule data available');
+                return;
+            }
+
+            // Get train info from the timetable data
+            const timetableData = MFDState.timetableData || {};
+            const trainInfo = timetableData.train_info || {};
+            const routeCode = trainInfo.route_code || 'UNKNOWN';
+            const trainNumber = trainInfo.train_number || 'UNKNOWN';
+
+            try {
+                const response = await fetch(`/api/save-completed-schedule/${routeCode}/${trainNumber}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        scheduleData: state.scheduleData,
+                        gameTimeAtStart: state.gameTimeAtStart,
+                        realTimeAtStart: state.realTimeAtStart
+                    })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    console.log('Schedule saved successfully:', result.filename);
+                } else {
+                    console.error('Failed to save schedule:', result.error);
+                }
+            } catch (error) {
+                console.error('Error saving schedule:', error);
+            }
+        }
+
+        async function appendSupportData() {
+            const dataSource = MFDState.displayData || {};
+            const latitude = dataSource['player_info.geoLocation.latitude'];
+            const longitude = dataSource['player_info.geoLocation.longitude'];
+
+            if (latitude === undefined || longitude === undefined || latitude === null || longitude === null) {
+                return;
+            }
+
+            try {
+                await fetch('/api/support-data/append', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        latitude,
+                        longitude
+                    })
+                });
+            } catch (error) {
+                console.error('Failed to append support data:', error);
+            }
+        }
+        
+        // Ebula Table Navigation Functions
+        function handleEbulaTableNavigation(direction) {
+            if (!window.ebulaTableState) return;
+            
+            // Find the active ebula table component
+            const tableContainer = document.querySelector('[id$="-table"]');
+            if (!tableContainer) return;
+            
+            const componentId = tableContainer.id.replace('-table', '');
+            const state = window.ebulaTableState[componentId];
+            if (!state) return;
+            
+            const visibleRows = state.displayedRows || 15;
+            const totalEntries = state.entries ? state.entries.length : 0;
+            const closestIndex = state.closestIndex || 0;
+            
+            // Calculate scroll boundaries matching components.js logic
+            // maxScrollOffset: allow scrolling forward to see last stations
+            const maxScrollOffset = Math.max(0, totalEntries - visibleRows - closestIndex);
+            
+            // minScrollOffset: allow scrolling back to see first station
+            const minScrollOffset = -closestIndex;
+            
+            if (direction === 'down') {
+                state.scrollOffset = Math.max(state.scrollOffset - 1, minScrollOffset);
+            } else if (direction === 'up') {
+                state.scrollOffset = Math.min(state.scrollOffset + 1, maxScrollOffset);
+            } else if (direction === 'left') {
+                state.scrollOffset = Math.min(state.scrollOffset + visibleRows, maxScrollOffset);
+            } else if (direction === 'right') {
+                state.scrollOffset = Math.max(state.scrollOffset - visibleRows, minScrollOffset);
+            }
+            
+            // Refresh table
+            updateData();
+        }
+        
+        function resetEbulaTableToClosest() {
+            if (!window.ebulaTableState) return;
+            
+            const tableContainer = document.querySelector('[id$="-table"]');
+            if (!tableContainer) return;
+            
+            const componentId = tableContainer.id.replace('-table', '');
+            const state = window.ebulaTableState[componentId];
+            if (!state) return;
+            
+            // Reset to automatic tracking mode (closest at bottom)
+            state.scrollOffset = 0;
+            updateData();
+        }
+        
+        // Go back to previous page
+        function page_back() {
+            if (MFDState.pageHistory.length > 0) {
+                const previousPage = MFDState.pageHistory.pop();
+                console.log('Going back to:', previousPage);
+                // Save updated history to localStorage
+                localStorage.setItem('pageHistory', JSON.stringify(MFDState.pageHistory));
+                // Don't add to history when going back
+                const currentHistory = [...MFDState.pageHistory];
+                loadPage(previousPage);
+                MFDState.pageHistory = currentHistory;
+            } else {
+                console.log('No previous page in history');
+            }
+        }
+        
+        // Schedule Browser Functions
+        async function openScheduleBrowser() {
+            MFDState.scheduleOverlayActive = true;
+            MFDState.scheduleSearchQuery = '';
+            MFDState.scheduleSelectedIndex = -1;
+            MFDState.scheduleSearchBarFocused = true;
+            
+            document.getElementById('scheduleOverlay').classList.add('active');
+            document.getElementById('scheduleSearch').value = '';
+            document.getElementById('scheduleSearch').classList.add('highlighted');
+            
+            // Load schedule list from server
+            try {
+                const response = await fetch('/api/schedules/list');
+                const data = await response.json();
+                MFDState.scheduleList = data.schedules || [];
+                renderScheduleList();
+            } catch (err) {
+                console.error('Error loading schedule list:', err);
+                MFDState.scheduleList = [];
+                renderScheduleList();
+            }
+        }
+        
+        function closeScheduleBrowser() {
+            MFDState.scheduleOverlayActive = false;
+            document.getElementById('scheduleOverlay').classList.remove('active');
+        }
+        
+        function renderScheduleList() {
+            const listEl = document.getElementById('scheduleList');
+            listEl.innerHTML = '';
+            
+            const query = MFDState.scheduleSearchQuery.toLowerCase();
+            const filteredSchedules = MFDState.scheduleList.filter(schedule => {
+                return schedule.train_number.toLowerCase().includes(query);
+            });
+            
+            filteredSchedules.forEach((schedule, index) => {
+                const item = document.createElement('div');
+                item.className = 'schedule-item';
+                if (index === MFDState.scheduleSelectedIndex) {
+                    item.classList.add('selected');
+                }
+                
+                const code = document.createElement('div');
+                code.className = 'schedule-item-code';
+                code.textContent = schedule.route_code;
+                
+                const number = document.createElement('div');
+                number.className = 'schedule-item-number';
+                number.textContent = schedule.train_number;
+                
+                const destination = document.createElement('div');
+                destination.className = 'schedule-item-destination';
+                destination.textContent = schedule.destination || '';
+                
+                item.appendChild(code);
+                item.appendChild(number);
+                item.appendChild(destination);
+                
+                item.onclick = () => {
+                    MFDState.scheduleSelectedIndex = index;
+                    renderScheduleList();
+                };
+                
+                listEl.appendChild(item);
+            });
+
+            const selectedItem = listEl.querySelector('.schedule-item.selected');
+            if (selectedItem) {
+                // Keep keyboard selection visible when moving through long lists.
+                selectedItem.scrollIntoView({ block: 'nearest' });
+            }
+        }
+        
+        async function selectSchedule() {
+            const query = MFDState.scheduleSearchQuery.toLowerCase();
+            const filteredSchedules = MFDState.scheduleList.filter(schedule => {
+                return schedule.train_number.toLowerCase().includes(query);
+            });
+            
+            if (MFDState.scheduleSelectedIndex >= 0 && MFDState.scheduleSelectedIndex < filteredSchedules.length) {
+                const selected = filteredSchedules[MFDState.scheduleSelectedIndex];
+                
+                // Load the schedule file
+                try {
+                    const response = await fetch(`/api/schedules/load/${encodeURIComponent(selected.filename)}`);
+                    const data = await response.json();
+                    MFDState.timetableData = data;
+                    
+                    // Merge timetable data into displayData for components
+                    let mergedData = {
+                        ...MFDState.displayData,
+                        ...flattenTimetableData(data)
+                    };
+                    
+                    // Check if there's a service timetable to load
+                    const serviceTimetableFile = data.train_info?.service_timetable;
+                    if (serviceTimetableFile) {
+                        try {
+                            const stResponse = await fetch(`/api/service-timetables/load/${encodeURIComponent(serviceTimetableFile)}`);
+                            const stData = await stResponse.json();
+                            MFDState.serviceTimetableData = stData;
+                            
+                            // Merge service timetable data as well
+                            mergedData = {
+                                ...mergedData,
+                                ...flattenServiceTimetable(stData)
+                            };
+                        } catch (stErr) {
+                            console.error('Error loading service timetable:', stErr);
+                        }
+                    }
+                    
+                    MFDState.displayData = mergedData;
+                    closeScheduleBrowser();
+                } catch (err) {
+                    console.error('Error loading schedule file:', err);
+                }
+            }
+        }
+        
+        function flattenTimetableData(timetable) {
+            const flattened = {};
+            
+            // Flatten train_info
+            if (timetable.train_info) {
+                Object.entries(timetable.train_info).forEach(([key, value]) => {
+                    flattened[`tt_${key}`] = value;
+                });
+            }
+            
+            // Add timetable_data with index-based keys
+            if (timetable.timetable_data && Array.isArray(timetable.timetable_data)) {
+                // Keep the full array
+                flattened.tt_timetable = timetable.timetable_data;
+                
+                // Add each stop with index-based keys like tt_0_station, tt_1_ETA, etc.
+                timetable.timetable_data.forEach((stop, index) => {
+                    Object.entries(stop).forEach(([key, value]) => {
+                        flattened[`tt_${index}_${key}`] = value;
+                    });
+                });
+            }
+            
+            return flattened;
+        }
+        
+        function flattenServiceTimetable(serviceTimetable) {
+            const flattened = {};
+            
+            // Flatten route_info
+            if (serviceTimetable.route_info) {
+                Object.entries(serviceTimetable.route_info).forEach(([key, value]) => {
+                    flattened[`st_${key}`] = value;
+                });
+            }
+            
+            // Add timetable_entries with index-based keys
+            if (serviceTimetable.timetable_entries && Array.isArray(serviceTimetable.timetable_entries)) {
+                // Keep the full array
+                flattened.st_entries = serviceTimetable.timetable_entries;
+                
+                // Add each entry with index-based keys like st_0_km, st_1_location, etc.
+                serviceTimetable.timetable_entries.forEach((entry, index) => {
+                    Object.entries(entry).forEach(([key, value]) => {
+                        flattened[`st_${index}_${key}`] = value;
+                    });
+                });
+            }
+            
+            // Add alternate timetable_entries if available
+            if (serviceTimetable.timetable_entries_alt && Array.isArray(serviceTimetable.timetable_entries_alt)) {
+                // Keep the full array as st_entries_alt
+                flattened.st_entries_alt = serviceTimetable.timetable_entries_alt;
+                
+                // Add each entry with alt-specific index-based keys like st_alt_0_km, st_alt_1_location, etc.
+                serviceTimetable.timetable_entries_alt.forEach((entry, index) => {
+                    Object.entries(entry).forEach(([key, value]) => {
+                        flattened[`st_alt_${index}_${key}`] = value;
+                    });
+                });
+            }
+            
+            return flattened;
+        }
+        
+        function handleScheduleBrowserInput(digit) {
+            if (MFDState.scheduleSearchBarFocused) {
+                MFDState.scheduleSearchQuery += digit;
+                document.getElementById('scheduleSearch').value = MFDState.scheduleSearchQuery;
+                MFDState.scheduleSelectedIndex = 0;  // Auto-select first match
+                renderScheduleList();
+            }
+        }
+        
+        function handleScheduleBrowserNavigation(direction) {
+            const query = MFDState.scheduleSearchQuery.toLowerCase();
+            const filteredSchedules = MFDState.scheduleList.filter(schedule => {
+                return schedule.train_number.toLowerCase().includes(query);
+            });
+            
+            if (direction === 'up') {
+                if (MFDState.scheduleSearchBarFocused) {
+                    // Already at search bar, do nothing
+                } else {
+                    // Move up in list or back to search bar
+                    if (MFDState.scheduleSelectedIndex > 0) {
+                        MFDState.scheduleSelectedIndex--;
+                        renderScheduleList();
+                    } else {
+                        // At top of list, go back to search bar
+                        MFDState.scheduleSearchBarFocused = true;
+                        MFDState.scheduleSelectedIndex = -1;
+                        document.getElementById('scheduleSearch').classList.add('highlighted');
+                        renderScheduleList();
+                    }
+                }
+            } else if (direction === 'down') {
+                if (MFDState.scheduleSearchBarFocused) {
+                    // Move from search bar to list
+                    MFDState.scheduleSearchBarFocused = false;
+                    MFDState.scheduleSelectedIndex = 0;
+                    document.getElementById('scheduleSearch').classList.remove('highlighted');
+                    renderScheduleList();
+                } else {
+                    // Move down in list
+                    if (MFDState.scheduleSelectedIndex < filteredSchedules.length - 1) {
+                        MFDState.scheduleSelectedIndex++;
+                        renderScheduleList();
+                    }
+                }
+            }
+        }
+
+        function getOrderedEntries(buttonMap, order) {
+            const entries = [];
+            const seen = new Set();
+            order.forEach(label => {
+                if (buttonMap && Object.prototype.hasOwnProperty.call(buttonMap, label)) {
+                    entries.push([label, buttonMap[label]]);
+                    seen.add(label);
+                }
+            });
+            Object.entries(buttonMap || {}).forEach(([label, action]) => {
+                if (!seen.has(label)) {
+                    entries.push([label, action]);
+                }
+            });
+            return entries;
+        }
+
+        function applyTransforms(rawData) {
+            const transforms = (MFDState.pagesConfig && MFDState.pagesConfig.api_transforms) || {};
+            const transformed = {};
+
+            Object.entries(rawData || {}).forEach(([key, value]) => {
+                transformed[key] = value;
+            });
+
+            Object.entries(transforms || {}).forEach(([transformKey, transform]) => {
+                // Handle substring transformations
+                if (transform.source && transform.substring) {
+                    const sourceValue = String(rawData[transform.source] || '');
+                    const start = transform.substring.start || 0;
+                    const end = transform.substring.end;
+                    
+                    let result;
+                    if (end !== undefined) {
+                        if (end < 0) {
+                            // Negative end means count from the end
+                            result = sourceValue.substring(start, sourceValue.length + end);
+                        } else {
+                            result = sourceValue.substring(start, end);
+                        }
+                    } else {
+                        result = sourceValue.substring(start);
+                    }
+                    transformed[transformKey] = result;
+                    return;
+                }
+
+                // Handle numeric transformations
+                const value = transformed[transformKey] !== undefined ? transformed[transformKey] : rawData[transformKey];
+                if (transform && typeof transform === 'object' && !transform.source) {
+                    const numValue = Number(value);
+                    if (Number.isFinite(numValue)) {
+                        const multiply = typeof transform.multiply === 'number' ? transform.multiply : 1;
+                        const add = typeof transform.add === 'number' ? transform.add : 0;
+                        transformed[transformKey] = (numValue * multiply) + add;
+                    }
+                }
+            });
+
+            return transformed;
+        }
+        
+        // Initialize MFD
+        async function initMFD() {
+            try {
+                // Fetch configuration
+                const pagesRes = await fetch('/api/pages');
+                MFDState.pagesConfig = await pagesRes.json();
+                initializeRuntimeVariables(MFDState.pagesConfig);
+                
+                // Check URL hash for page selection
+                const urlHash = window.location.hash.slice(1); // Remove #
+                const initialPage = urlHash || MFDState.pagesConfig.settings.default_page || 'dashboard';
+                
+                // Setup UI
+                setupButtons();
+                loadPage(initialPage);
+                
+                // Start polling
+                startDataPolling();
+                
+            } catch (err) {
+                console.error('Failed to initialize MFD:', err);
+                document.getElementById('screenContent').innerHTML = '<div>Error loading MFD</div>';
+            }
+        }
+        
+        function setupButtons() {
+            const config = MFDState.pagesConfig;
+            const currentPageConfig = config.pages[MFDState.currentPage];
+            
+            if (!currentPageConfig) return;
+            
+            const buttons = currentPageConfig.buttons;
+            
+            // Top buttons
+            const topContainer = document.getElementById('topBorder');
+            topContainer.innerHTML = '';
+            const topOrder = ['aus', 'i', 'St', 'V>0', 'V=0', 'UD', 'brightness', 'contrast'];
+            getOrderedEntries(buttons.top, topOrder).forEach(([label, action]) => {
+                const btn = document.createElement('button');
+                
+                // St button gets 2:1 ratio
+                if (label === 'St') {
+                    btn.className = 'btn btn-special';
+                } else {
+                    btn.className = 'btn btn-small';
+                }
+                
+                if (label === 'brightness') {
+                    btn.classList.add('btn-icon', 'brightness-btn');
+                    btn.appendChild(createSunIcon());
+                } else if (label === 'contrast') {
+                    btn.classList.add('btn-icon');
+                    btn.appendChild(createContrastIcon());
+                } else {
+                    btn.textContent = label;
+                }
+                
+                btn.onclick = () => handleButtonPress(label, action, 'top');
+                topContainer.appendChild(btn);
+            });
+            
+            // Right buttons
+            const rightContainer = document.getElementById('rightBorder');
+            rightContainer.innerHTML = '';
+            const rightOrder = ['c', 'left', 'right', 'up', 'down', 'E'];
+            getOrderedEntries(buttons.right, rightOrder).forEach(([label, action]) => {
+                const btn = document.createElement('button');
+                
+                // E button gets 1:2 ratio (taller)
+                if (label === 'E') {
+                    btn.className = 'btn btn-right btn-e';
+                } else {
+                    btn.className = 'btn btn-right';
+                }
+                
+                if (label === 'left') {
+                    btn.classList.add('arrow-left');
+                } else if (label === 'right') {
+                    btn.classList.add('arrow-right');
+                } else if (label === 'up') {
+                    btn.classList.add('arrow-up');
+                } else if (label === 'down') {
+                    btn.classList.add('arrow-down');
+                } else {
+                    btn.textContent = label;
+                }
+                
+                btn.onclick = () => handleButtonPress(label, action, 'right');
+                rightContainer.appendChild(btn);
+            });
+            
+            // Bottom buttons (numbers)
+            const bottomContainer = document.getElementById('bottomBorder');
+            bottomContainer.innerHTML = '';
+            const bottomOrder = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
+            getOrderedEntries(buttons.bottom, bottomOrder).forEach(([label, action]) => {
+                const btn = document.createElement('button');
+                btn.className = 'btn btn-number';
+                btn.textContent = label;
+                btn.onclick = () => handleButtonPress(label, action, 'bottom');
+                bottomContainer.appendChild(btn);
+            });
+        }
+
+        function updateMenuStrip(pageConfig) {
+            const menuStrip = document.getElementById('menuStrip');
+            if (!menuStrip) return;
+
+            menuStrip.innerHTML = '';
+            const labels = pageConfig.menu_labels || {};
+            const bottomOrder = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
+
+            bottomOrder.forEach(key => {
+                const item = document.createElement('div');
+                item.className = 'menu-item';
+
+                const labelConfig = labels[key];
+                if (typeof labelConfig === 'string') {
+                    item.textContent = labelConfig;
+                } else if (labelConfig && typeof labelConfig === 'object') {
+                    const isVisible = evaluateVisibleWhen(
+                        labelConfig.visible_when || labelConfig.visibleWhen,
+                        MFDState.displayData
+                    );
+                    if (isVisible) {
+                        item.textContent = labelConfig.text || labelConfig.value || '';
+                    } else {
+                        item.textContent = '';
+                    }
+                } else {
+                    item.textContent = '';
+                }
+
+                menuStrip.appendChild(item);
+            });
+        }
+        
+        function handleButtonPress(label, action, panel) {
+            // Intercept button presses when schedule browser is open
+            if (MFDState.scheduleOverlayActive) {
+                // Number buttons (0-9) for search input
+                if (panel === 'bottom' && label >= '0' && label <= '9') {
+                    handleScheduleBrowserInput(label);
+                    return;
+                }
+                
+                // Up/Down arrows for navigation (check lowercase label)
+                if (panel === 'right' && label === 'up') {
+                    handleScheduleBrowserNavigation('up');
+                    return;
+                }
+                if (panel === 'right' && label === 'down') {
+                    handleScheduleBrowserNavigation('down');
+                    return;
+                }
+                
+                // E button to select
+                if (panel === 'right' && label === 'E') {
+                    selectSchedule();
+                    return;
+                }
+                
+                // C button to close (check lowercase)
+                if (panel === 'right' && label === 'c') {
+                    closeScheduleBrowser();
+                    return;
+                }
+                
+                // Ignore other buttons
+                return;
+            }
+            
+            // Handle ebula_data_table navigation
+            if (window.ebulaTableNavigationActive) {
+                if (panel === 'right' && label === 'up') {
+                    handleEbulaTableNavigation('up');
+                    return;
+                }
+                if (panel === 'right' && label === 'down') {
+                    handleEbulaTableNavigation('down');
+                    return;
+                }
+                if (panel === 'right' && label === 'left') {
+                    handleEbulaTableNavigation('left');
+                    return;
+                }
+                if (panel === 'right' && label === 'right') {
+                    handleEbulaTableNavigation('right');
+                    return;
+                }
+                if (panel === 'right' && label === 'c') {
+                    resetEbulaTableToClosest();
+                    return;
+                }
+            }
+            
+            if (!action) return;
+            
+            switch (action.action) {
+                case 'page_navigate':
+                    loadPage(action.target);
+                    break;
+                case 'page_back':
+                    page_back();
+                    break;
+                case 'open_schedule_browser':
+                    openScheduleBrowser();
+                    break;
+                case 'delete_loaded_schedule':
+                    deleteLoadedSchedules();
+                    break;
+                case 'append_support_data':
+                    appendSupportData();
+                    break;
+                case 'adjust_brightness':
+                    MFDState.brightness = Math.min(100, Math.max(0, MFDState.brightness + (action.step || 5)));
+                    updateBrightness();
+                    break;
+                case 'toggle_night_mode':
+                    MFDState.nightMode = !MFDState.nightMode;
+                    document.getElementById('mainScreen').classList.toggle('night-mode');
+                    break;
+                case 'toggle_runtime_variable':
+                case 'set_runtime_variable':
+                case 'update_runtime_variable':
+                    updateRuntimeVariableFromAction(action);
+                    break;
+                case 'toggle':
+                    if (action.variable || action.name || action.key) {
+                        updateRuntimeVariableFromAction({ ...action, operation: action.operation || 'toggle' });
+                    }
+                    break;
+                case 'save_completed_schedule':
+                    saveCompletedSchedule();
+                    break;
+                case 'power_off':
+                    if (confirm('Power off MFD?')) {
+                        location.reload();
+                    }
+                    break;
+            }
+        }
+        
+        function applyComponentAlignment(componentDiv, alignment) {
+            if (!alignment) return;
+            
+            // Set display to flex to enable alignment
+            componentDiv.style.display = 'flex';
+            componentDiv.style.flexDirection = 'column';
+            
+            // Horizontal alignment (alignItems for flex column)
+            if (alignment.horizontal === 'left') {
+                componentDiv.style.alignItems = 'flex-start';
+            } else if (alignment.horizontal === 'center') {
+                componentDiv.style.alignItems = 'center';
+            } else if (alignment.horizontal === 'right') {
+                componentDiv.style.alignItems = 'flex-end';
+            }
+            
+            // Vertical alignment (justifyContent for flex column)
+            if (alignment.vertical === 'top') {
+                componentDiv.style.justifyContent = 'flex-start';
+            } else if (alignment.vertical === 'center') {
+                componentDiv.style.justifyContent = 'center';
+            } else if (alignment.vertical === 'bottom') {
+                componentDiv.style.justifyContent = 'flex-end';
+            }
+        }
+        
+        function loadPage(pageName) {
+            const pageConfig = MFDState.pagesConfig.pages[pageName];
+            if (!pageConfig) return;
+            
+            // Add current page to history before navigating (if different page)
+            if (MFDState.currentPage && MFDState.currentPage !== pageName) {
+                MFDState.pageHistory.push(MFDState.currentPage);
+                // Limit history to last 10 pages
+                if (MFDState.pageHistory.length > 10) {
+                    MFDState.pageHistory.shift();
+                }
+                // Save updated history to localStorage
+                localStorage.setItem('pageHistory', JSON.stringify(MFDState.pageHistory));
+            }
+            
+            // Check if this page requires a different template
+            const pageTemplate = pageConfig.template || MFDState.pagesConfig.settings?.template || 'mfd';
+            if (pageTemplate !== 'mfd') {
+                // Redirect to the correct template with the page in URL hash
+                window.location.href = `/${pageTemplate}#${pageName}`;
+                return;
+            }
+            
+            MFDState.currentPage = pageName;
+            
+            // Apply per-page colors if specified
+            const mainScreen = document.querySelector('.main-screen');
+            if (pageConfig.background_color) {
+                mainScreen.style.setProperty('--current-screen-bg', pageConfig.background_color);
+            } else {
+                mainScreen.style.removeProperty('--current-screen-bg');
+            }
+            if (pageConfig.text_color) {
+                mainScreen.style.setProperty('--current-screen-text-color', pageConfig.text_color);
+            } else {
+                mainScreen.style.removeProperty('--current-screen-text-color');
+            }
+            if (pageConfig.border_color) {
+                mainScreen.style.setProperty('--current-screen-border-color', pageConfig.border_color);
+            } else {
+                mainScreen.style.removeProperty('--current-screen-border-color');
+            }
+            
+            // Handle optional page title
+            const screenTitleEl = document.getElementById('screenTitle');
+            const hasTitle = pageConfig.title && pageConfig.title.trim() !== '';
+            
+            if (hasTitle) {
+                screenTitleEl.textContent = pageConfig.title;
+                screenTitleEl.style.display = 'block';
+                mainScreen.classList.remove('no-title');
+            } else {
+                screenTitleEl.style.display = 'none';
+                mainScreen.classList.add('no-title');
+            }
+            
+            setupButtons();
+            updateMenuStrip(pageConfig);
+            
+            const contentArea = document.getElementById('screenContent');
+            contentArea.innerHTML = '';
+            MFDState.components = [];
+
+            // Apply per-page grid layout if provided
+            const grid = pageConfig.layout_grid;
+            if (grid) {
+                contentArea.style.display = 'grid';
+                contentArea.style.gridTemplateColumns = grid.columns || '1fr';
+                contentArea.style.gridTemplateRows = grid.rows || 'auto';
+                if (Array.isArray(grid.areas) && grid.areas.length > 0) {
+                    contentArea.style.gridTemplateAreas = grid.areas.map(row => `"${row}"`).join(' ');
+                } else {
+                    contentArea.style.gridTemplateAreas = '';
+                }
+                contentArea.style.gap = grid.gap || '12px';
+            } else {
+                contentArea.style.display = '';
+                contentArea.style.gridTemplateColumns = '';
+                contentArea.style.gridTemplateRows = '';
+                contentArea.style.gridTemplateAreas = '';
+                contentArea.style.gap = '';
+            }
+            
+            // Render components using new system
+            pageConfig.components.forEach(componentConfig => {
+                // Attach page-level font_sizes to each component if not already specified
+                if (!componentConfig.font_sizes && pageConfig.font_sizes) {
+                    componentConfig.font_sizes = pageConfig.font_sizes;
+                }
+                
+                const componentDiv = document.createElement('div');
+                componentDiv.id = componentConfig.id;
+                
+                // Apply alignment if specified
+                if (componentConfig.alignment) {
+                    applyComponentAlignment(componentDiv, componentConfig.alignment);
+                }
+                
+                if (componentConfig.area) {
+                    componentDiv.style.gridArea = componentConfig.area;
+                } else {
+                    componentDiv.style.gridArea = '';
+                }
+                
+                // Check visibility condition if specified
+                if (componentConfig.visible_when) {
+                    const isVisible = evaluateVisibleWhen(componentConfig.visible_when, MFDState.displayData);
+                    if (!isVisible) {
+                        componentDiv.classList.add('hidden-content');
+                    }
+                }
+                
+                // Use ComponentFactory to render
+                ComponentFactory.renderComponent(componentDiv, componentConfig, MFDState.displayData);
+                
+                // Enable navigation for ebula_data_table components
+                if (componentConfig.type === 'ebula_data_table') {
+                    window.ebulaTableNavigationActive = true;
+                }
+                
+                contentArea.appendChild(componentDiv);
+                MFDState.components.push(componentConfig);
+            });
+        }
+        
+        function startDataPolling() {
+            updateData();
+            setInterval(updateData, 100);
+        }
+        
+        async function updateData() {
+            try {
+                const res = await fetch('/api/data');
+                const data = await res.json();
+                
+                MFDState.apiData = data.data || {};
+                rebuildDisplayData();
+                
+                MFDState.sessionActive = data.session_active || false;
+                
+                // Update components using new system
+                MFDState.components.forEach(componentConfig => {
+                    const componentContainer = document.getElementById(componentConfig.id);
+                    if (componentContainer) {
+                        // Check visibility condition if specified
+                        if (componentConfig.visible_when) {
+                            const isVisible = evaluateVisibleWhen(componentConfig.visible_when, MFDState.displayData);
+                            if (isVisible) {
+                                componentContainer.classList.remove('hidden-content');
+                            } else {
+                                componentContainer.classList.add('hidden-content');
+                            }
+                        }
+                        
+                        ComponentFactory.updateComponent(componentContainer, componentConfig, MFDState.displayData);
+                    }
+                });
+
+                if (MFDState.currentPage && MFDState.pagesConfig?.pages?.[MFDState.currentPage]) {
+                    updateMenuStrip(MFDState.pagesConfig.pages[MFDState.currentPage]);
+                }
+                
+            } catch (err) {
+                console.error('Data polling error:', err);
+            }
+        }
+        
+        function updateBrightness() {
+            document.getElementById('mainScreen').style.filter = `brightness(${MFDState.brightness}%)`;
+        }
+        
+        // Initialize when page loads
+        window.addEventListener('load', initMFD);
+    </script>
+</body>
+</html>

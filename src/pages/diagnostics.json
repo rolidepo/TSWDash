@@ -1,0 +1,199 @@
+{
+  "diagnostics": {
+    "template": "mfd",
+    "title": "Diagnostics",
+    "layout": "diagnostics",
+    "font_sizes": {
+      "title": "12px",
+      "value": "24px",
+      "unit": "10px"
+    },
+    "components": [
+      {
+        "type": "vertical_bar",
+        "id": "traction_effort",
+        "title": "Traction Effort",
+        "value": "tractive_effort",
+        "min": 0,
+        "max": 100,
+        "unit": "%",
+        "indicators": [25, 50, 75, 100]
+      },
+      {
+        "type": "text_display",
+        "id": "brake_pressure_1_display",
+        "title": "Brake Pressure 1",
+        "value": "brake_pressure_1",
+        "decimals": 0,
+        "unit": "Pa",
+        "styles": {
+          "title": {
+            "fontSize": "14px",
+            "bold": true,
+            "italic": false,
+            "underline": false
+          },
+          "value": {
+            "fontSize": "26px",
+            "bold": true,
+            "italic": false,
+            "underline": false
+          },
+          "unit": {
+            "fontSize": "12px",
+            "bold": false,
+            "italic": false,
+            "underline": false
+          }
+        }
+      },
+      {
+        "type": "text_display",
+        "id": "brake_pressure_2_display",
+        "title": "Brake Pressure 2",
+        "value": "brake_pressure_2",
+        "decimals": 0,
+        "unit": "Pa",
+        "styles": {
+          "title": {
+            "fontSize": "14px",
+            "bold": true,
+            "italic": false,
+            "underline": false
+          },
+          "value": {
+            "fontSize": "26px",
+            "bold": true,
+            "italic": false,
+            "underline": false
+          },
+          "unit": {
+            "fontSize": "12px",
+            "bold": false,
+            "italic": false,
+            "underline": false
+          }
+        }
+      }
+    ],
+    "buttons": {
+      "top": {
+        "aus": {
+          "action": "power_off"
+        },
+        "S": {
+          "action": "page_navigate",
+          "target": "settings"
+        },
+        "i": {
+          "action": "page_navigate",
+          "target": "info"
+        },
+        "St": {
+          "action": "toggle",
+          "target": "status"
+        },
+        "V>0": {
+          "action": "condition_check",
+          "value": "speed_ms",
+          "condition": ">",
+          "compare": 0
+        },
+        "V=0": {
+          "action": "condition_check",
+          "value": "speed_ms",
+          "condition": "==",
+          "compare": 0
+        },
+        "brightness": {
+          "action": "adjust_brightness",
+          "step": 5
+        },
+        "contrast": {
+          "action": "toggle_night_mode"
+        },
+        "UD": {
+          "action": "adjust_contrast",
+          "step": 5
+        }
+      },
+      "right": {
+        "c": {
+          "action": "config_mode"
+        },
+        "left": {
+          "action": "scroll",
+          "direction": "left"
+        },
+        "right": {
+          "action": "scroll",
+          "direction": "right"
+        },
+        "up": {
+          "action": "scroll",
+          "direction": "up"
+        },
+        "down": {
+          "action": "scroll",
+          "direction": "down"
+        },
+        "E": {
+          "action": "confirm"
+        }
+      },
+      "bottom": {
+        "1": {
+          "action": "page_navigate",
+          "target": "diagnostics"
+        },
+        "2": {
+          "action": "input_number",
+          "value": 2
+        },
+        "3": {
+          "action": "input_number",
+          "value": 3
+        },
+        "4": {
+          "action": "input_number",
+          "value": 4
+        },
+        "5": {
+          "action": "input_number",
+          "value": 5
+        },
+        "6": {
+          "action": "input_number",
+          "value": 6
+        },
+        "7": {
+          "action": "input_number",
+          "value": 7
+        },
+        "8": {
+          "action": "input_number",
+          "value": 8
+        },
+        "9": {
+          "action": "input_number",
+          "value": 9
+        },
+        "0": {
+          "action": "page_back"
+        }
+      }
+    },
+    "menu_labels": {
+      "1": "test1",
+      "2": "test2",
+      "3": "",
+      "4": "",
+      "5": "",
+      "6": "",
+      "7": "",
+      "8": "",
+      "9": "",
+      "0": ""
+    }
+  }
+}

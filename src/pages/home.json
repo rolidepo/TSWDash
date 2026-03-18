@@ -1,0 +1,166 @@
+{
+  "home": {
+    "title": "",
+    "layout": "dashboard",
+    "template": "mfd",
+    "background_color": "#32342B",
+    "text_color": "#00ff1a",
+    "border_color": "##FF69B4",
+    "layout_grid": {
+      "columns": "1fr",
+      "rows": "1fr",
+      "areas": [
+        "welcome"
+      ],
+      "gap": "0px"
+    },
+    "font_sizes": {
+      "title": "14px",
+      "value": "12px",
+      "unit": "12px"
+    },
+    "components": [
+      {
+        "type": "text_display",
+        "id": "welcome",
+        "value": "Welcome",
+        "area": "welcome",
+        "clickable": true,
+        "onClick": {
+          "action": "page_navigate",
+          "target": "dashboard"
+        },
+        "alignment": {
+          "horizontal": "center",
+          "vertical": "center"
+        },
+        "styles": {
+          "value": {
+            "fontSize": "48px",
+            "bold": true
+          }
+        }
+      }
+    ],
+    "buttons": {
+      "top": {
+        "aus": {
+          "action": ""
+        },
+        "S": {
+          "action": "page_navigate",
+          "target": "settings"
+        },
+        "i": {
+          "action": "page_navigate",
+          "target": "info"
+        },
+        "St": {
+          "action": "toggle",
+          "target": "status"
+        },
+        "V>0": {
+          "action": "condition_check",
+          "value": "speed_ms",
+          "condition": ">",
+          "compare": 0
+        },
+        "V=0": {
+          "action": "condition_check",
+          "value": "speed_ms",
+          "condition": "==",
+          "compare": 0
+        },
+        "brightness": {
+          "action": "adjust_brightness",
+          "step": 5
+        },
+        "contrast": {
+          "action": "toggle_night_mode"
+        },
+        "UD": {
+          "action": "adjust_contrast",
+          "step": 5
+        }
+      },
+      "right": {
+        "c": {
+          "action": "config_mode"
+        },
+        "left": {
+          "action": "scroll",
+          "direction": "left"
+        },
+        "right": {
+          "action": "scroll",
+          "direction": "right"
+        },
+        "up": {
+          "action": "scroll",
+          "direction": "up"
+        },
+        "down": {
+          "action": "scroll",
+          "direction": "down"
+        },
+        "E": {
+          "action": "confirm"
+        }
+      },
+      "bottom": {
+        "1": {
+          "action": "page_navigate",
+          "target": "dashboard"
+        },
+        "2": {
+          "action": "page_navigate",
+          "target": "diagnostics"
+        },
+        "3": {
+          "action": "page_navigate",
+          "target": "info"
+        },
+        "4": {
+          "action": "page_navigate",
+          "target": "settings"
+        },
+        "5": {
+          "action": "page_navigate",
+          "target": "EUGen"
+        },
+        "6": {
+          "action": "page_navigate",
+          "target": "ebula"
+        },
+        "7": {
+          "action": "page_navigate",
+          "target": "dashboard"
+        },
+        "8": {
+          "action": "page_navigate",
+          "target": "dashboard"
+        },
+        "9": {
+          "action": "page_navigate",
+          "target": "dashboard"
+        },
+        "0": {
+          "action": "page_navigate",
+          "target": "dashboard"
+        }
+      }
+    },
+    "menu_labels": {
+      "1": "Dash",
+      "2": "Dia",
+      "3": "Info",
+      "4": "Set",
+      "5": "EUGen",
+      "6": "ebula",
+      "7": "7",
+      "8": "8",
+      "9": "9",
+      "0": "0"
+    }
+  }
+}

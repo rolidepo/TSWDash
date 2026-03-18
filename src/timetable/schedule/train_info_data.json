@@ -1,0 +1,152 @@
+{
+  "companies": [
+    {
+      "value": "Deutsche Bahn",
+      "label": "Deutsche Bahn",
+      "picto": "db.png",
+      "types": [
+        "S-Bahn",
+        "Regio Bahn",
+        "Regional Express",
+        "IC",
+        "ICE"
+      ]
+    },
+    {
+      "value": "Deutsche Bahn Cargo",
+      "label": "Deutsche Bahn Cargo",
+      "picto": "db_cargo.png",
+      "types": [
+        "Slow Freight Train",
+        "Freight Train",
+        "Fast Freight Train"
+      ]
+    },
+    {
+      "value": "DB Schenker",
+      "label": "DB Schenker",
+      "picto": "db_schenker.png",
+      "types": [
+        "Slow Freight Train",
+        "Freight Train",
+        "Fast Freight Train"
+      ]
+    },
+    {
+      "value": "FlixTrain",
+      "label": "FlixTrain",
+      "picto": "flixtrain.png",
+      "types": [
+        "FLX"
+      ]
+    },
+    {
+      "value": "Metronom",
+      "label": "Metronom",
+      "picto": "metronom.png",
+      "types": [
+        "Regio Bahn"  
+      ]
+    },
+    {
+      "value": "Öbb",
+      "label": "Öbb",
+      "picto": "obb.png",
+      "types": [
+        "S-Bahn",
+        "Regio Bahn",
+        "Regional Express",
+        "IC"
+      ]
+    },
+    {
+      "value": "RailJet",
+      "label": "RailJet",
+      "picto": "obb_railjet.jpg",
+      "types": [
+        "RJX"
+      ]
+    },
+    {
+      "value": "SBB CFF FFS",
+      "label": "SBB CFF FFS",
+      "picto": "sbb.png",
+      "types": [
+        "S-Bahn",
+        "Regio Bahn",
+        "Regional Express",
+        "IC",
+        "ICE"
+      ]
+    },
+    {
+      "value": "SNCF",
+      "label": "SNCF",
+      "picto": "sncf.png",
+      "types": [
+        "TGV",
+        "Intercités",
+        "TER"
+      ]
+    },
+    {
+      "value": "MÁV",
+      "label": "MÁV",
+      "picto": "mav.png",
+      "types": [
+        "EC",
+        "IC"
+      ]
+    },
+    {
+      "value": "MRCE Dispolok",
+      "label": "MRCE Dispolok",
+      "picto": "mrce_dispolok.png",
+      "types": [
+        "Slow Freight Train",
+        "Freight Train",
+        "Fast Freight Train"
+      ]
+    },
+    {
+      "value": "Railpool",
+      "label": "Railpool",
+      "picto": "railpool.png",
+      "types": [
+        "Slow Freight Train",
+        "Freight Train",
+        "Fast Freight Train"
+      ]
+    },
+    {
+      "value": "METRANS",
+      "label": "METRANS",
+      "picto": "metrans.png",
+      "types": [
+        "Slow Freight Train",
+        "Freight Train",
+        "Fast Freight Train"
+      ]
+    }
+  ],
+  "priorities": [
+    "Low",
+    "Normal",
+    "High",
+    "Express"
+  ],
+  "route_codes": [
+    {
+      "value": "SKA",
+      "label": "SKA - Koln - Aachen"
+    },
+    {
+      "value": "FTF",
+      "label": "FTF - Frankfurt - Fulda"
+    },
+    {
+      "value": "DRL",
+      "label": "DRL - Dresden - Leipzig"
+    }
+  ]
+}

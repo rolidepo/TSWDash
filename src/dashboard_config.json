@@ -1,0 +1,21 @@
+{
+  "title": "TSW MFD Dashboard",
+  "sections": [
+    {
+      "name": "Train Speed",
+      "variables": ["speed_ms", "rpm"]
+    },
+    {
+      "name": "Brake System",
+      "variables": ["brake_pressure_1", "brake_pressure_2"]
+    },
+    {
+      "name": "Electrical",
+      "variables": ["voltage", "amperage"]
+    },
+    {
+      "name": "Weather",
+      "variables": ["temperature"]
+    }
+  ]
+}

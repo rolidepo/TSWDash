@@ -1,0 +1,22 @@
+{
+"train_info": {
+"company": "RailPool",
+"train_number": "GAG 47502",
+"destination": "Köln Kalk Nord - Genk",
+"type": "Slow Freight",
+"priority": "3",
+"max_speed_kph": 90,
+"timetable_length_km": 64,
+"driven_distance_km": 0,
+"route_code": "SKA",
+"service_timetable": "SKA_F1.json",
+"completed_timetable": false
+},
+"timetable_data": [
+{"station": "Köln-Müngersdorf/Technologiepark", "stop": true, "ETA": "12:56:00", "ETD": "12:58:00", "ATA": "", "ATD": "", "diff": ""},
+{"station": "Awanst Sindorf", "stop": false, "ETA": "", "ETD": "13:12:30", "ATA": "", "ATD": "", "diff": ""},
+{"station": "Düren", "stop": false, "ETA": "", "ETD": "13:28:00", "ATA": "", "ATD": "", "diff": ""},
+{"station": "Bksig 25115", "stop": false, "ETA": "", "ETD": "13:41:30", "ATA": "", "ATD": "", "diff": ""},
+{"station": "Aachen Hbf", "stop": true, "ETA": "13:56:00", "ETD": "", "ATA": "", "ATD": "", "diff": ""}
+]
+}

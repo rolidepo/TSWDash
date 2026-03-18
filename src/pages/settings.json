@@ -1,0 +1,117 @@
+{
+  "settings": {
+    "template": "touchscreen",
+    "title": "Settings",
+    "layout": "menu",
+    "components": [
+      {
+        "type": "text_display",
+        "id": "brightness_info",
+        "title": "Brightness",
+        "value": "brightness",
+        "decimals": 0,
+        "unit": "%"
+      },
+      {
+        "type": "text_display",
+        "id": "contrast_info",
+        "title": "Contrast",
+        "value": "contrast",
+        "decimals": 0,
+        "unit": "%"
+      },
+      {
+        "type": "text_display",
+        "id": "night_mode_info",
+        "title": "Night Mode",
+        "value": "nightMode",
+        "decimals": 0,
+        "unit": ""
+      },
+      {
+        "type": "text_display",
+        "id": "back_button",
+        "title": "Back",
+        "value": "",
+        "clickable": true,
+        "onClick": {
+          "action": "page_back"
+        },
+        "styles": {
+          "title": {
+            "fontSize": "18px",
+            "bold": true
+          }
+        },
+        "alignment": {
+          "horizontal": "center",
+          "vertical": "center"
+        }
+      },
+      {
+        "type": "text_display",
+        "id": "toggle_mode",
+        "title": "Toggle Dark/Light Mode",
+        "value": "",
+        "clickable": true,
+        "onClick": {
+          "action": "toggle_night_mode"
+        },
+        "styles": {
+          "title": {
+            "fontSize": "20px",
+            "bold": true
+          }
+        },
+        "alignment": {
+          "horizontal": "center",
+          "vertical": "center"
+        }
+      },
+      {
+        "type": "text_display",
+        "id": "back_to_dashboard",
+        "title": "Back to Dashboard",
+        "value": "",
+        "clickable": true,
+        "onClick": {
+          "action": "page_navigate",
+          "target": "dashboard"
+        },
+        "styles": {
+          "title": {
+            "fontSize": "18px",
+            "bold": true
+          }
+        },
+        "alignment": {
+          "horizontal": "center",
+          "vertical": "center"
+        }
+      }
+    ],
+    "buttons": {
+      "top": {
+        "action": ""
+      },
+      "right": {
+        "action": ""
+      },
+      "bottom": {
+        "action": ""
+      }
+    },
+    "menu_labels": {
+      "1": "",
+      "2": "",
+      "3": "",
+      "4": "",
+      "5": "",
+      "6": "",
+      "7": "",
+      "8": "",
+      "9": "",
+      "0": ""
+    }
+  }
+}

@@ -1,0 +1,1626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Route JSON Editor</title>
+    <style>
+        :root {
+            --bg: #0a1020;
+            --panel: #101a32;
+            --panel-2: #16233f;
+            --border: #2b3b63;
+            --text: #e7eefc;
+            --muted: #9eb0d3;
+            --primary: #3b82f6;
+            --primary-2: #2563eb;
+            --success: #10b981;
+            --warn: #f59e0b;
+            --danger: #ef4444;
+            --shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Inter, Segoe UI, Arial, sans-serif;
+            color: var(--text);
+            background: radial-gradient(circle at 22% -12%, #1d4ed8 0%, #0a1020 30%, #050913 100%);
+            min-height: 100vh;
+        }
+
+        .wrap {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 14px;
+        }
+
+        h1 {
+            margin: 0 0 10px;
+            font-size: 23px;
+        }
+
+        .topbar {
+            display: grid;
+            grid-template-columns: minmax(340px, 1fr) 100px 100px 100px;
+            gap: 8px;
+            align-items: end;
+            margin-bottom: 10px;
+            background: linear-gradient(180deg, rgba(22, 35, 63, 0.9), rgba(16, 26, 50, 0.95));
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        input, select, button {
+            width: 100%;
+            border: 1px solid var(--border);
+            background: var(--panel-2);
+            color: var(--text);
+            border-radius: 9px;
+            padding: 8px 9px;
+            font-size: 13px;
+            margin: 0;
+        }
+
+        button {
+            cursor: pointer;
+            border-color: var(--primary);
+            background: var(--primary);
+            font-weight: 600;
+            transition: .14s ease;
+        }
+
+        button:hover { background: var(--primary-2); border-color: var(--primary-2); }
+        button.secondary { background: #475569; border-color: #475569; }
+        button.success { background: var(--success); border-color: var(--success); }
+        button.warn { background: var(--warn); border-color: var(--warn); }
+        button.danger { background: var(--danger); border-color: var(--danger); }
+
+        details.tools {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: linear-gradient(180deg, rgba(22, 35, 63, 0.86), rgba(16, 26, 50, 0.92));
+            box-shadow: var(--shadow);
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        details.tools > summary {
+            list-style: none;
+            cursor: pointer;
+            padding: 9px 11px;
+            font-weight: 700;
+            font-size: 13px;
+            color: var(--muted);
+            border-bottom: 1px solid var(--border);
+            background: rgba(11, 18, 32, 0.7);
+        }
+
+        details.tools > summary::-webkit-details-marker { display: none; }
+
+        .tools-content {
+            padding: 10px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1.2fr;
+            gap: 10px;
+        }
+
+        .tools-panel {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: rgba(11, 18, 32, 0.55);
+            padding: 9px;
+        }
+
+        .tools-panel h3 {
+            margin: 0 0 8px;
+            font-size: 13px;
+        }
+
+        .inline-actions {
+            display: grid;
+            gap: 7px;
+            margin-top: 7px;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 6px;
+        }
+
+        .meta-item {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 7px;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .meta-item .v {
+            margin-top: 3px;
+            color: #bfdbfe;
+            font-family: Consolas, monospace;
+            word-break: break-all;
+        }
+
+        .route-info-box {
+            max-height: 280px;
+            overflow-y: auto;
+            padding-right: 2px;
+        }
+
+        .route-field {
+            display: grid;
+            grid-template-columns: 31% 115px 1fr 66px;
+            gap: 7px;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .route-field .k {
+            font-family: Consolas, monospace;
+            font-size: 12px;
+            color: #cfddf8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .route-field select,
+        .route-field input,
+        .route-field button {
+            height: 33px;
+            padding: 6px 8px;
+            border-radius: 8px;
+        }
+
+        .bool-cell {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            border: 1px solid var(--border);
+            background: var(--panel-2);
+            border-radius: 8px;
+            padding: 0 8px;
+            height: 33px;
+            font-size: 12px;
+            color: var(--muted);
+            gap: 8px;
+        }
+
+        .bool-cell input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            margin: 0;
+            accent-color: #60a5fa;
+        }
+
+        .entries-panel {
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            background: rgba(16, 26, 50, 0.92);
+        }
+
+        .entries-header {
+            display: grid;
+            grid-template-columns: 260px 100px 100px 130px 1fr;
+            gap: 8px;
+            align-items: end;
+            padding: 9px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(11, 18, 32, 0.82);
+        }
+
+        .entries-meta {
+            font-size: 12px;
+            color: var(--muted);
+            align-self: center;
+            padding-left: 8px;
+        }
+
+        .table-wrap {
+            max-height: 76vh;
+            overflow: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        thead th {
+            text-align: left;
+            font-size: 12px;
+            color: var(--muted);
+            padding: 9px 8px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(8, 14, 28, 0.96);
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        tbody td {
+            font-size: 13px;
+            border-bottom: 1px solid #25375f;
+            padding: 7px 8px;
+            vertical-align: top;
+        }
+
+        tr.entry-row:hover { background: rgba(59, 130, 246, 0.12); }
+        tr.entry-row.active { background: rgba(59, 130, 246, 0.2); }
+
+        .subtle {
+            color: var(--muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .list-edit-input {
+            width: 100%;
+            height: 30px;
+            padding: 5px 7px;
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            background: rgba(22, 35, 63, 0.9);
+            color: var(--text);
+            font-size: 12px;
+        }
+
+        .entry-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .entry-actions button {
+            font-size: 12px;
+            padding: 6px 8px;
+            margin: 0;
+            border-radius: 8px;
+        }
+
+        tr.editor-row td {
+            background: rgba(8, 14, 28, 0.82);
+            padding: 10px;
+        }
+
+        .editor-toolbar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .add-from-list {
+            display: grid;
+            grid-template-columns: 1fr 120px;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .add-from-list select,
+        .add-from-list button {
+            margin: 0;
+            height: 33px;
+            padding: 6px 8px;
+            border-radius: 8px;
+        }
+
+        .add-custom-field {
+            display: grid;
+            grid-template-columns: 1fr 120px 110px;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .add-custom-field input,
+        .add-custom-field select,
+        .add-custom-field button {
+            margin: 0;
+            height: 33px;
+            padding: 6px 8px;
+            border-radius: 8px;
+        }
+
+        .route-inline-add {
+            display: grid;
+            grid-template-columns: 1fr 120px;
+            gap: 7px;
+            margin-bottom: 7px;
+        }
+
+        .route-inline-add select,
+        .route-inline-add button,
+        .route-inline-add input {
+            margin: 0;
+            height: 33px;
+            padding: 6px 8px;
+            border-radius: 8px;
+        }
+
+        .route-custom-add {
+            display: grid;
+            grid-template-columns: 1fr 120px 120px;
+            gap: 7px;
+            margin-bottom: 8px;
+        }
+
+        .editor-groups {
+            display: grid;
+            gap: 10px;
+        }
+
+        .group-card {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: rgba(16, 26, 50, 0.9);
+            overflow: hidden;
+        }
+
+        .group-title {
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--border);
+            font-size: 12px;
+            font-weight: 700;
+            color: #cddbf5;
+            background: rgba(11, 18, 32, 0.72);
+        }
+
+        .group-fields {
+            padding: 8px;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        @media (max-width: 1700px) {
+            .group-fields { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        }
+
+        .field {
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 7px;
+            background: rgba(22, 35, 63, 0.72);
+        }
+
+        .field-key {
+            font-family: Consolas, monospace;
+            font-size: 12px;
+            color: #d4e1f9;
+            margin-bottom: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .field-controls {
+            display: grid;
+            grid-template-columns: 1fr 66px;
+            gap: 6px;
+        }
+
+        .field-controls select,
+        .field-controls input,
+        .field-controls button,
+        .field-controls .bool-cell {
+            margin: 0;
+            height: 33px;
+            padding: 6px 8px;
+            border-radius: 8px;
+        }
+
+        .status {
+            position: fixed;
+            top: 12px;
+            right: 12px;
+            display: none;
+            max-width: 350px;
+            z-index: 9999;
+            border-radius: 10px;
+            padding: 10px 12px;
+            color: #fff;
+            font-weight: 700;
+            box-shadow: var(--shadow);
+        }
+
+        .status.show { display: block; }
+        .status.info { background: #2563eb; }
+        .status.success { background: #059669; }
+        .status.error { background: #dc2626; }
+
+        .hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+        @media (max-width: 1300px) {
+            .tools-content { grid-template-columns: 1fr; }
+            .entries-header { grid-template-columns: 1fr 1fr; }
+            .entries-meta { grid-column: 1 / -1; }
+            .group-fields { grid-template-columns: 1fr; }
+            .field-controls { grid-template-columns: 1fr; }
+            .route-field { grid-template-columns: 1fr; }
+            .add-custom-field { grid-template-columns: 1fr; }
+            .route-inline-add { grid-template-columns: 1fr; }
+            .route-custom-add { grid-template-columns: 1fr; }
+            .topbar { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <h1>Route JSON Editor</h1>
+
+    <div class="topbar">
+        <div>
+            <label for="fileSelect">Route File</label>
+            <select id="fileSelect">
+                <option value="">-- Select route file --</option>
+            </select>
+        </div>
+        <button type="button" class="secondary" onclick="loadSelectedFile()">Load</button>
+        <button type="button" class="success" onclick="saveFile()">Save</button>
+        <button type="button" onclick="toggleTools()">Tools</button>
+    </div>
+
+    <details id="toolsPanel" class="tools">
+        <summary>Tools</summary>
+        <div class="tools-content">
+            <div class="tools-panel">
+                <h3>File Management</h3>
+                <label for="newFileName">Create New File</label>
+                <input id="newFileName" type="text" placeholder="Example: SKA_new.json" />
+                <div class="inline-actions">
+                    <button type="button" onclick="createNewFile()">Create From Template</button>
+                    <button type="button" class="secondary" onclick="loadFileList()">Refresh File List</button>
+                </div>
+                <div class="hint">Template config: timetable/route/route_editor_template.json</div>
+            </div>
+
+            <div class="tools-panel">
+                <h3>Player Location</h3>
+                <div class="meta-grid">
+                    <div class="meta-item"><strong>Latitude</strong><div id="latValue" class="v">--</div></div>
+                    <div class="meta-item"><strong>Longitude</strong><div id="lonValue" class="v">--</div></div>
+                    <div class="meta-item"><strong>Dirty</strong><div id="dirtyValue" class="v">No</div></div>
+                </div>
+                <div class="inline-actions">
+                    <button type="button" class="secondary" onclick="refreshPlayerLocation()">Refresh</button>
+                    <button type="button" class="warn" onclick="applyLocationToCurrentEntry()">Record To Open Entry</button>
+                    <button type="button" class="secondary" onclick="duplicateCurrentEntry()">Duplicate Open Entry</button>
+                    <button type="button" class="secondary" onclick="setDualTrackTrueForAllEntries()">Set dualTrack=true (All)</button>
+                </div>
+            </div>
+
+            <div class="tools-panel">
+                <h3>Route Info</h3>
+                <div class="route-inline-add">
+                    <select id="routeInfoTemplateSelect">
+                        <option value="">No fields available</option>
+                    </select>
+                    <button type="button" onclick="addRouteInfoFieldFromTemplate(document.getElementById('routeInfoTemplateSelect').value)">Add Template Field</button>
+                </div>
+                <div class="route-custom-add">
+                    <input id="routeInfoCustomKey" type="text" placeholder="Custom key name" />
+                    <select id="routeInfoCustomType">
+                        <option value="string">string</option>
+                        <option value="number">number</option>
+                        <option value="boolean">boolean</option>
+                        <option value="null">null</option>
+                    </select>
+                    <button type="button" class="secondary" onclick="addCustomRouteInfoField(document.getElementById('routeInfoCustomKey').value, document.getElementById('routeInfoCustomType').value)">Add Custom Field</button>
+                </div>
+                <div class="inline-actions" style="grid-template-columns: 1fr; display: grid; gap: 7px; margin-bottom: 8px;">
+                    <button type="button" class="secondary" onclick="sortRouteInfoKeys()">Sort Keys</button>
+                </div>
+                <div id="routeInfoFields" class="route-info-box"></div>
+            </div>
+        </div>
+    </details>
+
+    <div class="entries-panel">
+        <div class="entries-header">
+            <div>
+                <label for="entryGroupSelect">Entry Group</label>
+                <select id="entryGroupSelect" onchange="onEntryGroupChanged()">
+                    <option value="timetable_entries">timetable_entries</option>
+                    <option value="timetable_entries_alt">timetable_entries_alt</option>
+                </select>
+            </div>
+            <button type="button" class="secondary" onclick="previousEntry()">◀ Prev Open</button>
+            <button type="button" class="secondary" onclick="nextEntry()">Next Open ▶</button>
+            <button type="button" class="success" onclick="addNewEntry()">+ New Entry</button>
+            <div id="entriesMeta" class="entries-meta">No file loaded</div>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th style="width: 6%;">#</th>
+                    <th style="width: 7%;">KM</th>
+                    <th style="width: 8%;">Speed</th>
+                    <th style="width: 8%;">Picto</th>
+                    <th style="width: 24%;">Location</th>
+                    <th style="width: 12%;">Latitude</th>
+                    <th style="width: 12%;">Longitude</th>
+                    <th style="width: 9%;">Signal</th>
+                    <th style="width: 8%;">Station</th>
+                    <th style="width: 14%;">Actions</th>
+                </tr>
+                </thead>
+                <tbody id="entriesTbody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="status" class="status"></div>
+
+<script>
+    let currentFile = null;
+    let currentData = null;
+    let currentGroup = 'timetable_entries';
+    let currentIndex = -1;
+    let dirty = false;
+
+    let routeInfoTemplate = {};
+    let entryTemplate = {};
+    let entryFieldCatalog = [];
+    let entryFieldTypes = {};
+    let routeInfoOrder = [];
+    let entryGroupOrder = [];
+    let entryDisplayGroups = {};
+
+    function toggleTools() {
+        const panel = document.getElementById('toolsPanel');
+        panel.open = !panel.open;
+    }
+
+    function showStatus(message, type = 'info') {
+        const el = document.getElementById('status');
+        el.textContent = message;
+        el.className = `status show ${type}`;
+        setTimeout(() => { el.className = 'status'; }, 3000);
+    }
+
+    function markDirty(value = true) {
+        dirty = value;
+        document.getElementById('dirtyValue').textContent = dirty ? 'Yes' : 'No';
+    }
+
+    function normalizeFilename(inputName) {
+        const cleaned = String(inputName || '').trim();
+        if (!cleaned) return '';
+        return cleaned.toLowerCase().endsWith('.json') ? cleaned : `${cleaned}.json`;
+    }
+
+    function valueTypeOf(value) {
+        if (value === null) return 'null';
+        if (typeof value === 'boolean') return 'boolean';
+        if (typeof value === 'number') return 'number';
+        return 'string';
+    }
+
+    function parseValueByType(raw, type) {
+        if (type === 'null') return null;
+        if (type === 'boolean') return String(raw).toLowerCase() === 'true';
+        if (type === 'number') {
+            const n = Number(raw);
+            return Number.isFinite(n) ? n : null;
+        }
+        return String(raw);
+    }
+
+    function defaultValueForType(type) {
+        if (type === 'number') return 0;
+        if (type === 'boolean') return false;
+        if (type === 'null') return null;
+        return '';
+    }
+
+    function createDefaultNewEntry() {
+        const defaultKeys = [
+            'km',
+            'speed_limit',
+            'picto',
+            'location',
+            'longitude',
+            'latitude',
+            'station'
+        ];
+
+        const newEntry = {};
+        defaultKeys.forEach((key) => {
+            if (entryTemplate && Object.prototype.hasOwnProperty.call(entryTemplate, key)) {
+                newEntry[key] = JSON.parse(JSON.stringify(entryTemplate[key]));
+            } else {
+                newEntry[key] = null;
+            }
+        });
+
+        return newEntry;
+    }
+
+    function ensureStructure() {
+        if (!currentData) return;
+        if (!currentData.route_info || typeof currentData.route_info !== 'object') currentData.route_info = {};
+        if (!Array.isArray(currentData.timetable_entries)) currentData.timetable_entries = [];
+        if (!Array.isArray(currentData.timetable_entries_alt)) currentData.timetable_entries_alt = [];
+    }
+
+    function getCurrentEntries() {
+        if (!currentData) return [];
+        ensureStructure();
+        if (!Array.isArray(currentData[currentGroup])) currentData[currentGroup] = [];
+        return currentData[currentGroup];
+    }
+
+    function syncEntryFieldTypes() {
+        const nextTypes = {};
+
+        if (entryTemplate && typeof entryTemplate === 'object') {
+            Object.keys(entryTemplate).forEach((key) => {
+                const templateType = valueTypeOf(entryTemplate[key]);
+                if (templateType !== 'null') {
+                    nextTypes[key] = templateType;
+                }
+            });
+        }
+
+        if (currentData) {
+            const allEntries = [];
+            if (Array.isArray(currentData.timetable_entries)) allEntries.push(...currentData.timetable_entries);
+            if (Array.isArray(currentData.timetable_entries_alt)) allEntries.push(...currentData.timetable_entries_alt);
+
+            allEntries.forEach((entry) => {
+                if (!entry || typeof entry !== 'object') return;
+                Object.keys(entry).forEach((key) => {
+                    const fieldType = valueTypeOf(entry[key]);
+                    if (fieldType !== 'null' && !nextTypes[key]) {
+                        nextTypes[key] = fieldType;
+                    }
+                });
+            });
+        }
+
+        entryFieldTypes = nextTypes;
+    }
+
+    function resolveEntryFieldType(entry, key) {
+        const currentType = valueTypeOf(entry[key]);
+        if (currentType !== 'null') {
+            entryFieldTypes[key] = currentType;
+            return currentType;
+        }
+        return entryFieldTypes[key] || 'string';
+    }
+
+    function isKeyInGroups(key) {
+        return Object.values(entryDisplayGroups || {}).some((arr) => Array.isArray(arr) && arr.includes(key));
+    }
+
+    function orderedRouteInfoKeys(routeInfo) {
+        const keys = Object.keys(routeInfo || {});
+        const ordered = [];
+        (routeInfoOrder || []).forEach((key) => {
+            if (keys.includes(key)) ordered.push(key);
+        });
+        keys.filter((k) => !ordered.includes(k)).sort().forEach((k) => ordered.push(k));
+        return ordered;
+    }
+
+    function groupedEntryKeys(entry) {
+        const keys = Object.keys(entry || {});
+        const result = [];
+        const used = new Set();
+
+        (entryGroupOrder || []).forEach((groupName) => {
+            const configured = (entryDisplayGroups || {})[groupName];
+            if (!Array.isArray(configured)) return;
+            const present = configured.filter((k) => keys.includes(k));
+            if (present.length) {
+                present.forEach((k) => used.add(k));
+                result.push({ name: groupName, keys: present });
+            }
+        });
+
+        const uncategorized = keys.filter((k) => !used.has(k));
+        if (uncategorized.length) {
+            result.push({ name: 'Other', keys: uncategorized.sort() });
+        }
+
+        return result;
+    }
+
+    function createValueInput(type, value, onChange) {
+        if (type === 'boolean') {
+            const boolCell = document.createElement('div');
+            boolCell.className = 'bool-cell';
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = value === true;
+            checkbox.addEventListener('change', () => onChange(checkbox.checked));
+
+            const label = document.createElement('span');
+            label.textContent = checkbox.checked ? 'Enabled' : 'Disabled';
+            checkbox.addEventListener('change', () => {
+                label.textContent = checkbox.checked ? 'Enabled' : 'Disabled';
+            });
+
+            boolCell.appendChild(checkbox);
+            boolCell.appendChild(label);
+            return boolCell;
+        }
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = value === null ? '' : String(value);
+        input.disabled = type === 'null';
+        input.addEventListener('input', () => onChange(parseValueByType(input.value, type)));
+        return input;
+    }
+
+    async function loadTemplateMeta() {
+        const response = await fetch('/api/route-editor/template');
+        if (!response.ok) throw new Error('Failed to load template metadata');
+        const data = await response.json();
+        routeInfoTemplate = data.route_info_template || {};
+        entryTemplate = data.entry_template || {};
+        entryFieldCatalog = Array.isArray(data.entry_field_catalog)
+            ? data.entry_field_catalog
+            : Object.keys(entryTemplate || {});
+        routeInfoOrder = Array.isArray(data.route_info_order) ? data.route_info_order : [];
+        entryGroupOrder = Array.isArray(data.entry_group_order) ? data.entry_group_order : [];
+        entryDisplayGroups = (data.entry_display_groups && typeof data.entry_display_groups === 'object')
+            ? data.entry_display_groups
+            : {};
+        syncEntryFieldTypes();
+    }
+
+    async function loadFileList() {
+        try {
+            const response = await fetch('/api/route-editor/files');
+            if (!response.ok) throw new Error('Could not load files');
+            const data = await response.json();
+            const select = document.getElementById('fileSelect');
+            const selected = select.value;
+            select.innerHTML = '<option value="">-- Select route file --</option>';
+            (data.files || []).forEach((name) => {
+                const option = document.createElement('option');
+                option.value = name;
+                option.textContent = name;
+                select.appendChild(option);
+            });
+            if (selected) select.value = selected;
+            showStatus('Route files refreshed', 'info');
+        } catch (error) {
+            showStatus(error.message, 'error');
+        }
+    }
+
+    async function loadSelectedFile() {
+        const filename = document.getElementById('fileSelect').value;
+        if (!filename) {
+            showStatus('Select a file first', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/route-editor/load/${encodeURIComponent(filename)}`);
+            if (!response.ok) {
+                const err = await response.json().catch(() => ({}));
+                throw new Error(err.error || 'Failed to load file');
+            }
+
+            currentData = await response.json();
+            currentFile = filename;
+            currentGroup = document.getElementById('entryGroupSelect').value;
+            currentIndex = -1;
+            ensureStructure();
+            markDirty(false);
+            syncEntryFieldTypes();
+            renderAll();
+            showStatus(`Loaded ${filename}`, 'success');
+        } catch (error) {
+            showStatus(error.message, 'error');
+        }
+    }
+
+    async function createNewFile() {
+        const filename = normalizeFilename(document.getElementById('newFileName').value);
+        if (!filename) {
+            showStatus('Enter a file name', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/route-editor/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filename })
+            });
+            if (!response.ok) {
+                const err = await response.json().catch(() => ({}));
+                throw new Error(err.error || 'Create failed');
+            }
+            await loadFileList();
+            document.getElementById('fileSelect').value = filename;
+            document.getElementById('newFileName').value = '';
+            await loadSelectedFile();
+            showStatus(`Created ${filename}`, 'success');
+        } catch (error) {
+            showStatus(error.message, 'error');
+        }
+    }
+
+    async function saveFile() {
+        if (!currentFile || !currentData) {
+            showStatus('No file loaded', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/route-editor/save/${encodeURIComponent(currentFile)}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(currentData)
+            });
+            if (!response.ok) {
+                const err = await response.json().catch(() => ({}));
+                throw new Error(err.error || 'Save failed');
+            }
+            markDirty(false);
+            showStatus(`Saved ${currentFile}`, 'success');
+        } catch (error) {
+            showStatus(error.message, 'error');
+        }
+    }
+
+    async function refreshPlayerLocation() {
+        try {
+            const response = await fetch('/api/data');
+            const payload = await response.json();
+            const data = payload.data || {};
+            const lat = data['player_info.geoLocation.latitude'];
+            const lon = data['player_info.geoLocation.longitude'];
+            if (lat === undefined || lon === undefined) {
+                document.getElementById('latValue').textContent = '--';
+                document.getElementById('lonValue').textContent = '--';
+                showStatus('Player location unavailable', 'error');
+                return;
+            }
+            document.getElementById('latValue').textContent = Number(lat).toFixed(10);
+            document.getElementById('lonValue').textContent = Number(lon).toFixed(10);
+        } catch (error) {
+            showStatus(error.message, 'error');
+        }
+    }
+
+    async function applyLocationToEntry(index) {
+        if (!currentData) {
+            showStatus('Load a file first', 'error');
+            return;
+        }
+
+        const entries = getCurrentEntries();
+        if (index < 0 || index >= entries.length) {
+            showStatus('Open an entry first', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/data');
+            const payload = await response.json();
+            const data = payload.data || {};
+            const lat = data['player_info.geoLocation.latitude'];
+            const lon = data['player_info.geoLocation.longitude'];
+
+            if (lat === undefined || lon === undefined) {
+                showStatus('Player location unavailable', 'error');
+                return;
+            }
+
+            entries[index].latitude = Number(lat);
+            entries[index].longitude = Number(lon);
+            markDirty(true);
+            renderEntriesTable();
+            document.getElementById('latValue').textContent = Number(lat).toFixed(10);
+            document.getElementById('lonValue').textContent = Number(lon).toFixed(10);
+            showStatus(`Location recorded to #${index}`, 'success');
+        } catch (error) {
+            showStatus(error.message, 'error');
+        }
+    }
+
+    async function applyLocationToCurrentEntry() {
+        await applyLocationToEntry(currentIndex);
+    }
+
+    function renderAll() {
+        renderRouteInfoFields();
+        renderEntriesTable();
+    }
+
+    function renderRouteInfoFields() {
+        const container = document.getElementById('routeInfoFields');
+        container.innerHTML = '';
+        if (!currentData) return;
+
+        const routeInfo = currentData.route_info || {};
+        const orderedKeys = orderedRouteInfoKeys(routeInfo);
+
+        orderedKeys.forEach((key) => {
+            const value = routeInfo[key];
+            const type = valueTypeOf(value);
+
+            const row = document.createElement('div');
+            row.className = 'route-field';
+
+            const keyDiv = document.createElement('div');
+            keyDiv.className = 'k';
+            keyDiv.textContent = key;
+
+            const typeSelect = document.createElement('select');
+            ['string', 'number', 'boolean', 'null'].forEach((t) => {
+                const option = document.createElement('option');
+                option.value = t;
+                option.textContent = t;
+                if (t === type) option.selected = true;
+                typeSelect.appendChild(option);
+            });
+
+            const valueHolder = document.createElement('div');
+            const setValue = (nextValue) => {
+                routeInfo[key] = nextValue;
+                markDirty(true);
+            };
+
+            let valueControl = createValueInput(type, value, setValue);
+            valueHolder.appendChild(valueControl);
+
+            typeSelect.addEventListener('change', () => {
+                const newType = typeSelect.value;
+                const currentRaw = type === 'boolean' ? String(value === true) : (value === null ? '' : String(value));
+                routeInfo[key] = parseValueByType(currentRaw, newType);
+                markDirty(true);
+                renderRouteInfoFields();
+            });
+
+            const delBtn = document.createElement('button');
+            delBtn.className = 'danger';
+            delBtn.textContent = 'Del';
+            delBtn.addEventListener('click', () => {
+                delete routeInfo[key];
+                markDirty(true);
+                renderRouteInfoFields();
+            });
+
+            row.appendChild(keyDiv);
+            row.appendChild(typeSelect);
+            row.appendChild(valueHolder);
+            row.appendChild(delBtn);
+            container.appendChild(row);
+        });
+
+        refreshRouteInfoTemplateSelect();
+    }
+
+    function refreshRouteInfoTemplateSelect() {
+        const select = document.getElementById('routeInfoTemplateSelect');
+        if (!select) return;
+
+        const previous = select.value;
+        select.innerHTML = '';
+
+        if (!currentData) {
+            const option = document.createElement('option');
+            option.value = '';
+            option.textContent = 'Load a file first';
+            select.appendChild(option);
+            select.disabled = true;
+            return;
+        }
+
+        const routeInfo = currentData.route_info || {};
+        const missing = Object.keys(routeInfoTemplate).filter((key) => !(key in routeInfo));
+
+        if (!missing.length) {
+            const option = document.createElement('option');
+            option.value = '';
+            option.textContent = 'No template fields left';
+            select.appendChild(option);
+            select.disabled = true;
+            return;
+        }
+
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = 'Select template field...';
+        select.appendChild(placeholder);
+
+        missing.forEach((fieldName) => {
+            const option = document.createElement('option');
+            option.value = fieldName;
+            option.textContent = fieldName;
+            if (fieldName === previous) option.selected = true;
+            select.appendChild(option);
+        });
+
+        select.disabled = false;
+    }
+
+    function entrySummary(entry, index) {
+        const km = entry && entry.km !== undefined && entry.km !== null ? entry.km : '-';
+        const picto = entry && entry.picto !== undefined && entry.picto !== null ? entry.picto : '-';
+        const speed = entry && entry.speed_limit !== undefined && entry.speed_limit !== null ? entry.speed_limit : '-';
+        const location = entry && entry.location ? entry.location : '(no location)';
+        const signal = entry && entry.signal ? entry.signal : '';
+        const latitudeRaw = entry && entry.latitude !== undefined && entry.latitude !== null ? Number(entry.latitude) : null;
+        const longitudeRaw = entry && entry.longitude !== undefined && entry.longitude !== null ? Number(entry.longitude) : null;
+        const latitude = Number.isFinite(latitudeRaw) ? latitudeRaw.toFixed(6) : '-';
+        const longitude = Number.isFinite(longitudeRaw) ? longitudeRaw.toFixed(6) : '-';
+        return {
+            idx: index,
+            km: String(km),
+            picto: String(picto),
+            speed: String(speed),
+            location,
+            latitude,
+            longitude,
+            signal,
+            station: entry && entry.station !== undefined && entry.station !== null ? String(entry.station) : '-'
+        };
+    }
+
+    function renderEntryField(groupFieldsContainer, entry, key) {
+        const value = entry[key];
+        const type = resolveEntryFieldType(entry, key);
+
+        const field = document.createElement('div');
+        field.className = 'field';
+
+        const keyDiv = document.createElement('div');
+        keyDiv.className = 'field-key';
+        keyDiv.textContent = key;
+
+        const controls = document.createElement('div');
+        controls.className = 'field-controls';
+
+        const valueHolder = document.createElement('div');
+        valueHolder.appendChild(createValueInput(type, value, (nextValue) => {
+            entry[key] = nextValue;
+            markDirty(true);
+        }));
+
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'danger';
+        removeBtn.textContent = 'Del';
+        removeBtn.addEventListener('click', () => {
+            delete entry[key];
+            markDirty(true);
+            renderEntriesTable();
+        });
+
+        controls.appendChild(valueHolder);
+        controls.appendChild(removeBtn);
+
+        field.appendChild(keyDiv);
+        field.appendChild(controls);
+        groupFieldsContainer.appendChild(field);
+    }
+
+    function renderEntriesTable() {
+        const tbody = document.getElementById('entriesTbody');
+        const meta = document.getElementById('entriesMeta');
+        tbody.innerHTML = '';
+
+        if (!currentData) {
+            meta.textContent = 'No file loaded';
+            return;
+        }
+
+        const entries = getCurrentEntries();
+        if (currentIndex < -1) currentIndex = -1;
+        if (currentIndex >= entries.length) currentIndex = Math.max(0, entries.length - 1);
+        const openLabel = currentIndex >= 0 ? `#${currentIndex}` : 'none';
+        meta.textContent = `${currentGroup} • ${entries.length} entries • open ${openLabel}`;
+
+        if (!entries.length) {
+            const row = document.createElement('tr');
+            row.innerHTML = '<td colspan="10" class="subtle">No entries. Use + New Entry.</td>';
+            tbody.appendChild(row);
+            return;
+        }
+
+        entries.forEach((entry, index) => {
+            const summary = entrySummary(entry, index);
+
+            const tr = document.createElement('tr');
+            tr.className = `entry-row ${index === currentIndex ? 'active' : ''}`;
+
+            const idxTd = document.createElement('td');
+            idxTd.textContent = String(summary.idx);
+
+            const kmTd = document.createElement('td');
+            kmTd.textContent = summary.km;
+
+            const pictoTd = document.createElement('td');
+            pictoTd.textContent = summary.picto;
+
+            const speedTd = document.createElement('td');
+            speedTd.textContent = summary.speed;
+
+            const locationTd = document.createElement('td');
+            const locationInput = document.createElement('input');
+            locationInput.type = 'text';
+            locationInput.className = 'list-edit-input';
+            locationInput.placeholder = 'Location';
+            locationInput.value = entry && entry.location !== undefined && entry.location !== null
+                ? String(entry.location)
+                : '';
+            locationInput.addEventListener('input', () => {
+                entry.location = locationInput.value;
+                markDirty(true);
+            });
+            locationTd.appendChild(locationInput);
+
+            const latitudeTd = document.createElement('td');
+            latitudeTd.textContent = summary.latitude;
+
+            const longitudeTd = document.createElement('td');
+            longitudeTd.textContent = summary.longitude;
+
+            const signalTd = document.createElement('td');
+            signalTd.textContent = summary.signal || '-';
+
+            const stationTd = document.createElement('td');
+            stationTd.textContent = summary.station;
+
+            tr.appendChild(idxTd);
+            tr.appendChild(kmTd);
+            tr.appendChild(speedTd);
+            tr.appendChild(pictoTd);
+            tr.appendChild(locationTd);
+            tr.appendChild(latitudeTd);
+            tr.appendChild(longitudeTd);
+            tr.appendChild(signalTd);
+            tr.appendChild(stationTd);
+
+            const actionsTd = document.createElement('td');
+            const actions = document.createElement('div');
+            actions.className = 'entry-actions';
+
+            const openBtn = document.createElement('button');
+            openBtn.textContent = index === currentIndex ? 'Close' : 'Open';
+            openBtn.className = 'secondary';
+            openBtn.addEventListener('click', () => {
+                currentIndex = index === currentIndex ? -1 : index;
+                renderEntriesTable();
+            });
+
+            const recordBtn = document.createElement('button');
+            recordBtn.textContent = 'Record';
+            recordBtn.className = 'warn';
+            recordBtn.addEventListener('click', async () => { await applyLocationToEntry(index); });
+
+            actions.appendChild(openBtn);
+            actions.appendChild(recordBtn);
+            actionsTd.appendChild(actions);
+            tr.appendChild(actionsTd);
+            tbody.appendChild(tr);
+
+            if (index === currentIndex) {
+                const editorTr = document.createElement('tr');
+                editorTr.className = 'editor-row';
+                const editorTd = document.createElement('td');
+                editorTd.colSpan = 10;
+
+                const toolbar = document.createElement('div');
+                toolbar.className = 'editor-toolbar';
+
+                const addFromListWrap = document.createElement('div');
+                addFromListWrap.className = 'add-from-list';
+
+                const addFromListSelect = document.createElement('select');
+                const missingCatalogFields = entryFieldCatalog.filter((key) => !(key in entry));
+
+                if (!missingCatalogFields.length) {
+                    const option = document.createElement('option');
+                    option.value = '';
+                    option.textContent = 'No fields available';
+                    addFromListSelect.appendChild(option);
+                    addFromListSelect.disabled = true;
+                } else {
+                    const placeholder = document.createElement('option');
+                    placeholder.value = '';
+                    placeholder.textContent = 'Select field...';
+                    addFromListSelect.appendChild(placeholder);
+
+                    missingCatalogFields.forEach((fieldName) => {
+                        const option = document.createElement('option');
+                        option.value = fieldName;
+                        option.textContent = fieldName;
+                        addFromListSelect.appendChild(option);
+                    });
+                }
+
+                const addFromListBtn = document.createElement('button');
+                addFromListBtn.textContent = 'Add';
+                addFromListBtn.disabled = !missingCatalogFields.length;
+                addFromListBtn.addEventListener('click', () => {
+                    if (!addFromListSelect.value) {
+                        showStatus('Select a field to add', 'error');
+                        return;
+                    }
+                    addEntryFieldFromCatalog(addFromListSelect.value);
+                });
+
+                addFromListWrap.appendChild(addFromListSelect);
+                addFromListWrap.appendChild(addFromListBtn);
+
+                const addCustomBtn = document.createElement('button');
+                const addCustomWrap = document.createElement('div');
+                addCustomWrap.className = 'add-custom-field';
+
+                const addCustomKeyInput = document.createElement('input');
+                addCustomKeyInput.type = 'text';
+                addCustomKeyInput.placeholder = 'Custom field key';
+
+                const addCustomTypeSelect = document.createElement('select');
+                ['string', 'number', 'boolean', 'null'].forEach((typeName) => {
+                    const option = document.createElement('option');
+                    option.value = typeName;
+                    option.textContent = typeName;
+                    addCustomTypeSelect.appendChild(option);
+                });
+
+                const addCustomActionBtn = document.createElement('button');
+                addCustomActionBtn.className = 'secondary';
+                addCustomActionBtn.textContent = 'Add Custom Field';
+                addCustomActionBtn.addEventListener('click', () => {
+                    addCustomEntryField(addCustomKeyInput.value, addCustomTypeSelect.value);
+                });
+
+                addCustomWrap.appendChild(addCustomKeyInput);
+                addCustomWrap.appendChild(addCustomTypeSelect);
+                addCustomWrap.appendChild(addCustomActionBtn);
+
+                const sortBtn = document.createElement('button');
+                sortBtn.className = 'secondary';
+                sortBtn.textContent = 'Sort Entry Keys';
+                sortBtn.addEventListener('click', sortCurrentEntryKeys);
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'danger';
+                deleteBtn.textContent = 'Delete Open Entry';
+                deleteBtn.addEventListener('click', deleteCurrentEntry);
+
+                toolbar.appendChild(addFromListWrap);
+                toolbar.appendChild(addCustomWrap);
+                toolbar.appendChild(sortBtn);
+                toolbar.appendChild(deleteBtn);
+
+                const groupsContainer = document.createElement('div');
+                groupsContainer.className = 'editor-groups';
+                const groupedKeys = groupedEntryKeys(entry);
+
+                groupedKeys.forEach((group) => {
+                    const card = document.createElement('div');
+                    card.className = 'group-card';
+
+                    const title = document.createElement('div');
+                    title.className = 'group-title';
+                    title.textContent = group.name;
+
+                    const fieldsContainer = document.createElement('div');
+                    fieldsContainer.className = 'group-fields';
+
+                    group.keys.forEach((key) => {
+                        renderEntryField(fieldsContainer, entry, key);
+                    });
+
+                    card.appendChild(title);
+                    card.appendChild(fieldsContainer);
+                    groupsContainer.appendChild(card);
+                });
+
+                editorTd.appendChild(toolbar);
+                editorTd.appendChild(groupsContainer);
+                editorTr.appendChild(editorTd);
+                tbody.appendChild(editorTr);
+            }
+        });
+    }
+
+    function onEntryGroupChanged() {
+        currentGroup = document.getElementById('entryGroupSelect').value;
+        currentIndex = -1;
+        renderEntriesTable();
+    }
+
+    function nextEntry() {
+        const entries = getCurrentEntries();
+        if (!entries.length) return;
+        if (currentIndex < 0) {
+            currentIndex = 0;
+        } else if (currentIndex < entries.length - 1) {
+            currentIndex += 1;
+        }
+        renderEntriesTable();
+    }
+
+    function previousEntry() {
+        const entries = getCurrentEntries();
+        if (!entries.length) return;
+        if (currentIndex < 0) {
+            currentIndex = entries.length - 1;
+        } else if (currentIndex > 0) {
+            currentIndex -= 1;
+        }
+        renderEntriesTable();
+    }
+
+    function addNewEntry() {
+        if (!currentData) {
+            showStatus('Load a file first', 'error');
+            return;
+        }
+        const entries = getCurrentEntries();
+        const newEntry = createDefaultNewEntry();
+        const insertIndex = currentIndex >= 0 ? currentIndex + 1 : entries.length;
+        entries.splice(insertIndex, 0, newEntry);
+        currentIndex = insertIndex;
+        markDirty(true);
+        renderEntriesTable();
+        showStatus('Entry added', 'success');
+    }
+
+    function duplicateCurrentEntry() {
+        const entries = getCurrentEntries();
+        if (!entries.length || currentIndex < 0) {
+            showStatus('Open an entry first', 'error');
+            return;
+        }
+        const copied = JSON.parse(JSON.stringify(entries[currentIndex]));
+        entries.splice(currentIndex + 1, 0, copied);
+        currentIndex += 1;
+        markDirty(true);
+        renderEntriesTable();
+        showStatus('Entry duplicated', 'success');
+    }
+
+    function deleteCurrentEntry() {
+        const entries = getCurrentEntries();
+        if (!entries.length || currentIndex < 0) {
+            showStatus('Open an entry first', 'error');
+            return;
+        }
+        entries.splice(currentIndex, 1);
+        if (!entries.length) {
+            currentIndex = -1;
+        } else {
+            currentIndex = Math.max(0, Math.min(currentIndex, entries.length - 1));
+        }
+        markDirty(true);
+        renderEntriesTable();
+        showStatus('Entry deleted', 'info');
+    }
+
+    function addRouteInfoFieldFromTemplate(selectedFieldName) {
+        if (!currentData) {
+            showStatus('Load a file first', 'error');
+            return;
+        }
+        const routeInfo = currentData.route_info || {};
+        const missing = Object.keys(routeInfoTemplate).filter((key) => !(key in routeInfo));
+        if (!missing.length) {
+            showStatus('No missing template fields', 'info');
+            return;
+        }
+        const chosen = String(selectedFieldName || '').trim();
+        if (!chosen) {
+            showStatus('Select a template field to add', 'error');
+            return;
+        }
+        if (!missing.includes(chosen)) {
+            showStatus('Selected field is not available', 'error');
+            return;
+        }
+        if (!(chosen in routeInfoTemplate)) {
+            showStatus('Field not in template', 'error');
+            return;
+        }
+        routeInfo[chosen] = JSON.parse(JSON.stringify(routeInfoTemplate[chosen]));
+        if (!routeInfoOrder.includes(chosen)) routeInfoOrder.push(chosen);
+        markDirty(true);
+        renderRouteInfoFields();
+    }
+
+    function addCustomRouteInfoField(customKey, customType) {
+        if (!currentData) {
+            showStatus('Load a file first', 'error');
+            return;
+        }
+        const key = String(customKey || '').trim();
+        if (!key) return;
+        if (key in currentData.route_info) {
+            showStatus('Key already exists', 'error');
+            return;
+        }
+        const type = String(customType || 'string').toLowerCase();
+        if (!['string', 'number', 'boolean', 'null'].includes(type)) {
+            showStatus('Invalid type', 'error');
+            return;
+        }
+        currentData.route_info[key] = defaultValueForType(type);
+        if (!routeInfoOrder.includes(key)) routeInfoOrder.push(key);
+        const customKeyInput = document.getElementById('routeInfoCustomKey');
+        if (customKeyInput) customKeyInput.value = '';
+        markDirty(true);
+        renderRouteInfoFields();
+    }
+
+    function addEntryFieldFromCatalog(selectedFieldName) {
+        const entries = getCurrentEntries();
+        if (!entries.length || currentIndex < 0) {
+            showStatus('Open an entry first', 'error');
+            return;
+        }
+        const entry = entries[currentIndex];
+        const missing = entryFieldCatalog.filter((key) => !(key in entry));
+        if (!missing.length) {
+            showStatus('No missing catalog fields', 'info');
+            return;
+        }
+        const chosen = String(selectedFieldName || '').trim();
+        if (!chosen) {
+            showStatus('Select a field to add', 'error');
+            return;
+        }
+        if (!(missing.includes(chosen))) {
+            showStatus('Selected field is not available', 'error');
+            return;
+        }
+        if (!entryFieldCatalog.includes(chosen)) {
+            showStatus('Field not in catalog', 'error');
+            return;
+        }
+
+        entry[chosen] = chosen in entryTemplate ? JSON.parse(JSON.stringify(entryTemplate[chosen])) : null;
+        if (!entryFieldTypes[chosen]) {
+            const detectedType = valueTypeOf(entry[chosen]);
+            if (detectedType !== 'null') {
+                entryFieldTypes[chosen] = detectedType;
+            }
+        }
+        markDirty(true);
+        renderEntriesTable();
+    }
+
+    function addCustomEntryField(customKey, customType) {
+        const entries = getCurrentEntries();
+        if (!entries.length || currentIndex < 0) {
+            showStatus('Open an entry first', 'error');
+            return;
+        }
+        const entry = entries[currentIndex];
+        const key = String(customKey || '').trim();
+        if (!key) return;
+        if (key in entry) {
+            showStatus('Field already exists', 'error');
+            return;
+        }
+        const type = String(customType || 'string').toLowerCase();
+        if (!['string', 'number', 'boolean', 'null'].includes(type)) {
+            showStatus('Invalid type', 'error');
+            return;
+        }
+        const defaultValue = defaultValueForType(type);
+        entry[key] = defaultValue;
+        entryFieldTypes[key] = type;
+        if (!entryFieldCatalog.includes(key)) entryFieldCatalog.push(key);
+        if (!(key in entryTemplate)) entryTemplate[key] = defaultValue;
+        markDirty(true);
+        renderEntriesTable();
+    }
+
+    function sortRouteInfoKeys() {
+        if (!currentData) return;
+        const routeInfo = currentData.route_info || {};
+        const sorted = {};
+        orderedRouteInfoKeys(routeInfo).forEach((key) => { sorted[key] = routeInfo[key]; });
+        currentData.route_info = sorted;
+        markDirty(true);
+        renderRouteInfoFields();
+    }
+
+    function sortCurrentEntryKeys() {
+        const entries = getCurrentEntries();
+        if (!entries.length || currentIndex < 0) return;
+        const source = entries[currentIndex];
+        const sorted = {};
+        Object.keys(source).sort().forEach((key) => { sorted[key] = source[key]; });
+        entries[currentIndex] = sorted;
+        markDirty(true);
+        renderEntriesTable();
+    }
+
+    function setDualTrackTrueForAllEntries() {
+        if (!currentData) {
+            showStatus('Load a file first', 'error');
+            return;
+        }
+
+        ensureStructure();
+
+        const applyToArray = (arr) => {
+            if (!Array.isArray(arr)) return 0;
+            let updated = 0;
+            arr.forEach((entry) => {
+                if (entry && typeof entry === 'object') {
+                    if (entry.dualTrack !== true) {
+                        entry.dualTrack = true;
+                        updated += 1;
+                    } else {
+                        entry.dualTrack = true;
+                    }
+                }
+            });
+            return updated;
+        };
+
+        const updatedMain = applyToArray(currentData.timetable_entries);
+        const updatedAlt = applyToArray(currentData.timetable_entries_alt);
+        const totalUpdated = updatedMain + updatedAlt;
+
+        if (!entryFieldCatalog.includes('dualTrack')) {
+            entryFieldCatalog.push('dualTrack');
+        }
+        if (!entryFieldTypes.dualTrack) {
+            entryFieldTypes.dualTrack = 'boolean';
+        }
+        if (!(entryTemplate && typeof entryTemplate === 'object')) {
+            entryTemplate = {};
+        }
+        if (!Object.prototype.hasOwnProperty.call(entryTemplate, 'dualTrack')) {
+            entryTemplate.dualTrack = true;
+        }
+
+        markDirty(true);
+        renderEntriesTable();
+        showStatus(`dualTrack=true applied (${totalUpdated} updated)`, 'success');
+    }
+
+    async function bootstrap() {
+        try {
+            await loadTemplateMeta();
+            await loadFileList();
+            await refreshPlayerLocation();
+        } catch (error) {
+            showStatus(error.message, 'error');
+        }
+    }
+
+    document.getElementById('fileSelect').addEventListener('change', loadSelectedFile);
+
+    bootstrap();
+</script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+{
+  "route_info_template": {
+    "destination": "",
+    "has_lzb": false,
+    "has_gnt": false,
+    "has_alt": true,
+    "max_speed": 160,
+    "notes": "",
+    "route_code": "",
+    "route_name": "",
+    "start_station": "Köln Hbf"
+  },
+  "entry_template": {
+    "km": null,
+    "speed_limit": null,
+    "picto": null,
+    "location": null,
+    "signal": null,
+    "station": null,
+    "latitude": null,
+    "longitude": null,
+    "notes": null,
+    "tunnelStart": false,
+    "tunnel": false,
+    "tunnelEnd": false,
+    "dualTrackSart": false,
+    "dualTrack": true,
+    "dualTrackEnd": false,
+    "picto_icon": "",
+    "GNTSpeed": null,
+    "speedLimitFront": false,
+    "invertedSpeedlimit": false,
+    "incline": 0,
+    "picto_border_radius": false,
+    "picto_strikethrough_horizontal": false,
+    "picto_strikethrough_diagonal": false,
+    "pictoFont": "12px",
+    "line_change": false,
+    "distance_driven": 0
+  },
+  "route_info_order": [
+    "route_code",
+    "route_name",
+    "start_station",
+    "destination",
+    "max_speed",
+    "has_lzb",
+    "has_gnt",
+    "has_alt",
+    "notes"
+  ],
+  "entry_group_order": [
+    "Core",
+    "Signalling",
+    "Track",
+    "Picto",
+    "Geo",
+    "Notes",
+    "Other"
+  ],
+  "entry_display_groups": {
+    "Core": [
+      "km",
+      "speed_limit",
+      "station",
+      "incline"
+    ],
+    "Signalling": [
+      "signal",
+      "GNTSpeed",
+      "speedLimitFront",
+      "invertedSpeedlimit"
+    ],
+    "Track": [
+      "tunnelStart",
+      "tunnel",
+      "tunnelEnd",
+      "dualTrackSart",
+      "dualTrack",
+      "dualTrackEnd"
+    ],
+    "Picto": [
+      "picto",
+      "picto_icon",
+      "picto_border_radius",
+      "picto_strikethrough_horizontal",
+      "picto_strikethrough_diagonal",
+      "pictoFont"
+    ],
+    "Geo": [
+      "location",
+      "latitude",
+      "longitude"
+    ],
+    "Notes": [
+      "notes"
+    ],
+    "Other": [
+      "line_change",
+      "distance_driven"
+    ]
+  }
+}

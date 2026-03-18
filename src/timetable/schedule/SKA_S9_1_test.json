@@ -1,0 +1,27 @@
+{
+"train_info": {
+"company": "DB",
+"train_number": "S19 test",
+"destination": "S19 Au(Sieg) - Düren Hbf",
+"type": "S-Bahn",
+"priority": "2",
+"max_speed_kph": 140,
+"timetable_length_km": 39.3,
+"driven_distance_km": 0,
+"route_code": "SKA",
+"service_timetable": "SKA-S_2.json",
+"completed_timetable": false
+},
+"timetable_data": [
+{"station": "Horrem siding", "stop": true, "ETA": "", "ETD": "09:20:30", "ATA": "", "ATD": "", "diff": "", "stpDurr": "", "kmMark":""},
+{"station": "Horrem", "stop": true, "ETA": "09:20:00", "ETD": "09:20:30", "ATA": "", "ATD": "", "diff": "", "stpDurr": "", "kmMark":""},
+{"station": "Frechen-Königsdorf Hp", "stop": true, "ETA": "09:16:00", "ETD": "09:16:30", "ATA": "", "ATD": "", "diff": "", "stpDurr": "", "kmMark":""},
+{"station": "K Weiden-West Hp", "stop": true, "ETA": "09:13:00", "ETD": "09:13:30", "ATA": "", "ATD": "", "diff": "", "stpDurr": "", "kmMark":""},
+{"station": "K-Löwenich S Hp", "stop": true, "ETA": "09:11:00", "ETD": "09:11:30", "ATA": "", "ATD": "", "diff": "", "stpDurr": "", "kmMark":""},
+{"station": "Bft KMüngersdf--Tpark", "stop": true, "ETA": "09:08:00", "ETD": "09:08:30", "ATA": "", "ATD": "", "diff": "", "stpDurr": "", "kmMark":""},
+{"station": "K-Ehrenfeld Pbf", "stop": true, "ETA": "09:05:30", "ETD": "09:06:00", "ATA": "", "ATD": "", "diff": "", "stpDurr": "", "kmMark":""},
+{"station": "Bft K-Hansaring", "stop": true, "ETA": "09:01:30", "ETD": "09:02:00", "ATA": "", "ATD": "", "diff": "", "stpDurr": "", "kmMark":""},
+{"station": "Zvsig, Zsig TEST", "stop": false, "ETA": "", "ETD": "09:00:45", "ATA": "", "ATD": "", "diff": "", "stpDurr": "", "kmMark":""},
+{"station": "Köln Hbf", "stop": true, "ETA": "08:59:00", "ETD": "09:00:00", "ATA": "", "ATD": "", "diff": "", "stpDurr": "", "kmMark":""}
+]
+}

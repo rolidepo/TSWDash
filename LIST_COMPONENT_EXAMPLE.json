@@ -1,0 +1,307 @@
+{
+  "ListDemo": {
+    "title": "List Component Demo",
+    "layout": "mfd",
+    "template": "mfd",
+    "layout_grid": {
+      "columns": "50% 50%",
+      "rows": "50% 50%",
+      "areas": [
+        "events_list status_list",
+        "alerts_list traction_list"
+      ],
+      "gap": "5px"
+    },
+    "components": [
+      {
+        "type": "list",
+        "id": "events_log",
+        "area": "events_list",
+        "fontFamily": "Arial",
+        "fontSize": "12px",
+        "maxRows": 6,
+        "rowHeight": "18px",
+        "color": "#D0D0D0",
+        "backgroundColor": "transparent",
+        "conditions": [
+          {
+            "when": {
+              "left": ["door_open", "door_open_legacy"],
+              "operator": "==",
+              "right": true
+            },
+            "display": {
+              "text": "Door Opened",
+              "color": "#FFFFFF",
+              "backgroundColor": "#FF6B00",
+              "bold": true
+            }
+          },
+          {
+            "when": {
+              "left": ["door_open", "door_open_legacy"],
+              "operator": "==",
+              "right": false
+            },
+            "display": {
+              "text": "Door Closed",
+              "color": "#FFFFFF",
+              "backgroundColor": "#2E7D32"
+            }
+          },
+          {
+            "when": {
+              "left": "brake_pressure",
+              "operator": ">",
+              "right": 5.0
+            },
+            "display": {
+              "text": "Heavy Braking Applied",
+              "color": "#FFFFFF",
+              "backgroundColor": "#D32F2F",
+              "bold": true
+            }
+          },
+          {
+            "when": {
+              "all": [
+                {"left": "speed", "operator": ">", "right": 0},
+                {"left": "pantograph_lowered", "operator": "==", "right": true}
+              ]
+            },
+            "display": {
+              "text": "Pantograph Down While Moving",
+              "color": "#FFFFFF",
+              "backgroundColor": "#F57C00",
+              "bold": true
+            }
+          }
+        ]
+      },
+      {
+        "type": "list",
+        "id": "status_log",
+        "area": "status_list",
+        "fontFamily": "Courier New",
+        "fontSize": "11px",
+        "maxRows": 6,
+        "rowHeight": "auto",
+        "conditions": [
+          {
+            "when": {
+              "left": "pantograph_raised",
+              "operator": "==",
+              "right": true
+            },
+            "display": {
+              "text": "✓ Pantograph Raised",
+              "color": "#4CAF50",
+              "bold": true
+            }
+          },
+          {
+            "when": {
+              "left": "pantograph_raised",
+              "operator": "==",
+              "right": false
+            },
+            "display": {
+              "text": "✗ Pantograph Lowered",
+              "color": "#F44336",
+              "strikethrough": true,
+              "strikethroughColor": "#F44336"
+            }
+          },
+          {
+            "when": {
+              "left": "lights_active",
+              "operator": "==",
+              "right": true
+            },
+            "display": {
+              "text": "Lights ON",
+              "color": "#FFEB3B",
+              "backgroundColor": "#505050"
+            }
+          }
+        ]
+      },
+      {
+        "type": "list",
+        "id": "alerts_log",
+        "area": "alerts_list",
+        "fontFamily": "Arial",
+        "fontSize": "13px",
+        "maxRows": 5,
+        "rowHeight": "20px",
+        "conditions": [
+          {
+            "when": {
+              "left": "emergency_brake_active",
+              "operator": "==",
+              "right": true
+            },
+            "display": {
+              "text": "🚨 EMERGENCY BRAKE ACTIVE",
+              "color": "#FFFFFF",
+              "backgroundColor": "#B71C1C",
+              "bold": true,
+              "blinking": "both"
+            }
+          },
+          {
+            "when": {
+              "left": "over_speed",
+              "operator": "==",
+              "right": true
+            },
+            "display": {
+              "text": "⚠️ OVERSPEED WARNING",
+              "color": "#000000",
+              "backgroundColor": "#FFD700",
+              "bold": true,
+              "blinking": "background",
+              "blinkingTextColorOn": "#000000",
+              "blinkingTextColorOff": "#FF6B00"
+            }
+          },
+          {
+            "when": {
+              "left": "system_fault",
+              "operator": "==",
+              "right": true
+            },
+            "display": {
+              "text": "System Fault Detected",
+              "color": "#FFFFFF",
+              "backgroundColor": "#8B0000",
+              "italic": true,
+              "crossthrough": true,
+              "crossthroughColor": "#FFFFFF",
+              "crossthroughWidth": 2
+            }
+          }
+        ]
+      },
+      {
+        "type": "list",
+        "id": "traction_log",
+        "area": "traction_list",
+        "fontFamily": "Arial",
+        "fontSize": "12px",
+        "maxRows": 5,
+        "rowHeight": "18px",
+        "conditions": [
+          {
+            "when": {
+              "left": ["traction_mode", "traction_mode_v2"],
+              "operator": "==",
+              "right": "full"
+            },
+            "display": {
+              "text": "Full Traction Available",
+              "color": "#FFFFFF",
+              "backgroundColor": "#1B5E20",
+              "bold": true
+            }
+          },
+          {
+            "when": {
+              "left": ["traction_mode", "traction_mode_v2"],
+              "operator": "==",
+              "right": "partial"
+            },
+            "display": {
+              "text": "Partial Traction",
+              "color": "#000000",
+              "backgroundColor": "#FDD835",
+              "bold": true
+            }
+          },
+          {
+            "when": {
+              "left": ["traction_mode", "traction_mode_v2"],
+              "operator": "==",
+              "right": "none"
+            },
+            "display": {
+              "text": "No Traction",
+              "color": "#FFFFFF",
+              "backgroundColor": "#C62828",
+              "bold": true
+            }
+          },
+          {
+            "when": {
+              "left": "wheelslip_detected",
+              "operator": "==",
+              "right": true
+            },
+            "display": {
+              "text": "Wheelslip Detected",
+              "color": "#FFFFFF",
+              "backgroundColor": "#F57F17",
+              "blinking": "text"
+            }
+          }
+        ]
+      },
+      {
+        "type": "text_display",
+        "id": "title1",
+        "area": "events_list",
+        "value": "Event History",
+        "title": "Events",
+        "unit": ""
+      },
+      {
+        "type": "text_display",
+        "id": "title2",
+        "area": "status_list",
+        "value": "System Status",
+        "title": "Status",
+        "unit": ""
+      },
+      {
+        "type": "text_display",
+        "id": "title3",
+        "area": "alerts_list",
+        "value": "Alert History",
+        "title": "Alerts",
+        "unit": ""
+      },
+      {
+        "type": "text_display",
+        "id": "title4",
+        "area": "traction_list",
+        "value": "Traction Log",
+        "title": "Traction",
+        "unit": ""
+      }
+    ],
+    "buttons": {
+      "top": {
+        "aus": {"action": ""},
+        "S": {
+          "action": "page_navigate",
+          "target": "settings"
+        },
+        "i": {
+          "action": "page_navigate",
+          "target": "info"
+        }
+      },
+      "bottom": {
+        "1": {
+          "action": "page_navigate",
+          "target": "dashboard"
+        },
+        "0": {"action": "page_back"}
+      }
+    },
+    "menu_labels": {
+      "1": "Dashboard",
+      "0": "Back"
+    }
+  }
+}

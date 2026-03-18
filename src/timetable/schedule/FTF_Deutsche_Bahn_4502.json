@@ -1,0 +1,161 @@
+{
+  "train_info": {
+    "company": "Deutsche Bahn",
+    "completed_timetable": false,
+    "destination": "RE50 Frankfurt (Main) Hbf - Fulda",
+    "driven_distance_km": 0,
+    "gnt_enabled": false,
+    "max_speed_kph": 160,
+    "priority": "Normal",
+    "route_code": "FTF",
+    "service_timetable": "FTF_1.json",
+    "timetable_length_km": 110.1,
+    "train_number": "4502",
+    "type": "Regional Express"
+  },
+  "timetable_data": [
+    {
+      "station": "Frankfurt (Main) Hbf",
+      "stop": true,
+      "ETA": "06:24:00",
+      "ETD": "06:26:00",
+      "ATA": "",
+      "ATD": "",
+      "diff": "",
+      "stpDurr": "",
+      "kmMark": "0"
+    },
+    {
+      "station": "Frankfurt (Main) Süd",
+      "stop": true,
+      "ETA": "06:31:00",
+      "ETD": "06:33:00",
+      "ATA": "",
+      "ATD": "",
+      "diff": "",
+      "stpDurr": "",
+      "kmMark": "4.2"
+    },
+    {
+      "station": "Offenbach (Main) Hbf",
+      "stop": true,
+      "ETA": "06:37:00",
+      "ETD": "06:38:00",
+      "ATA": "",
+      "ATD": "",
+      "diff": "",
+      "stpDurr": "",
+      "kmMark": "9.9"
+    },
+    {
+      "station": "Hanau Hbf Nordseite",
+      "stop": true,
+      "ETA": "06:46:00",
+      "ETD": "06:48:00",
+      "ATA": "",
+      "ATD": "",
+      "diff": "",
+      "stpDurr": "",
+      "kmMark": "22.8"
+    },
+    {
+      "station": "Langenselbold",
+      "stop": true,
+      "ETA": "06:55:30",
+      "ETD": "06:56:00",
+      "ATA": "",
+      "ATD": "",
+      "diff": "",
+      "stpDurr": "",
+      "kmMark": "33.7"
+    },
+    {
+      "station": "Gelnhausen",
+      "stop": true,
+      "ETA": "07:02:00",
+      "ETD": "07:03:00",
+      "ATA": "",
+      "ATD": "",
+      "diff": "",
+      "stpDurr": "",
+      "kmMark": "43.9"
+    },
+    {
+      "station": "Wächtersbach",
+      "stop": true,
+      "ETA": "07:10:00",
+      "ETD": "07:10:30",
+      "ATA": "",
+      "ATD": "",
+      "diff": "",
+      "stpDurr": "",
+      "kmMark": "54.5"
+    },
+    {
+      "station": "Bad Soden-Salmünster",
+      "stop": true,
+      "ETA": "07:15:00",
+      "ETD": "07:15:30",
+      "ATA": "",
+      "ATD": "",
+      "diff": "",
+      "stpDurr": "",
+      "kmMark": "61.2"
+    },
+    {
+      "station": "Steinau (Straße)",
+      "stop": true,
+      "ETA": "07:20:30",
+      "ETD": "07:21:00",
+      "ATA": "",
+      "ATD": "",
+      "diff": "",
+      "stpDurr": "",
+      "kmMark": "67.8"
+    },
+    {
+      "station": "Schlüchtern",
+      "stop": true,
+      "ETA": "07:26:30",
+      "ETD": "07:27:00",
+      "ATA": "",
+      "ATD": "",
+      "diff": "",
+      "stpDurr": "",
+      "kmMark": "74.2"
+    },
+    {
+      "station": "Flieden",
+      "stop": true,
+      "ETA": "07:34:30",
+      "ETD": "07:35:00",
+      "ATA": "",
+      "ATD": "",
+      "diff": "",
+      "stpDurr": "",
+      "kmMark": "85.2"
+    },
+    {
+      "station": "Neuhof (Kr Fulda)",
+      "stop": true,
+      "ETA": "07:38:30",
+      "ETD": "07:39:00",
+      "ATA": "",
+      "ATD": "",
+      "diff": "",
+      "stpDurr": "",
+      "kmMark": "96.8"
+    },
+    {
+      "station": "Fulda",
+      "stop": true,
+      "ETA": "07:48:00",
+      "ETD": "",
+      "ATA": "",
+      "ATD": "",
+      "diff": "",
+      "stpDurr": "",
+      "kmMark": "110.1"
+    }
+  ]
+}

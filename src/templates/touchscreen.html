@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TSW Dashboard - Touchscreen</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+    <script src="./canvas-renderers.js"></script>
+    <script src="./components.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* CSS Variables for customization */
+        :root {
+            --border-color: #D0D0D0;
+        }
+        
+        /* Dark mode (default) */
+        html, body {
+            height: 100%;
+            width: 100%;
+            background-color: #000000;
+            color: #D0D0D0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+        
+        /* Light mode */
+        body.light-mode {
+            background-color: #D0D0D0;
+            color: #1a1a1a;
+            --border-color: #1a1a1a;
+        }
+        
+        /* Main container - full screen */
+        .touchscreen-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: inherit;
+        }
+        
+        /* Main content area - full screen, no padding */
+        .content-area {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+            display: grid;
+        }
+        
+        /* Component styling - no background, no rounded corners */
+        .component {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-self: stretch;
+            justify-self: stretch;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .component.no-padding {
+            padding: 0;
+        }
+        
+        .component.hidden-content * {
+            visibility: hidden;
+        }
+        
+        .component.clickable {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .component.clickable:hover {
+            background: transparent;
+            border-color: #888888;
+        }
+        
+        .component.clickable:active {
+            transform: scale(0.98);
+        }
+        
+        .btn, .component.clickable {
+            transition: none;
+        }
+        
+        .component-title {
+            font-size: 14px;
+            font-weight: bold;
+            opacity: 0.8;
+            color: inherit;
+        }
+        
+        .component-value {
+            font-size: clamp(24px, 4.5vh, 44px);
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            color: inherit;
+        }
+        
+        .component-unit {
+            font-size: 14px;
+            opacity: 0.7;
+            color: inherit;
+        }
+
+        /* Blinking animations for text indicators */
+        @keyframes blink-opacity {
+            0%, 49% {
+                opacity: 1;
+            }
+            50%, 100% {
+                opacity: 0;
+            }
+        }
+
+        @keyframes blink-bg {
+            0%, 49% {
+                background-color: var(--blink-bg-color, transparent);
+            }
+            50%, 100% {
+                background-color: transparent;
+            }
+        }
+
+        @keyframes blink-text-color {
+            0%, 49% {
+                color: var(--blink-text-color-on, currentColor);
+            }
+            50%, 100% {
+                color: var(--blink-text-color-off, currentColor);
+            }
+        }
+
+        .blinking-text {
+            animation: blink-opacity 1s steps(2) infinite;
+        }
+
+        .blinking-bg,
+        .blinking-both {
+            animation: blink-bg 1s steps(2) infinite;
+        }
+
+        .blinking-bg-text {
+            animation: blink-text-color 1s steps(2) infinite;
+        }
+
+        .blinking-both > * {
+            animation: blink-opacity 1s steps(2) infinite;
+        }
+
+        .ebula-data-table {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+            padding: 0;
+            border: none;
+        }
+
+        .component.ebula-data-table {
+            border: 1px solid var(--current-screen-text-color) !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .ebula-data-table > div {
+            overflow: hidden !important;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .ebula-data-table > div::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Schedule Browser Overlay */
+        .schedule-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50%;
+            height: 50%;
+            background: #000000;
+            border: 3px solid #D0D0D0;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            padding: 15px;
+            gap: 10px;
+        }
+        
+        .schedule-overlay.active {
+            display: flex;
+        }
+        
+        .schedule-search-bar {
+            width: 100%;
+            padding: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            background: white;
+            color: black;
+            border: 3px solid #D0D0D0;
+            outline: none;
+            text-align: left;
+            letter-spacing: 1px;
+        }
+        
+        .schedule-search-bar.highlighted {
+            box-shadow: 0 0 0 3px #D0D0D0;
+        }
+        
+        .schedule-list {
+            flex: 1;
+            overflow-y: auto;
+            border: 2px solid #D0D0D0;
+            background: #000000;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .schedule-list::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .schedule-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #D0D0D0;
+            cursor: pointer;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            color: #D0D0D0;
+        }
+        
+        .schedule-item:hover {
+            background: #D0D0D0;
+            color: #000000;
+        }
+        
+        .schedule-item.selected {
+            background: #D0D0D0;
+            color: #000000;
+            font-weight: bold;
+        }
+        
+        .schedule-item-code {
+            font-size: 14px;
+            font-weight: bold;
+            min-width: 60px;
+        }
+        
+        .schedule-item-number {
+            font-size: 16px;
+            font-weight: bold;
+            min-width: 80px;
+        }
+        
+        .schedule-item-destination {
+            font-size: 14px;
+            flex: 1;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="touchscreen-container">
+        <!-- Main Content - Full Screen -->
+        <div class="content-area" id="contentArea">
+            <!-- Components rendered here -->
+        </div>
+        
+        <!-- Schedule Browser Overlay -->
+        <div class="schedule-overlay" id="scheduleOverlay">
+            <input type="text" class="schedule-search-bar highlighted" id="scheduleSearch" placeholder="ENTER TRAIN NUMBER..." />
+            <div class="schedule-list" id="scheduleList"></div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * Helper function to resolve value with fallback support
+         * Accepts a single value key or an array of keys, returns the first value found in data
+         */
+        function resolveValue(valueKey, data) {
+            // If it's a single string, return the value directly
+            if (typeof valueKey === 'string') {
+                const value = data[valueKey];
+                // Skip undefined, null, and empty strings
+                if (value !== undefined && value !== null && value !== '') {
+                    return value;
+                }
+                return undefined;
+            }
+            
+            // If it's an array, try each key or literal in order
+            if (Array.isArray(valueKey)) {
+                for (const key of valueKey) {
+                    if (typeof key === 'string') {
+                        if (Object.prototype.hasOwnProperty.call(data, key)) {
+                            const value = data[key];
+                            // Skip undefined, null, and empty strings
+                            if (value !== undefined && value !== null && value !== '') {
+                                return value;
+                            }
+                        }
+                    } else if (key !== undefined && key !== null && key !== '') {
+                        return key;
+                    }
+                }
+            }
+            
+            return undefined;
+        }
+        
+        // Global State
+        let AppState = {
+            currentPage: null,
+            pagesConfig: null,
+            apiData: {},
+            displayData: {},
+            runtimeVariables: {
+                GNT_active: false,
+                alt_timetable: false,
+                speed_unit_mph: false
+            },
+            gameStatus: 'offline',
+            components: [],
+            brightness: 100,
+            nightMode: true,  // Dark mode by default
+            pageHistory: [],  // Track visited pages for back navigation
+            // Schedule browser state
+            scheduleOverlayActive: false,
+            scheduleList: [],
+            scheduleSearchQuery: '',
+            scheduleSelectedIndex: -1,
+            scheduleSearchBarFocused: true,
+            timetableData: {},
+            serviceTimetableData: {}
+        };
+        
+        // Initialize page history from localStorage
+        try {
+            const savedHistory = localStorage.getItem('pageHistory');
+            if (savedHistory) {
+                AppState.pageHistory = JSON.parse(savedHistory);
+                console.log('Loaded page history:', AppState.pageHistory);
+            }
+        } catch (e) {
+            console.error('Error loading page history:', e);
+        }
+        
+        // Toggle night mode function (for button actions)
+        function toggle_night_mode() {
+            AppState.nightMode = !AppState.nightMode;
+            if (AppState.nightMode) {
+                document.body.classList.remove('light-mode');
+            } else {
+                document.body.classList.add('light-mode');
+            }
+            console.log('Night mode:', AppState.nightMode ? 'ON (Dark)' : 'OFF (Light)');
+            
+            // Reapply page colors to adjust for mode
+            if (AppState.currentPage) {
+                applyPageColors(AppState.pagesConfig.pages[AppState.currentPage]);
+            }
+        }
+        
+        // Go back to previous page
+        function page_back() {
+            if (AppState.pageHistory.length > 0) {
+                const previousPage = AppState.pageHistory.pop();
+                console.log('Going back to:', previousPage);
+                // Save updated history to localStorage
+                localStorage.setItem('pageHistory', JSON.stringify(AppState.pageHistory));
+                // Don't add to history when going back
+                const currentHistory = [...AppState.pageHistory];
+                loadPage(previousPage);
+                AppState.pageHistory = currentHistory;
+            } else {
+                console.log('No previous page in history');
+            }
+        }
+        
+        // Helper function to invert color for light mode
+        function invertColor(hexColor) {
+            // Remove # if present
+            const hex = hexColor.replace('#', '');
+            
+            // Parse RGB
+            const r = parseInt(hex.substring(0, 2), 16);
+            const g = parseInt(hex.substring(2, 4), 16);
+            const b = parseInt(hex.substring(4, 6), 16);
+            
+            // Invert
+            const invR = (255 - r).toString(16).padStart(2, '0');
+            const invG = (255 - g).toString(16).padStart(2, '0');
+            const invB = (255 - b).toString(16).padStart(2, '0');
+            
+            return `#${invR}${invG}${invB}`;
+        }
+        
+        // Apply page colors respecting current mode
+        function applyPageColors(pageConfig) {
+            const body = document.body;
+            const isLightMode = !AppState.nightMode;
+            
+            if (pageConfig.background_color) {
+                const bgColor = isLightMode ? invertColor(pageConfig.background_color) : pageConfig.background_color;
+                body.style.backgroundColor = bgColor;
+            } else {
+                body.style.backgroundColor = '';
+            }
+            
+            if (pageConfig.text_color) {
+                const textColor = isLightMode ? invertColor(pageConfig.text_color) : pageConfig.text_color;
+                body.style.color = textColor;
+            } else {
+                body.style.color = '';
+            }
+            
+            if (pageConfig.border_color) {
+                const borderColor = isLightMode ? invertColor(pageConfig.border_color) : pageConfig.border_color;
+                document.documentElement.style.setProperty('--border-color', borderColor);
+            } else {
+                document.documentElement.style.removeProperty('--border-color');
+            }
+        }
+
+        function initializeRuntimeVariables(pagesConfig) {
+            const configuredRuntimeVariables = pagesConfig?.settings?.runtime_variables || {};
+            AppState.runtimeVariables = {
+                GNT_active: false,
+                ...configuredRuntimeVariables
+            };
+        }
+
+        function evaluateVisibleWhen(visibleWhen, data) {
+            if (!visibleWhen) return true;
+
+            if (typeof visibleWhen === 'object' && !Array.isArray(visibleWhen)) {
+                const variable = visibleWhen.variable;
+                const conditionValue = resolveValue(variable, data);
+
+                if (Object.prototype.hasOwnProperty.call(visibleWhen, 'equals')) {
+                    return conditionValue == visibleWhen.equals;
+                }
+
+                if (Object.prototype.hasOwnProperty.call(visibleWhen, 'not_equals')) {
+                    return conditionValue != visibleWhen.not_equals;
+                }
+
+                return Boolean(conditionValue);
+            }
+
+            return Boolean(resolveValue(visibleWhen, data));
+        }
+
+        function rebuildDisplayData() {
+            AppState.displayData = {
+                ...applyTransforms(AppState.apiData),
+                ...(AppState.timetableData ? flattenTimetableData(AppState.timetableData) : {}),
+                ...(AppState.serviceTimetableData ? flattenServiceTimetable(AppState.serviceTimetableData) : {}),
+                ...(AppState.runtimeVariables || {})
+            };
+        }
+
+        function updateRuntimeVariableFromAction(action) {
+            const variableName = action?.variable || action?.name || action?.key;
+            if (!variableName) return false;
+
+            const operation = action?.operation
+                || action?.mode
+                || (action?.action === 'toggle_runtime_variable' ? 'toggle' : 'set');
+
+            const currentValue = AppState.runtimeVariables[variableName];
+            let nextValue;
+
+            switch (operation) {
+                case 'toggle':
+                    nextValue = !Boolean(currentValue);
+                    break;
+                case 'set':
+                    nextValue = action.value;
+                    break;
+                case 'increment':
+                    nextValue = Number(currentValue || 0) + Number(action.step || 1);
+                    break;
+                case 'decrement':
+                    nextValue = Number(currentValue || 0) - Number(action.step || 1);
+                    break;
+                default:
+                    nextValue = action.value;
+                    break;
+            }
+
+            AppState.runtimeVariables[variableName] = nextValue;
+            rebuildDisplayData();
+            return true;
+        }
+
+        // Global helper function for components to set runtime variables directly
+        window.setComponentRuntimeVariable = (variableName, value) => {
+            if (!variableName) return false;
+            AppState.runtimeVariables[variableName] = value;
+            rebuildDisplayData();
+            return true;
+        };
+
+        // Initialize
+        async function init() {
+            try {
+                const pagesRes = await fetch('/api/pages');
+                AppState.pagesConfig = await pagesRes.json();
+                initializeRuntimeVariables(AppState.pagesConfig);
+                
+                // Check URL hash for page selection
+                const urlHash = window.location.hash.slice(1); // Remove #
+                const initialPage = urlHash || AppState.pagesConfig.settings.default_page || 'dashboard';
+                
+                loadPage(initialPage);
+                startDataPolling();
+                
+            } catch (err) {
+                console.error('Failed to initialize:', err);
+                document.getElementById('contentArea').innerHTML = '<div style="padding: 20px;">Error loading dashboard</div>';
+            }
+        }
+
+        // Load page
+        function loadPage(pageName) {
+            const pageConfig = AppState.pagesConfig.pages[pageName];
+            if (!pageConfig) return;
+            
+            // Add current page to history before navigating (if different page)
+            if (AppState.currentPage && AppState.currentPage !== pageName) {
+                AppState.pageHistory.push(AppState.currentPage);
+                // Limit history to last 10 pages
+                if (AppState.pageHistory.length > 10) {
+                    AppState.pageHistory.shift();
+                }
+                // Save updated history to localStorage
+                localStorage.setItem('pageHistory', JSON.stringify(AppState.pageHistory));
+            }
+            
+            // Check if this page requires a different template
+            const pageTemplate = pageConfig.template || AppState.pagesConfig.settings?.template || 'touchscreen';
+            if (pageTemplate !== 'touchscreen') {
+                // Redirect to the correct template with the page in URL hash
+                window.location.href = `/${pageTemplate}#${pageName}`;
+                return;
+            }
+            
+            AppState.currentPage = pageName;
+            
+            // Apply per-page colors respecting current mode
+            applyPageColors(pageConfig);
+            
+            // Render content
+            const contentArea = document.getElementById('contentArea');
+            contentArea.innerHTML = '';
+            AppState.components = [];
+
+            // Apply grid layout if specified
+            const grid = pageConfig.layout_grid;
+            if (grid) {
+                contentArea.style.display = 'grid';
+                contentArea.style.gridTemplateColumns = grid.columns || '1fr';
+                contentArea.style.gridTemplateRows = grid.rows || 'auto';
+                if (Array.isArray(grid.areas) && grid.areas.length > 0) {
+                    contentArea.style.gridTemplateAreas = grid.areas.map(row => `"${row}"`).join(' ');
+                }
+                contentArea.style.gap = grid.gap || '12px';
+            } else {
+                contentArea.style.display = '';
+            }
+
+            // Render components
+            pageConfig.components.forEach(componentConfig => {
+                // Attach page-level font_sizes if needed
+                if (!componentConfig.font_sizes && pageConfig.font_sizes) {
+                    componentConfig.font_sizes = pageConfig.font_sizes;
+                }
+                
+                const componentDiv = document.createElement('div');
+                componentDiv.id = componentConfig.id;
+                
+                // Apply alignment if specified
+                if (componentConfig.alignment) {
+                    applyComponentAlignment(componentDiv, componentConfig.alignment);
+                }
+                
+                // Apply grid area
+                if (componentConfig.area) {
+                    componentDiv.style.gridArea = componentConfig.area;
+                }
+                
+                // Make clickable if specified
+                if (componentConfig.clickable) {
+                    componentDiv.classList.add('clickable');
+                    componentDiv.addEventListener('click', () => {
+                        handleComponentClick(componentConfig);
+                    });
+                }
+                
+                // Check visibility
+                if (componentConfig.visible_when) {
+                    const isVisible = evaluateVisibleWhen(componentConfig.visible_when, AppState.displayData);
+                    if (!isVisible) {
+                        componentDiv.classList.add('hidden-content');
+                    }
+                }
+                
+                // Render component
+                ComponentFactory.renderComponent(componentDiv, componentConfig, AppState.displayData);
+                
+                // Enable navigation for ebula_data_table components
+                if (componentConfig.type === 'ebula_data_table') {
+                    window.ebulaTableNavigationActive = true;
+                }
+                
+                contentArea.appendChild(componentDiv);
+                AppState.components.push(componentConfig);
+            });
+        }
+
+        function applyComponentAlignment(componentDiv, alignment) {
+            if (!alignment) return;
+            
+            componentDiv.style.display = 'flex';
+            componentDiv.style.flexDirection = 'column';
+            
+            // Horizontal
+            if (alignment.horizontal === 'left') {
+                componentDiv.style.alignItems = 'flex-start';
+            } else if (alignment.horizontal === 'center') {
+                componentDiv.style.alignItems = 'center';
+            } else if (alignment.horizontal === 'right') {
+                componentDiv.style.alignItems = 'flex-end';
+            }
+            
+            // Vertical
+            if (alignment.vertical === 'top') {
+                componentDiv.style.justifyContent = 'flex-start';
+            } else if (alignment.vertical === 'center') {
+                componentDiv.style.justifyContent = 'center';
+            } else if (alignment.vertical === 'bottom') {
+                componentDiv.style.justifyContent = 'flex-end';
+            }
+        }
+
+        // Schedule Browser Functions
+        async function openScheduleBrowser() {
+            AppState.scheduleOverlayActive = true;
+            AppState.scheduleSearchQuery = '';
+            AppState.scheduleSelectedIndex = -1;
+            AppState.scheduleSearchBarFocused = true;
+            
+            const searchInput = document.getElementById('scheduleSearch');
+            document.getElementById('scheduleOverlay').classList.add('active');
+            searchInput.value = '';
+            searchInput.classList.add('highlighted');
+            searchInput.focus();
+            
+            // Add keyboard event listener
+            searchInput.addEventListener('keydown', handleScheduleSearchKeydown);
+            
+            // Load schedule list from server
+            try {
+                const response = await fetch('/api/schedules/list');
+                const data = await response.json();
+                AppState.scheduleList = data.schedules || [];
+                renderScheduleList();
+            } catch (err) {
+                console.error('Error loading schedule list:', err);
+                AppState.scheduleList = [];
+                renderScheduleList();
+            }
+        }
+        
+        function closeScheduleBrowser() {
+            AppState.scheduleOverlayActive = false;
+            document.getElementById('scheduleOverlay').classList.remove('active');
+            // Remove keyboard event listener
+            const searchInput = document.getElementById('scheduleSearch');
+            searchInput.removeEventListener('keydown', handleScheduleSearchKeydown);
+        }
+        
+        function handleScheduleSearchKeydown(event) {
+            const searchInput = document.getElementById('scheduleSearch');
+            
+            if (event.key === 'Backspace') {
+                event.preventDefault();
+                AppState.scheduleSearchQuery = AppState.scheduleSearchQuery.slice(0, -1);
+            } else if (event.key === 'Enter') {
+                event.preventDefault();
+                selectSchedule();
+                return;
+            } else if (/^[0-9a-zA-Z]$/.test(event.key)) {
+                event.preventDefault();
+                AppState.scheduleSearchQuery += event.key.toUpperCase();
+            }
+            
+            searchInput.value = AppState.scheduleSearchQuery;
+            AppState.scheduleSelectedIndex = 0;  // Auto-select first match
+            renderScheduleList();
+        }
+        
+        function renderScheduleList() {
+            const listEl = document.getElementById('scheduleList');
+            listEl.innerHTML = '';
+            
+            const query = AppState.scheduleSearchQuery.toLowerCase();
+            const filteredSchedules = AppState.scheduleList.filter(schedule => {
+                return schedule.train_number.toLowerCase().includes(query);
+            });
+            
+            filteredSchedules.forEach((schedule, index) => {
+                const item = document.createElement('div');
+                item.className = 'schedule-item';
+                if (index === AppState.scheduleSelectedIndex) {
+                    item.classList.add('selected');
+                }
+                
+                const code = document.createElement('div');
+                code.className = 'schedule-item-code';
+                code.textContent = schedule.route_code;
+                
+                const number = document.createElement('div');
+                number.className = 'schedule-item-number';
+                number.textContent = schedule.train_number;
+                
+                const destination = document.createElement('div');
+                destination.className = 'schedule-item-destination';
+                destination.textContent = schedule.destination || '';
+                
+                item.appendChild(code);
+                item.appendChild(number);
+                item.appendChild(destination);
+                
+                item.onclick = () => {
+                    AppState.scheduleSelectedIndex = index;
+                    selectSchedule();
+                };
+                
+                listEl.appendChild(item);
+            });
+
+            const selectedItem = listEl.querySelector('.schedule-item.selected');
+            if (selectedItem) {
+                // Keep selection in view when list is longer than viewport.
+                selectedItem.scrollIntoView({ block: 'nearest' });
+            }
+        }
+        
+        async function selectSchedule() {
+            const query = AppState.scheduleSearchQuery.toLowerCase();
+            const filteredSchedules = AppState.scheduleList.filter(schedule => {
+                return schedule.train_number.toLowerCase().includes(query);
+            });
+            
+            if (AppState.scheduleSelectedIndex >= 0 && AppState.scheduleSelectedIndex < filteredSchedules.length) {
+                const selected = filteredSchedules[AppState.scheduleSelectedIndex];
+                
+                // Load the schedule file
+                try {
+                    const response = await fetch(`/api/schedules/load/${encodeURIComponent(selected.filename)}`);
+                    const data = await response.json();
+                    AppState.timetableData = data;
+                    
+                    // Merge timetable data into displayData for components
+                    let mergedData = {
+                        ...AppState.displayData,
+                        ...flattenTimetableData(data)
+                    };
+                    
+                    // Check if there's a service timetable to load
+                    const serviceTimetableFile = data.train_info?.service_timetable;
+                    if (serviceTimetableFile) {
+                        try {
+                            const stResponse = await fetch(`/api/service-timetables/load/${encodeURIComponent(serviceTimetableFile)}`);
+                            const stData = await stResponse.json();
+                            AppState.serviceTimetableData = stData;
+                            
+                            // Merge service timetable data as well
+                            mergedData = {
+                                ...mergedData,
+                                ...flattenServiceTimetable(stData)
+                            };
+                        } catch (stErr) {
+                            console.error('Error loading service timetable:', stErr);
+                        }
+                    }
+                    
+                    AppState.displayData = mergedData;
+                    closeScheduleBrowser();
+                } catch (err) {
+                    console.error('Error loading schedule file:', err);
+                }
+            }
+        }
+        
+        function flattenTimetableData(timetable) {
+            const flattened = {};
+            
+            // Flatten train_info
+            if (timetable.train_info) {
+                Object.entries(timetable.train_info).forEach(([key, value]) => {
+                    flattened[`tt_${key}`] = value;
+                });
+            }
+            
+            // Add timetable_data with index-based keys
+            if (timetable.timetable_data && Array.isArray(timetable.timetable_data)) {
+                flattened.tt_timetable = timetable.timetable_data;
+                
+                timetable.timetable_data.forEach((stop, index) => {
+                    Object.entries(stop).forEach(([key, value]) => {
+                        flattened[`tt_${index}_${key}`] = value;
+                    });
+                });
+            }
+            
+            return flattened;
+        }
+        
+        function flattenServiceTimetable(serviceTimetable) {
+            const flattened = {};
+            
+            // Flatten route_info
+            if (serviceTimetable.route_info) {
+                Object.entries(serviceTimetable.route_info).forEach(([key, value]) => {
+                    flattened[`st_${key}`] = value;
+                });
+            }
+            
+            // Add timetable_entries with index-based keys
+            if (serviceTimetable.timetable_entries && Array.isArray(serviceTimetable.timetable_entries)) {
+                flattened.st_entries = serviceTimetable.timetable_entries;
+                
+                serviceTimetable.timetable_entries.forEach((entry, index) => {
+                    Object.entries(entry).forEach(([key, value]) => {
+                        flattened[`st_${index}_${key}`] = value;
+                    });
+                });
+            }
+            
+            // Add alternate timetable_entries if available
+            if (serviceTimetable.timetable_entries_alt && Array.isArray(serviceTimetable.timetable_entries_alt)) {
+                // Keep the full array as st_entries_alt
+                flattened.st_entries_alt = serviceTimetable.timetable_entries_alt;
+                
+                // Add each entry with alt-specific index-based keys like st_alt_0_km, st_alt_1_location, etc.
+                serviceTimetable.timetable_entries_alt.forEach((entry, index) => {
+                    Object.entries(entry).forEach(([key, value]) => {
+                        flattened[`st_alt_${index}_${key}`] = value;
+                    });
+                });
+            }
+            
+            return flattened;
+        }
+        
+        function deleteLoadedSchedules() {
+            AppState.timetableData = {};
+            AppState.serviceTimetableData = {};
+
+            // Rebuild display data to preserve runtime variables
+            rebuildDisplayData();
+        }
+
+        async function appendSupportData() {
+            const dataSource = AppState.displayData || {};
+            const latitude = dataSource['player_info.geoLocation.latitude'];
+            const longitude = dataSource['player_info.geoLocation.longitude'];
+
+            if (latitude === undefined || longitude === undefined || latitude === null || longitude === null) {
+                return;
+            }
+
+            try {
+                await fetch('/api/support-data/append', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        latitude,
+                        longitude
+                    })
+                });
+            } catch (error) {
+                console.error('Failed to append support data:', error);
+            }
+        }
+
+        // Save completed schedule with recorded ATA/ATD timestamps
+        async function saveCompletedSchedule() {
+            if (!window.ebulaTableState) {
+                console.error('No ebula table state available');
+                return;
+            }
+
+            // Find the ebula table component
+            const tableContainer = document.querySelector('[id$="-table"]');
+            if (!tableContainer) {
+                console.error('Ebula table not found');
+                return;
+            }
+
+            const componentId = tableContainer.id.replace('-table', '');
+            const state = window.ebulaTableState[componentId];
+            if (!state || !state.scheduleData) {
+                console.error('No schedule data available');
+                return;
+            }
+
+            // Get train info from the timetable data
+            const timetableData = AppState.timetableData || {};
+            const trainInfo = timetableData.train_info || {};
+            const routeCode = trainInfo.route_code || 'UNKNOWN';
+            const trainNumber = trainInfo.train_number || 'UNKNOWN';
+
+            try {
+                const response = await fetch(`/api/save-completed-schedule/${routeCode}/${trainNumber}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        scheduleData: state.scheduleData,
+                        gameTimeAtStart: state.gameTimeAtStart,
+                        realTimeAtStart: state.realTimeAtStart,
+                        trainInfo: trainInfo
+                    })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    console.log('Schedule saved successfully:', result.filename);
+                    if (result.driven_distance_km !== undefined) {
+                        console.log('Driven distance: ' + result.driven_distance_km + ' km');
+                    }
+                } else {
+                    console.error('Failed to save schedule:', result.error);
+                }
+            } catch (error) {
+                console.error('Error saving schedule:', error);
+            }
+        }
+
+        // Ebula Table Navigation Functions
+        function handleEbulaTableNavigation(direction) {
+            if (!window.ebulaTableState) return;
+            
+            // Find the active ebula table component
+            const tableContainer = document.querySelector('[id$="-table"]');
+            if (!tableContainer) return;
+            
+            const componentId = tableContainer.id.replace('-table', '');
+            const state = window.ebulaTableState[componentId];
+            if (!state) return;
+            
+            const visibleRows = state.displayedRows || 15;
+            const maxScrollOffset = Math.max(0, state.entries ? state.entries.length - visibleRows : 0);
+            
+            if (direction === 'down') {
+                state.scrollOffset = Math.max(state.scrollOffset - 1, 0);
+            } else if (direction === 'up') {
+                state.scrollOffset = Math.min(state.scrollOffset + 1, maxScrollOffset);
+            } else if (direction === 'left') {
+                state.scrollOffset = Math.min(state.scrollOffset + visibleRows, maxScrollOffset);
+            } else if (direction === 'right') {
+                state.scrollOffset = Math.max(state.scrollOffset - visibleRows, 0);
+            }
+            
+            // Refresh table
+            updateData();
+        }
+        
+        function resetEbulaTableToClosest() {
+            if (!window.ebulaTableState) return;
+            
+            const tableContainer = document.querySelector('[id$="-table"]');
+            if (!tableContainer) return;
+            
+            const componentId = tableContainer.id.replace('-table', '');
+            const state = window.ebulaTableState[componentId];
+            if (!state) return;
+            
+            // Reset to show closest at bottom with entries above
+            state.scrollOffset = state.displayedRows - 1;
+            updateData();
+        }
+
+        function handleComponentClick(componentConfig) {
+            if (!componentConfig.onClick) return;
+            
+            const action = componentConfig.onClick;
+            switch (action.action) {
+                case 'page_navigate':
+                    loadPage(action.target);
+                    break;
+                case 'page_back':
+                    page_back();
+                    break;
+                case 'toggle_night_mode':
+                    toggle_night_mode();
+                    break;
+                case 'toggle':
+                    if (action.variable || action.name || action.key) {
+                        updateRuntimeVariableFromAction({ ...action, operation: action.operation || 'toggle' });
+                    }
+                    break;
+                case 'toggle_runtime_variable':
+                case 'set_runtime_variable':
+                case 'update_runtime_variable':
+                    updateRuntimeVariableFromAction(action);
+                    break;
+                case 'open_schedule_browser':
+                    openScheduleBrowser();
+                    break;
+                case 'delete_loaded_schedule':
+                    deleteLoadedSchedules();
+                    break;
+                case 'append_support_data':
+                    appendSupportData();
+                    break;
+                case 'save_completed_schedule':
+                    saveCompletedSchedule();
+                    break;
+                default:
+                    console.log('Click action:', action);
+            }
+        }
+
+        function renderNavigation(pageConfig) {
+            // Navigation removed - touchscreen is now full-screen content only
+        }
+
+        function applyTransforms(rawData) {
+            const transforms = (AppState.pagesConfig && AppState.pagesConfig.api_transforms) || {};
+            const transformed = {};
+
+            Object.entries(rawData || {}).forEach(([key, value]) => {
+                transformed[key] = value;
+            });
+
+            Object.entries(transforms || {}).forEach(([transformKey, transform]) => {
+                // Handle substring transformations
+                if (transform.source && transform.substring) {
+                    const sourceValue = String(rawData[transform.source] || '');
+                    const start = transform.substring.start || 0;
+                    const end = transform.substring.end;
+                    
+                    let result;
+                    if (end !== undefined) {
+                        if (end < 0) {
+                            // Negative end means count from the end
+                            result = sourceValue.substring(start, sourceValue.length + end);
+                        } else {
+                            result = sourceValue.substring(start, end);
+                        }
+                    } else {
+                        result = sourceValue.substring(start);
+                    }
+                    transformed[transformKey] = result;
+                    return;
+                }
+
+                // Handle numeric transformations
+                const value = transformed[transformKey] !== undefined ? transformed[transformKey] : rawData[transformKey];
+                if (transform && typeof transform === 'object' && !transform.source) {
+                    const numValue = Number(value);
+                    if (Number.isFinite(numValue)) {
+                        const multiply = typeof transform.multiply === 'number' ? transform.multiply : 1;
+                        const add = typeof transform.add === 'number' ? transform.add : 0;
+                        transformed[transformKey] = (numValue * multiply) + add;
+                    }
+                }
+            });
+
+            return transformed;
+        }
+
+        function startDataPolling() {
+            updateData();
+            setInterval(updateData, 100);
+        }
+
+        async function updateData() {
+            try {
+                const res = await fetch('/api/data');
+                const data = await res.json();
+                
+                AppState.apiData = data.data || {};
+                rebuildDisplayData();
+                
+                AppState.gameStatus = data.game_status || 'offline';
+                
+                // Update status indicator
+                updateStatusIndicator(AppState.gameStatus);
+                
+                // Update components
+                AppState.components.forEach(componentConfig => {
+                    const componentContainer = document.getElementById(componentConfig.id);
+                    if (componentContainer) {
+                        // Check visibility
+                        if (componentConfig.visible_when) {
+                            const isVisible = evaluateVisibleWhen(componentConfig.visible_when, AppState.displayData);
+                            if (isVisible) {
+                                componentContainer.classList.remove('hidden-content');
+                            } else {
+                                componentContainer.classList.add('hidden-content');
+                            }
+                        }
+                        
+                        ComponentFactory.updateComponent(componentContainer, componentConfig, AppState.displayData);
+                    }
+                });
+                
+            } catch (err) {
+                console.error('Data polling error:', err);
+            }
+        }
+
+        function updateStatusIndicator(status) {
+            // Status indicator removed - full-screen content only
+            // Status is still tracked in AppState.gameStatus
+        }
+
+        // Initialize on load
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

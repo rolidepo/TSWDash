@@ -1,0 +1,19 @@
+{
+"train_info": {
+"company": "FlixTrain",
+"train_number": "FLX 1230",
+"destination": "Aachen Hbf",
+"type": "Express",
+"priority": "3",
+"max_speed_kph": 200,
+"timetable_length_km": 64,
+"driven_distance_km": 0,
+"route_code": "SKA",
+"service_timetable": "SKA_1.json",
+"completed_timetable": false
+},
+"timetable_data": [
+{"station": "Köln Hbf", "stop": true, "ETA": "13:45:00", "ETD": "13:47:00", "ATA": "", "ATD": "", "diff": ""},
+{"station": "Aachen Hbf", "stop": true, "ETA": "14:24:00", "ETD": "", "ATA": "", "ATD": "", "diff": ""}
+]
+}

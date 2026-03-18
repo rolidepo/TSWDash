@@ -1,0 +1,160 @@
+{
+  "subscriptions": [
+    {
+      "id": 1,
+      "name": "main_telemetry",
+      "frequency_ms": 100,
+      "endpoints": [
+        "CurrentDrivableActor.Function.HUD_GetSpeed",
+        "CurrentDrivableActor.Function.HUD_GetRPM",
+        "CurrentDrivableActor.Function.HUD_GetBrakeGauge_1",
+        "CurrentDrivableActor.Function.HUD_GetBrakeGauge_2",
+        "CurrentDrivableActor.Function.HUD_GetAcceleration",
+        "CurrentDrivableActor/PZB_Service_V3.Property.bIsPZB_Active",
+        "CurrentDrivableActor/PZB_Service_V3.Property.ProgramMode",
+        "CurrentDrivableActor/PZB_Service_V3.Property.ActiveInfluence",
+        "CurrentDrivableActor/PZB_Service_V3.Property.influenceCode",
+        "CurrentDrivableActor/PZB_Service_V2.Property.bIsPZB_Active",
+        "CurrentDrivableActor/PZB_Service_V2.Property.ProgramMode",
+        "CurrentDrivableActor/PZB_Service_V2.Property.ActiveInfluence",
+        "CurrentDrivableActor/PZB_Service_V2.Property.influenceCode",
+        "CurrentDrivableActor/PZB.Property.bIsPZB_Active",
+        "CurrentDrivableActor/PZB.Property.ProgramMode",
+        "CurrentDrivableActor/PZB.Property.ActiveInfluence",
+        "CurrentDrivableActor/PZB.Property.influenceCode",
+        "CurrentDrivableActor/LZB.Property.bIsActivated",
+        "CurrentDrivableActor/LZB.Property.targetSpeedDistance_m",
+        "CurrentDrivableActor/LZB_Service.Property.targetSpeedDistance_m",
+        "CurrentDrivableActor/LZB_Service.Property.bIsActivated",
+        "CurrentDrivableActor/LZB_Service.Function.LZB_GetIsOverspeedBraking",
+        "CurrentDrivableActor/LZB_Service.Function.LZB_GetIsEmergencyBraking",
+        "CurrentDrivableActor/LZB_Service.Property.OverspeedState",
+        "CurrentDrivableActor/LZB_Service.Property.maxPermisibleSpeed_ms",
+        "CurrentDrivableActor/LZB_Service.Property.expectedTargetSpeed_ms",
+        "CurrentDrivableActor/AFB.Property.AFB_TargetSpeedMS",
+        "CurrentDrivableActor.Property.AFB_CurrentSpeedSetPoint",
+        "CurrentDrivableActor/AFB.Property.AFBIsEnabled",
+        "CurrentDrivableActor/AFB.Function.GetActiveState",
+        "CurrentDrivableActor/BP_Sifa_Service.Property.bIsCutIn",
+        "CurrentDrivableActor/BP_Sifa_Service.Property.WarningStateVisual",
+        "CurrentDrivableActor/BP_Sifa_Service.Property.WarningStateAuditory",
+        "CurrentDrivableActor/Sifa.Property._IsEnabled",
+        "CurrentDrivableActor/Sifa.Function.isFirstWarning",
+        "CurrentDrivableActor/Sifa.Function.isSecondWarning",
+        "CurrentDrivableActor.Function.HUD_GetTractiveEffort",
+        "CurrentDrivableActor.Function.GetTargetTractiveEffort",
+        "CurrentDrivableActor.Function.GetTargetDynamicBrakingEffort",
+        "CurrentDrivableActor.Function.IS_GetTargetTractiveEffortN",
+        "CurrentDrivableActor.Function.IS_GetTargetBrakingEffortN",
+        "CurrentDrivableActor.Function.IS_GetTractiveEffortN",
+        "CurrentDrivableActor.Function.IS_GetBrakingEffortN",
+        "CurrentDrivableActor.Function.GetTargetTractiveRequestedEffort",
+        "CurrentDrivableActor.Function.GetTargetDynamicRequestedEffort",
+        "CurrentDrivableActor/DriverAssist.Function.GetAreDoorsUnlocked",
+        "CurrentDrivableActor.Function.HUD_GetIsSlipping",
+        "CurrentDrivableActor.Function.IS_GetVehicleInfo",
+        "CurrentDrivableActor/EnergyCounter.Property.kwh_used",
+        "CurrentDrivableActor/EnergyCounter.Property.kwh_gen",
+        "CurrentDrivableActor.Property.PantographLowered",
+        "CurrentDrivableActor.Function.IS_GetCurrentCollectorState",
+        "TimeOfDay.Data"
+      ],
+      "variables": {
+        "CurrentDrivableActor.Function.HUD_GetSpeed": "speed_ms",
+        "CurrentDrivableActor.Function.HUD_GetRPM": "rpm",
+        "CurrentDrivableActor.Function.HUD_GetBrakeGauge_1": "brake_pressure_1",
+        "CurrentDrivableActor.Function.HUD_GetBrakeGauge_2": "brake_pressure_2",
+        "CurrentDrivableActor.Function.HUD_GetAcceleration": "acceleration_ms2",
+        "CurrentDrivableActor/PZB_Service_V3.Property.bIsPZB_Active": "PZB_IsActive",
+        "CurrentDrivableActor/PZB_Service_V3.Property.ProgramMode": "PZB_ProgramMode",
+        "CurrentDrivableActor/PZB_Service_V3.Property.ActiveInfluence": "PZB_ActiveInfluence",
+        "CurrentDrivableActor/PZB_Service_V3.Property.influenceCode": "PZB_InfluenceCode",
+        "CurrentDrivableActor/PZB_Service_V2.Property.bIsPZB_Active": "PZB_IsActive_v2",
+        "CurrentDrivableActor/PZB_Service_V2.Property.ProgramMode": "PZB_ProgramMode_v2",
+        "CurrentDrivableActor/PZB_Service_V2.Property.ActiveInfluence": "PZB_ActiveInfluence_v2",
+        "CurrentDrivableActor/PZB_Service_V2.Property.influenceCode": "PZB_InfluenceCode_v2",
+        "CurrentDrivableActor/PZB.Property.bIsPZB_Active": "PZB_IsActive_v1",
+        "CurrentDrivableActor/PZB.Property.ProgramMode": "PZB_ProgramMode_v1",
+        "CurrentDrivableActor/PZB.Property.ActiveInfluence": "PZB_ActiveInfluence_v1",
+        "CurrentDrivableActor/PZB.Property.influenceCode": "PZB_InfluenceCode_v1",
+        "CurrentDrivableActor/LZB.Property.bIsActivated": "LZB_IsActive_legacy",
+        "CurrentDrivableActor/LZB.Property.targetSpeedDistance_m": "LZB_target_speed_distance_legacy",
+        "CurrentDrivableActor/LZB_Service.Property.targetSpeedDistance_m": "LZB_target_speed_distance",
+        "CurrentDrivableActor/LZB_Service.Property.bIsActivated": "LZB_IsActive",
+        "CurrentDrivableActor/LZB_Service.Function.LZB_GetIsOverspeedBraking": "LZB_IsOverspeedBraking",
+        "CurrentDrivableActor/LZB_Service.Function.LZB_GetIsEmergencyBraking": "LZB_IsEmergencyBraking",
+        "CurrentDrivableActor/LZB_Service.Property.OverspeedState": "LZB_OverspeedState",
+        "CurrentDrivableActor/LZB_Service.Property.maxPermisibleSpeed_ms": "LZB_maxPermisibleSpeed_ms",
+        "CurrentDrivableActor/LZB_Service.Property.expectedTargetSpeed_ms": "LZB_expectedTargetSpeed_ms",
+        "CurrentDrivableActor/AFB.Property.AFB_TargetSpeedMS": "AFB_TargetSpeed_ms",
+        "CurrentDrivableActor.Property.AFB_CurrentSpeedSetPoint": "AFB_CurrentSpeedSetPoint",
+        "CurrentDrivableActor/AFB.Property.AFBIsEnabled": "AFB_IsEnabled",
+        "CurrentDrivableActor/AFB.Function.GetActiveState": "AFB_ActiveState",
+        "CurrentDrivableActor/BP_Sifa_Service.Property.bIsCutIn": "Sifa_Active",
+        "CurrentDrivableActor/BP_Sifa_Service.Property.WarningStateVisual": "Sifa_WarningStateVisual",
+        "CurrentDrivableActor/BP_Sifa_Service.Property.WarningStateAuditory": "Sifa_WarningStateAuditory",
+        "CurrentDrivableActor/Sifa.Property._IsEnabled" : "Sifa_Active_legacy",
+        "CurrentDrivableActor/Sifa.Function.isFirstWarning" : "Sifa_WarningStateVisual_legacy",
+        "CurrentDrivableActor/Sifa.Function.isSecondWarning" : "Sifa_WarningStateAuditory_legacy",
+        "CurrentDrivableActor.Function.HUD_GetTractiveEffort": "tractive_effort",
+        "CurrentDrivableActor.Function.GetTargetTractiveEffort": "TargetTractiveEffort",
+        "CurrentDrivableActor.Function.GetTargetDynamicBrakingEffort": "TargetDynamicBrakeEffort",
+        "CurrentDrivableActor.Function.IS_GetTargetTractiveEffortN": "TargetTractiveEffort_legacy",
+        "CurrentDrivableActor.Function.IS_GetTargetBrakingEffortN": "TargetDynamicBrakeEffort_legacy",
+        "CurrentDrivableActor.Function.IS_GetTractiveEffortN": "tractive_effort_legacy",
+        "CurrentDrivableActor.Function.IS_GetBrakingEffortN": "brake_effort_legacy",
+        "CurrentDrivableActor.Function.GetTargetTractiveRequestedEffort": "TargetTractiveRequestedEffort",
+        "CurrentDrivableActor.Function.GetTargetDynamicRequestedEffort": "TargetDynamicRequestedEffort",
+        "CurrentDrivableActor/DriverAssist.Function.GetAreDoorsUnlocked": "doors_unlocked",
+        "CurrentDrivableActor.Function.HUD_GetIsSlipping": "is_slipping",
+        "CurrentDrivableActor.Function.IS_GetVehicleInfo": "vehicle_info",
+        "CurrentDrivableActor/EnergyCounter.Property.kwh_used": "kwh_used",
+        "CurrentDrivableActor/EnergyCounter.Property.kwh_gen": "kwh_gen",
+        "CurrentDrivableActor.Property.PantographLowered": "pantograph_lowered",
+        "CurrentDrivableActor.Function.IS_GetCurrentCollectorState": "mcb_state",
+        "TimeOfDay.Data": "tod_data"
+      }
+    },
+    {
+      "id": 2,
+      "name": "electrical_systems",
+      "frequency_ms": 10000,
+      "endpoints": [
+        "CurrentDrivableActor.Function.HUD_GetAmmeter",
+        "CurrentDrivableActor.Function.HUD_GetVoltmeter"
+      ],
+      "variables": {
+        "CurrentDrivableActor.Function.HUD_GetAmmeter": "amperage",
+        "CurrentDrivableActor.Function.HUD_GetVoltmeter": "voltage"
+      }
+    }
+  ],
+  "single_endpoints": [
+    {
+      "id": "player_info",
+      "frequency_ms": 1000,
+      "path": "DriverAid.PlayerInfo",
+      "variables": {
+        "PlayerInfo": "player_info"
+      }
+    }
+    
+  ],
+  "patch_endpoints": [
+    {
+      "id": "throttle_control",
+      "path": "CurrentDrivableActor/Throttle(Lever)",
+      "variable_name": "throttle_input"
+    },
+    {
+      "id": "brake_control",
+      "path": "CurrentDrivableActor/Brake(Lever)",
+      "variable_name": "brake_input"
+    },
+    {
+      "id": "weather_control",
+      "path": "WeatherManager.Temperature",
+      "variable_name": "temperature"
+    }
+  ]
+}

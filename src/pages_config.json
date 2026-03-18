@@ -1,0 +1,1043 @@
+{
+  "pages": {
+    "home": {
+      "title": "",
+      "layout": "dashboard",
+      "template": "mfd",
+      "background_color": "#34192B",
+      "text_color": "#00ff1a",
+      "border_color": "##FF69B4",
+      "layout_grid": {
+        "columns": "1fr",
+        "rows": "1fr",
+        "areas": [
+          "welcome"
+        ],
+        "gap": "0px"
+      },
+      "font_sizes": {
+        "title": "14px",
+        "value": "12px",
+        "unit": "12px"
+      },
+      "components": [
+        {
+          "type": "text_display",
+          "id": "welcome",
+          "value": "Welcome",
+          "area": "welcome",
+          "clickable": true,
+          "onClick": {
+            "action": "page_navigate", "target": "dashboard"
+          },
+          "alignment": {
+            "horizontal": "center",
+            "vertical": "center"
+          },
+          "styles": {
+            "value": {
+              "fontSize": "48px",
+              "bold": true
+            }
+          }
+        }
+      ],
+      "buttons": {
+        "top": {
+          "aus": {"action": ""},
+          "S": {"action": "page_navigate", "target": "settings"},
+          "TT": {"action": "open_schedule_browser"},
+          "i": {"action": "page_navigate", "target": "info"},
+          "St": {"action": "toggle", "target": "status"},
+          "V>0": {"action": "condition_check", "value": "speed_ms", "condition": ">", "compare": 0},
+          "V=0": {"action": "condition_check", "value": "speed_ms", "condition": "==", "compare": 0},
+          "brightness": {"action": "adjust_brightness", "step": 5},
+          "contrast": {"action": "toggle_night_mode"},
+          "UD": {"action": "adjust_contrast", "step": 5}
+        },
+        "right": {
+          "c": {"action": "config_mode"},
+          "left": {"action": "scroll", "direction": "left"},
+          "right": {"action": "scroll", "direction": "right"},
+          "up": {"action": "scroll", "direction": "up"},
+          "down": {"action": "scroll", "direction": "down"},
+          "E": {"action": "confirm"}
+        },
+        "bottom": {
+          "1": {"action": "page_navigate", "target": "dashboard"},
+          "2": {"action": "page_navigate", "target": "diagnostics"},
+          "3": {"action": "page_navigate", "target": "info"},
+          "4": {"action": "page_navigate", "target": "settings"},
+          "5": {"action": "page_navigate", "target": "EUGen"},
+          "6": {"action": "page_navigate", "target": "timetable"},
+          "7": {"action": "page_navigate", "target": "dashboard"},
+          "8": {"action": "page_navigate", "target": "dashboard"},
+          "9": {"action": "page_navigate", "target": "dashboard"},
+          "0": {"action": "page_navigate", "target": "dashboard"}
+        }
+      },
+      "menu_labels": {
+        "1": "Dash",
+        "2": "Dia",
+        "3": "Info",
+        "4": "Set",
+        "5": "EUGen",
+        "6": "TT",
+        "7": "7",
+        "8": "8",
+        "9": "9",
+        "0": "0"
+      }
+    },
+    "EUGen": {
+      "title": "",
+      "layout": "mfd",
+      "show_speedometer": true,
+      "template": "mfd",
+      "layout_grid": {
+        "columns": "minmax(0, 100px) auto auto auto auto auto auto auto auto auto auto auto auto",
+        "rows": "minmax(0, 50px) minmax(0, 50px) auto auto auto auto",
+        "areas": [
+          "empt1 empt2 empt2 empt2 empt2 time time empt3 empt3 empt3 empt3 empt3 empt3",
+          "lzbnum speedo speedo speedo speedo speedo speedo traction traction traction traction traction traction",
+          "lzbbar speedo speedo speedo speedo speedo speedo traction traction traction traction traction traction",
+          "ind1 ind2 ind3 ind4 ind5 ind6 ind7 ind8 ind9 ind10 ind11 ind12 ind13",
+          "ind14 list1 list1 list1 list1 list1 list1 list1 list2 list2 list2 list2 list2",
+          "ind15 list1 list1 list1 list1 list1 list1 list1 list2 list2 list2 list2 list2"
+        ],
+        "gap": "0px"
+      },
+      "font_sizes": {
+        "title": "14px",
+        "value": "12px",
+        "unit": "12px"
+      },
+      "components": [
+        {
+            "type": "seven_segment",
+            "id": "lzb_distance_display",
+           
+            "value": "LZB_target_speed_distance.Value",
+            "area": "lzbnum",
+            "font_sizes": {
+              "value": "25px"
+            },
+            
+            
+            "alignment": {
+              "horizontal": "center",
+              "vertical": "center"
+            },
+            "visible_when": {
+                "variable": "LZB_IsActive.Value",
+                "equals": true
+            }
+        },
+        {
+            "type": "scaled_vertical_bar",
+            "id": "lzb_distance_bar",
+           
+            "value": "LZB_target_speed_distance.Value",
+            "font_sizes": {
+              "value": "100px"
+            },
+            "area": "lzbbar",
+            "alignment": {
+              "horizontal": "left",
+              "vertical": "top"
+            },
+            "visible_when": {
+                "variable": "LZB_IsActive.Value",
+                "equals": true
+            }
+           
+        },
+        {
+          "type": "speedometer",
+          "id": "speed_gauge",
+          "title": "Speed",
+          "value": "speed_ms.Speed_ms",
+          "min": 0,
+          "max": "LZB_LocoMaxSpeed_legacy.value",
+          "unit": "km/h",
+          "size": 350,
+          "area": "speedo"
+        },
+
+
+
+        {
+          "type": "text_display",
+          "id": "empt1",
+          "value": "",
+          "area": "empt1"
+        },
+        {
+          "type": "text_display",
+          "id": "empt2",
+          "value": "",
+          "area": "empt2"
+        },
+        {
+          "type": "text_display",
+          "id": "time",
+          "value": "",
+          "area": "time"
+        },
+        {
+          "type": "text_display",
+          "id": "empt3",
+          "value": "",
+          "area": "empt3"
+        },
+        {
+          "type": "text_display",
+          "id": "empt3",
+          "value": "",
+          "area": "empt3"
+        },
+        {
+          "type": "text_display",
+          "id": "ind1",
+          "value": "",
+          "area": "ind1"
+        },
+        {
+          "type": "text_display",
+          "id": "ind2",
+          "value": "",
+          "area": "ind2"
+        },
+        {
+          "type": "text_display",
+          "id": "ind3",
+          "value": "",
+          "area": "ind3"
+        },
+        {
+          "type": "text_display",
+          "id": "ind4",
+          "value": "",
+          "area": "ind4"
+        },
+        {
+          "type": "text_display",
+          "id": "ind5",
+          "value": "",
+          "area": "ind5"
+        },
+        {
+          "type": "text_display",
+          "id": "ind6",
+          "value": "",
+          "area": "ind6"
+        },
+        {
+          "type": "text_display",
+          "id": "ind7",
+          "value": "",
+          "area": "ind7"
+        },
+        {
+          "type": "text_display",
+          "id": "ind8",
+          "value": "",
+          "area": "ind8"
+        },
+        {
+          "type": "text_display",
+          "id": "ind9",
+          "value": "",
+          "area": "ind9"
+        },
+        {
+          "type": "text_display",
+          "id": "ind10",
+          "value": "",
+          "area": "ind10"
+        },
+        {
+          "type": "text_display",
+          "id": "ind11",
+          "area": "ind11"
+        },
+        {
+          "type": "text_display",
+          "id": "ind14",
+          "area": "ind14"
+        },
+        {
+          "type": "text_display",
+          "id": "ind15",
+          "area": "ind15"
+        }
+      ],
+      "buttons": {
+        "top": {
+          "aus": {"action": ""},
+          "S": {"action": "page_navigate", "target": "settings"},
+          "i": {"action": "page_navigate", "target": "info"},
+          "St": {"action": "toggle", "target": "status"},
+          "V>0": {"action": "condition_check", "value": "speed_ms", "condition": ">", "compare": 0},
+          "V=0": {"action": "condition_check", "value": "speed_ms", "condition": "==", "compare": 0},
+          "brightness": {"action": "adjust_brightness", "step": 5},
+          "contrast": {"action": "toggle_night_mode"},
+          "UD": {"action": "adjust_contrast", "step": 5}
+        },
+        "right": {
+          "c": {"action": "config_mode"},
+          "left": {"action": "scroll", "direction": "left"},
+          "right": {"action": "scroll", "direction": "right"},
+          "up": {"action": "scroll", "direction": "up"},
+          "down": {"action": "scroll", "direction": "down"},
+          "E": {"action": "confirm"}
+        },
+        "bottom": {
+          "1": {"action": "page_navigate", "target": "dashboard"},
+          "2": {"action": "page_navigate", "target": "diagnostics"},
+          "3": {"action": "page_navigate", "target": "info"},
+          "4": {"action": "page_navigate", "target": "settings"},
+          "5": {"action": "page_navigate", "target": "dashboard"},
+          "6": {"action": "page_navigate", "target": "dashboard"},
+          "7": {"action": "page_navigate", "target": "dashboard"},
+          "8": {"action": "page_navigate", "target": "dashboard"},
+          "9": {"action": "page_navigate", "target": "dashboard"},
+          "0": {"action": "page_navigate", "target": "dashboard"}
+        }
+      },
+      "menu_labels": {
+        "1": "Dash",
+        "2": "Dia",
+        "3": "Info",
+        "4": "Set",
+        "5": "5",
+        "6": "6",
+        "7": "7",
+        "8": "8",
+        "9": "9",
+        "0": "0"
+      }
+    },
+    "dashboard": {
+      "title": "",
+      "layout": "dashboard",
+      "show_speedometer": true,
+      "template": "mfd",
+      "layout_grid": {
+        "columns": "1.2fr 1fr",
+        "rows": "auto 1fr auto",
+        "areas": [
+          "speed rpm3 rpm3",
+          "speed lzb lzb",
+          "rpm2 lzb lzb",
+          "rpm brake brake"
+        ],
+        "gap": "0px"
+      },
+      "font_sizes": {
+        "title": "14px",
+        "value": "12px",
+        "unit": "12px"
+      },
+      "components": [
+        {
+          "type": "speedometer",
+          "id": "speed_gauge",
+          "title": "Speed",
+          "value": "speed_ms.Speed_ms",
+          "min": 0,
+          "max": "LZB_LocoMaxSpeed.value",
+          "unit": "km/h",
+          "size": 350,
+          "area": "speed"
+        },
+        {
+          "type": "progress_bar",
+          "id": "brake_bar",
+          "title": "Brake Pressure",
+          "value": "brake_pressure_1",
+          "min": 0,
+          "max": 500000,
+          "unit": "Pa",
+          "color": "#ff6b6b",
+          "area": "brake",
+          "alignment": {
+            "horizontal": "center",
+            "vertical": "center"
+          },
+          "styles": {
+            "title": {
+              "fontSize": "14px",
+              "bold": true,
+              "italic": false,
+              "underline": false
+            },
+            "value": {
+              "fontSize": "20px",
+              "bold": true,
+              "italic": false,
+              "underline": false
+            },
+            "unit": {
+              "fontSize": "12px",
+              "bold": false,
+              "italic": true,
+              "underline": false
+            }
+          }
+        },
+        {
+          "type": "vertical_bar",
+          "id": "traction_effort",
+          "title": "Traction Effort",
+          "value": "tractive_effort_TractiveEffort_N",
+          "min": 0,
+          "max": 400,
+          "unit": "kN",
+          "indicators": [100, 200, 300, 400],
+          "area": "rpm",
+          "alignment": {
+            "horizontal": "center",
+            "vertical": "center"
+          }
+        },
+        {
+          "type": "text_display",
+          "id": "braking_effort_display",
+          "unit_position": "inline",
+          "value": "player_info.currentServiceName",
+          "decimals": 0,
+          "unit": "kN",
+          "area": "rpm2",
+          "alignment": {
+            "horizontal": "right",
+            "vertical": "bottom"
+          },
+          "styles": {
+            "title": {
+              "fontSize": "12px",
+              "bold": false,
+              "italic": false,
+              "underline": true
+            },
+            "value": {
+              "fontSize": "12px",
+              "bold": true,
+              "italic": false,
+              "underline": true
+            },
+            "unit": {
+              "fontSize": "11px",
+              "bold": false,
+              "italic": true,
+              "underline": false
+            }
+          }
+        },
+        {
+            "type": "seven_segment",
+            "id": "lzb_distance_display",
+           
+            "value": "LZB_target_speed_distance.Value",
+            "area": "rpm3",
+            "max":"50",
+            "alignment": {
+              "horizontal": "left",
+              "vertical": "top"
+            },
+            "visible_when": {
+                "variable": "LZB_IsActive.Value",
+                "equals": true
+            }
+        },
+        {
+            "type": "scaled_vertical_bar",
+            "id": "lzb_distance_bar",
+            
+            "value": "LZB_target_speed_distance.Value",
+            
+            "area": "lzb",
+            "visible_when": {
+                "variable": "LZB_IsActive.Value",
+                "equals": true
+            }
+           
+        }
+
+
+      ],
+      "buttons": {
+        "top": {
+          "aus": {"action": "power_off"},
+          "S": {"action": "page_navigate", "target": "settings"},
+          "i": {"action": "page_navigate", "target": "info"},
+          "St": {"action": "toggle", "target": "status"},
+          "V>0": {"action": "condition_check", "value": "speed_ms", "condition": ">", "compare": 0},
+          "V=0": {"action": "condition_check", "value": "speed_ms", "condition": "==", "compare": 0},
+          "brightness": {"action": "adjust_brightness", "step": 5},
+          "contrast": {"action": "toggle_night_mode"},
+          "UD": {"action": "adjust_contrast", "step": 5}
+        },
+        "right": {
+          "c": {"action": "config_mode"},
+          "left": {"action": "scroll", "direction": "left"},
+          "right": {"action": "scroll", "direction": "right"},
+          "up": {"action": "scroll", "direction": "up"},
+          "down": {"action": "scroll", "direction": "down"},
+          "E": {"action": "confirm"}
+        },
+        "bottom": {
+          "1": {"action": "page_navigate", "target": "diagnostics"},
+          "2": {"action": "input_number", "value": 2},
+          "3": {"action": "input_number", "value": 3},
+          "4": {"action": "input_number", "value": 4},
+          "5": {"action": "input_number", "value": 5},
+          "6": {"action": "input_number", "value": 6},
+          "7": {"action": "input_number", "value": 7},
+          "8": {"action": "input_number", "value": 8},
+          "9": {"action": "input_number", "value": 9},
+          "0": {"action": "page_back"}
+        }
+      },
+      "menu_labels": {
+        "1": "1",
+        "2": "2",
+        "3": "3",
+        "4": "4",
+        "5": "5",
+        "6": "6",
+        "7": "7",
+        "8": "8",
+        "9": "9",
+        "0": "0"
+      }
+    },
+    "diagnostics": {
+      "template": "mfd",
+      "title": "Diagnostics",
+      "layout": "diagnostics",
+      "font_sizes": {
+        "title": "12px",
+        "value": "24px",
+        "unit": "10px"
+      },
+      "components": [
+        {
+          "type": "vertical_bar",
+          "id": "traction_effort",
+          "title": "Traction Effort",
+          "value": "tractive_effort",
+          "min": 0,
+          "max": 100,
+          "unit": "%",
+          "indicators": [25, 50, 75, 100]
+        },
+        {
+          "type": "text_display",
+          "id": "brake_pressure_1_display",
+          "title": "Brake Pressure 1",
+          "value": "brake_pressure_1",
+          "decimals": 0,
+          "unit": "Pa",
+          "styles": {
+            "title": {
+              "fontSize": "14px",
+              "bold": true,
+              "italic": false,
+              "underline": false
+            },
+            "value": {
+              "fontSize": "26px",
+              "bold": true,
+              "italic": false,
+              "underline": false
+            },
+            "unit": {
+              "fontSize": "12px",
+              "bold": false,
+              "italic": false,
+              "underline": false
+            }
+          }
+        },
+        {
+          "type": "text_display",
+          "id": "brake_pressure_2_display",
+          "title": "Brake Pressure 2",
+          "value": "brake_pressure_2",
+          "decimals": 0,
+          "unit": "Pa",
+          "styles": {
+            "title": {
+              "fontSize": "14px",
+              "bold": true,
+              "italic": false,
+              "underline": false
+            },
+            "value": {
+              "fontSize": "26px",
+              "bold": true,
+              "italic": false,
+              "underline": false
+            },
+            "unit": {
+              "fontSize": "12px",
+              "bold": false,
+              "italic": false,
+              "underline": false
+            }
+          }
+        }
+      ],
+      "buttons": {
+        "top": {
+          "aus": {"action": "power_off"},
+          "S": {"action": "page_navigate", "target": "settings"},
+          "i": {"action": "page_navigate", "target": "info"},
+          "St": {"action": "toggle", "target": "status"},
+          "V>0": {"action": "condition_check", "value": "speed_ms", "condition": ">", "compare": 0},
+          "V=0": {"action": "condition_check", "value": "speed_ms", "condition": "==", "compare": 0},
+          "brightness": {"action": "adjust_brightness", "step": 5},
+          "contrast": {"action": "toggle_night_mode"},
+          "UD": {"action": "adjust_contrast", "step": 5}
+        },
+        "right": {
+          "c": {"action": "config_mode"},
+          "left": {"action": "scroll", "direction": "left"},
+          "right": {"action": "scroll", "direction": "right"},
+          "up": {"action": "scroll", "direction": "up"},
+          "down": {"action": "scroll", "direction": "down"},
+          "E": {"action": "confirm"}
+        },
+        "bottom": {
+          "1": {"action": "page_navigate", "target": "diagnostics"},
+          "2": {"action": "input_number", "value": 2},
+          "3": {"action": "input_number", "value": 3},
+          "4": {"action": "input_number", "value": 4},
+          "5": {"action": "input_number", "value": 5},
+          "6": {"action": "input_number", "value": 6},
+          "7": {"action": "input_number", "value": 7},
+          "8": {"action": "input_number", "value": 8},
+          "9": {"action": "input_number", "value": 9},
+          "0": {"action": "page_back"}
+        }
+      },
+      "menu_labels": {
+        "1": "test1",
+        "2": "test2",
+        "3": "",
+        "4": "",
+        "5": "",
+        "6": "",
+        "7": "",
+        "8": "",
+        "9": "",
+        "0": ""
+      }
+    },
+    "info": {
+      "title": "Information",
+      "layout": "info",
+      "components": [
+        {
+          "type": "text_display",
+          "id": "temperature",
+          "title": "Temperature",
+          "value": "temperature",
+          "decimals": 1,
+          "unit": "°C"
+        },
+        {
+          "type": "text_display",
+          "id": "voltage",
+          "title": "Voltage",
+          "value": "voltage",
+          "decimals": 1,
+          "unit": "V"
+        },
+        {
+          "type": "text_display",
+          "id": "amperage",
+          "title": "Current",
+          "value": "amperage",
+          "decimals": 1,
+          "unit": "A"
+        }
+      ],
+      "buttons": {
+        "top": {
+          "aus": {"action": "power_off"},
+          "S": {"action": "page_navigate", "target": "settings"},
+          "i": {"action": "page_navigate", "target": "info"},
+          "St": {"action": "toggle", "target": "status"},
+          "V>0": {"action": "condition_check", "value": "speed_ms", "condition": ">", "compare": 0},
+          "V=0": {"action": "condition_check", "value": "speed_ms", "condition": "==", "compare": 0},
+          "brightness": {"action": "adjust_brightness", "step": 5},
+          "contrast": {"action": "toggle_night_mode"},
+          "UD": {"action": "adjust_contrast", "step": 5}
+        },
+        "right": {
+          "c": {"action": "config_mode"},
+          "left": {"action": "scroll", "direction": "left"},
+          "right": {"action": "scroll", "direction": "right"},
+          "up": {"action": "scroll", "direction": "up"},
+          "down": {"action": "scroll", "direction": "down"},
+          "E": {"action": "confirm"}
+        },
+        "bottom": {
+          "1": {"action": "page_navigate", "target": "diagnostics"},
+          "2": {"action": "input_number", "value": 2},
+          "3": {"action": "input_number", "value": 3},
+          "4": {"action": "input_number", "value": 4},
+          "5": {"action": "input_number", "value": 5},
+          "6": {"action": "input_number", "value": 6},
+          "7": {"action": "input_number", "value": 7},
+          "8": {"action": "input_number", "value": 8},
+          "9": {"action": "input_number", "value": 9},
+          "0": {"action": "page_back"}
+        }
+      },
+      "menu_labels": {
+        "1": "",
+        "2": "",
+        "3": "",
+        "4": "",
+        "5": "",
+        "6": "",
+        "7": "",
+        "8": "",
+        "9": "",
+        "0": ""
+      }
+    },
+    "settings": {
+      "template": "touchscreen",
+      "title": "Settings",
+      "layout": "menu",
+      "components": [
+        {
+          "type": "text_display",
+          "id": "brightness_info",
+          "title": "Brightness",
+          "value": "brightness",
+          "decimals": 0,
+          "unit": "%"
+        },
+        {
+          "type": "text_display",
+          "id": "contrast_info",
+          "title": "Contrast",
+          "value": "contrast",
+          "decimals": 0,
+          "unit": "%"
+        },
+        {
+          "type": "text_display",
+          "id": "night_mode_info",
+          "title": "Night Mode",
+          "value": "nightMode",
+          "decimals": 0,
+          "unit": ""
+        },
+        {
+          "type": "text_display",
+          "id": "back_button",
+          "title": "⬅️ Back",
+          "value": "",
+          "clickable": true,
+          "onClick": {
+            "action": "page_back"
+          },
+          "styles": {
+            "title": {
+              "fontSize": "18px",
+              "bold": true
+            }
+          },
+          "alignment": {
+            "horizontal": "center",
+            "vertical": "center"
+          }
+        },
+        {
+          "type": "text_display",
+          "id": "toggle_mode",
+          "title": "🌓 Toggle Dark/Light Mode",
+          "value": "",
+          "clickable": true,
+          "onClick": {
+            "action": "toggle_night_mode"
+          },
+          "styles": {
+            "title": {
+              "fontSize": "20px",
+              "bold": true
+            }
+          },
+          "alignment": {
+            "horizontal": "center",
+            "vertical": "center"
+          }
+        },
+        {
+          "type": "text_display",
+          "id": "back_to_dashboard",
+          "title": "← Back to Dashboard",
+          "value": "",
+          "clickable": true,
+          "onClick": {
+            "action": "page_navigate",
+            "target": "dashboard"
+          },
+          "styles": {
+            "title": {
+              "fontSize": "18px",
+              "bold": true
+            }
+          },
+          "alignment": {
+            "horizontal": "center",
+            "vertical": "center"
+          }
+        }
+      ],
+      "buttons": {
+        "top": {
+          "aus": {"action": "power_off"},
+          "S": {"action": "page_navigate", "target": "settings"},
+          "i": {"action": "page_navigate", "target": "info"},
+          "St": {"action": "toggle", "target": "status"},
+          "V>0": {"action": "condition_check", "value": "speed_ms", "condition": ">", "compare": 0},
+          "V=0": {"action": "condition_check", "value": "speed_ms", "condition": "==", "compare": 0},
+          "brightness": {"action": "adjust_brightness", "step": 5},
+          "contrast": {"action": "toggle_night_mode"},
+          "UD": {"action": "adjust_contrast", "step": 5}
+        },
+        "right": {
+          "c": {"action": "config_mode"},
+          "left": {"action": "scroll", "direction": "left"},
+          "right": {"action": "scroll", "direction": "right"},
+          "up": {"action": "scroll", "direction": "up"},
+          "down": {"action": "scroll", "direction": "down"},
+          "E": {"action": "confirm"}
+        },
+        "bottom": {
+          "1": {"action": "page_navigate", "target": "diagnostics"},
+          "2": {"action": "input_number", "value": 2},
+          "3": {"action": "input_number", "value": 3},
+          "4": {"action": "input_number", "value": 4},
+          "5": {"action": "input_number", "value": 5},
+          "6": {"action": "input_number", "value": 6},
+          "7": {"action": "input_number", "value": 7},
+          "8": {"action": "input_number", "value": 8},
+          "9": {"action": "input_number", "value": 9},
+          "0": {"action": "input_number", "value": 0}
+        }
+      },
+      "menu_labels": {
+        "1": "",
+        "2": "",
+        "3": "",
+        "4": "",
+        "5": "",
+        "6": "",
+        "7": "",
+        "8": "",
+        "9": "",
+        "0": ""
+      }
+    },
+    "timetable": {
+      "title": "TIMETABLE",
+      "layout": "dashboard",
+      "template": "mfd",
+      "layout_grid": {
+        "columns": "1fr 1fr",
+        "rows": "auto auto auto auto 1fr",
+        "areas": [
+          "train_num destination",
+          "train_type max_speed",
+          "route_code company",
+          "divider divider",
+          "station station"
+        ],
+        "gap": "10px"
+      },
+      "font_sizes": {
+        "title": "16px",
+        "value": "18px",
+        "unit": "14px"
+      },
+      "components": [
+        {
+          "type": "text_display",
+          "id": "train_number",
+          "title": "Train",
+          "value": "tt_train_number",
+          "area": "train_num",
+          "alignment": {
+            "horizontal": "left",
+            "vertical": "center"
+          },
+          "styles": {
+            "value": {
+              "fontSize": "24px",
+              "bold": true
+            }
+          }
+        },
+        {
+          "type": "text_display",
+          "id": "destination",
+          "title": "Destination",
+          "value": "tt_destination",
+          "area": "destination",
+          "alignment": {
+            "horizontal": "right",
+            "vertical": "center"
+          },
+          "styles": {
+            "value": {
+              "fontSize": "18px"
+            }
+          }
+        },
+        {
+          "type": "text_display",
+          "id": "train_type",
+          "title": "Type",
+          "value": "tt_type",
+          "area": "train_type",
+          "alignment": {
+            "horizontal": "left",
+            "vertical": "center"
+          }
+        },
+        {
+          "type": "text_display",
+          "id": "max_speed",
+          "title": "Max Speed",
+          "value": "tt_max_speed_kph",
+          "unit": "km/h",
+          "area": "max_speed",
+          "alignment": {
+            "horizontal": "right",
+            "vertical": "center"
+          }
+        },
+        {
+          "type": "text_display",
+          "id": "route_code",
+          "title": "Route",
+          "value": "tt_route_code",
+          "area": "route_code",
+          "alignment": {
+            "horizontal": "left",
+            "vertical": "center"
+          }
+        },
+        {
+          "type": "text_display",
+          "id": "company",
+          "title": "Company",
+          "value": "tt_company",
+          "area": "company",
+          "alignment": {
+            "horizontal": "right",
+            "vertical": "center"
+          }
+        },
+        {
+          "type": "text_display",
+          "id": "current_station",
+          "title": "Current Station",
+          "value": "tt_current_station",
+          "area": "station",
+          "alignment": {
+            "horizontal": "center",
+            "vertical": "top"
+          },
+          "styles": {
+            "title": {
+              "fontSize": "14px"
+            },
+            "value": {
+              "fontSize": "20px",
+              "bold": true
+            }
+          }
+        }
+      ],
+      "buttons": {
+        "top": {
+          "TT": {"action": "open_schedule_browser"},
+          "aus": {"action": ""},
+          "S": {"action": "page_navigate", "target": "settings"},
+          "i": {"action": "page_navigate", "target": "info"}
+        },
+        "right": {
+          "c": {"action": "config_mode"},
+          "left": {"action": "page_back"},
+          "right": {"action": "scroll", "direction": "right"},
+          "up": {"action": "scroll", "direction": "up"},
+          "down": {"action": "scroll", "direction": "down"},
+          "E": {"action": "confirm"}
+        },
+        "bottom": {
+          "0": {"action": "page_back"},
+          "1": {"action": "page_navigate", "target": "home"}
+        }
+      },
+      "menu_labels": {
+        "0": "Back",
+        "1": "Home"
+      }
+    }
+  },
+  "api_transforms": {
+    "speed_ms.Speed_ms": {
+      "multiply": 3.6,
+      "add": 0,
+      "unit": "km/h"
+    },
+    "rpm": {
+      "multiply": 1,
+      "add": 0,
+      "unit": "RPM"
+    },
+    "brake_pressure_1": {
+      "multiply": 1,
+      "add": 0,
+      "unit": "Pa",
+      "compare_critical": 400000
+    },
+    "tractive_effort_TractiveEffort_N": {
+      "multiply": 0.001,
+      "add": 0,
+      "unit": "kN",
+      "compare_critical": 5000
+    },
+    "temperature": {
+      "multiply": 1,
+      "add": 0,
+      "unit": "°C",
+      "min": -40,
+      "max": 80
+    },
+    "LZB_LocoMaxSpeed_legacy.value": {
+      "multiply": 3.6,
+      "add": 20
+    }
+  },
+  "settings": {
+    "template": "mfd",
+    "default_page": "home",
+    "brightness": 100,
+    "contrast": 100,
+    "night_mode": false,
+    "font_family": "monospace",
+    "theme": "dark"
+  }
+}
+
+

@@ -1,0 +1,1527 @@
+{
+  "EUGen": {
+    "title": "",
+    "layout": "mfd",
+    "show_speedometer": true,
+    "template": "mfd",
+    "layout_grid": {
+      "columns": "7% 7% 7% 7% 7% 7% 7% 7% 7% 7% 7% 7% 9% 7%",
+      "rows": "5% 7% 60% 10% 6% 6% 6%",
+      "areas": [
+        "empt1 date date date date time time empt3 empt3 empt3 empt3 empt3 empt3 empt3",
+        "lzbnum speedo speedo speedo speedo speedo speedo traction traction traction traction traction traction extra2",
+        "lzbbar speedo speedo speedo speedo speedo speedo traction traction traction traction traction traction extra1",
+        "ind1 ind2 ind3 ind4 ind5 ind6 ind7 ind8 ind9 ind10 ind11 ind12 ind13 extra",
+        "ind14 list1 list1 list1 list1 list1 list1 list2 list2 list2 list2 list2 list2 ind19",
+        "ind17 list1 list1 list1 list1 list1 list1 list2 list2 list2 list2 list2 list2 ind20",
+        "ind15 list1 list1 list1 list1 list1 list1 list2 list2 list2 list2 list2 list2 ind21"
+      ],
+      "gap": "0px"
+    },
+    "font_sizes": {
+      "title": "14px",
+      "value": "12px",
+      "unit": "12px"
+    },
+    "components": [
+      {
+        "type": "seven_segment",
+        "id": "lzb_distance_display",
+        "value": ["LZB_target_speed_distance.Value", "LZB_target_speed_distance_legacy.Value"],
+        "area": "lzbnum",
+        "font_sizes": {
+          "value": "20px"
+        },
+        "alignment": {
+          "horizontal": "right",
+          "vertical": "center"
+        },
+        "visible_when": {
+          "variable": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"],
+          "equals": true
+        }
+      },
+      {
+        "type": "scaled_vertical_bar",
+        "id": "lzb_distance_bar",
+        "value": ["LZB_target_speed_distance.Value", "LZB_target_speed_distance_legacy.Value"],
+        "font_sizes": {
+          "value": "100px"
+        },
+        "area": "lzbbar",
+        "alignment": {
+          "horizontal": "left",
+          "vertical": "top"
+        },
+        "visible_when": {
+          "variable": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"],
+          "equals": true
+        }
+      },
+      {
+        "type": "traction_dial",
+        "id": "traction_dial",
+        "area": "traction",
+        "MaxRight": ["vehicle_info.Output.maxTractiveEffortN_5_51382DF64252D2E36D1AADAA50733891", 350],
+        "MaxLeft": ["vehicle_info.Output.maxDynamicBrakingEffortN_9_25684CCD4FC8E712D16C33B881F47F52", 240],
+        "CurrentRight": ["tractive_effort.TractiveEffort_N","tractive_effort_legacy.Result"],
+        "CurrentLeft": ["TargetDynamicBrakeEffort.ReturnValue","brake_effort_legacy.Result"],
+        "PointerRight": ["TargetTractiveEffort.ReturnValue","TargetTractiveEffort_legacy.Result","tractive_effort.TractiveEffort_N"],
+        "PointerLeft": ["TargetDynamicBrakeEffort.ReturnValue","TargetDynamicBrakeEffort_legacy.Result","brake_effort_legacy.Result"],
+        "size": 300
+      },
+      {
+        "type": "speedometer_v2",
+        "id": "speed_gauge_v2",
+        "speed_unit_mph": false,
+        "area": "speedo",
+        "value": "speed_ms.Speed_ms",
+        "min": 0,
+        "max": ["vehicle_info.Output.maxPermissibleSpeedMS_11_C87720DD4A008EF058465FB17C9C5125", 180],
+        "unit": "km/h",
+        "size": 320,
+        "bottom_boxes": {
+          "value": "LZB_expectedTargetSpeed_ms.Value",
+          "visible_when": {"variable": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "equals": true},
+          "color": "#F6C90E"
+        },
+        "rim_pointer": {
+            "value": "LZB_maxPermisibleSpeed_ms.Value",
+            "visible_when": {"variable": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "equals": true},
+            "color": "#ff0000"
+        },
+        "diamond_pointer": {
+            "value": ["AFB_TargetSpeed_ms.Value","AFB_CurrentSpeedSetPoint.Value"],
+            "visible_when": {"variable": ["AFB_IsEnabled.Value","AFB_ActiveState.bReturnValue"], "equals": true},
+            "color": "#ffd400"
+        }
+        },
+      {
+        "type": "text_indicator",
+        "id": "lzb_status_ind",
+        "area": "ind1",
+        "value": "",
+        "fontFamily": "Arial",
+        "fontSize": "14px",
+        "conditions": [
+            {
+            "when": { "left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": true },
+            "display": {
+                "text": "LZB"
+            }
+            },
+            {
+                "when": { "left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true },
+                "display": {
+                    "text": "PZB"
+                }
+                }
+        ],
+        "default": {
+            "text": ""
+        }
+        },
+        {
+            "type": "text_indicator",
+            "id": "lzb_b",
+            "area": "ind2",
+            "value": "",
+            "fontFamily": "Arial",
+            "fontSize": "35px",
+            "conditions": [
+                {
+                "when": { "left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": true },
+                "display": {
+                    "text": "B",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff",
+                    "crossthrough": false,
+                    "crossthroughColor": "#FF0000",
+                    "crossthroughWidth": 4
+                }
+                },
+                {
+                "when": { "left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true },
+                "display": {
+                    "text": "B",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff",
+                    "strikethrough": false,
+                    "strikethroughColor": "#FF0000",
+                    "strikethroughWidth": 4
+                }
+                }
+            ],
+            "default": {
+                "text": ""
+            }
+        },
+        {
+            "type": "text_indicator",
+            "id": "pzd_ind",
+            "area": "ind7",
+            "value": "",
+            "fontFamily": "Arial",
+            "fontSize": "25px",
+            "conditions": [
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false}
+                    ]
+                },
+                "display": {
+                    "text": "PZB",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff"
+                }
+                }
+            ],
+            "default": {
+                "text": ""
+            }
+        },
+        
+        {
+            "type": "text_indicator",
+            "id": "emergency_ind",
+            "area": "ind6",
+            "value": "",
+            "fontFamily": "Arial",
+            "fontSize": "35px",
+            "conditions": [
+                {
+                "when": {
+                    "any": [
+                        {"left":  "PZB_ActiveInfluence.isEmergency_52_531FD15144E006B521BB478708C6CCF2", "operator": "==", "right": true},
+                        {"left":  "PZB_ActiveInfluence_v1.isEmergency_52_531FD15144E006B521BB478708C6CCF2", "operator": "==", "right": true},
+                        {"left":  "PZB_ActiveInfluence_v2.isEmergency_52_531FD15144E006B521BB478708C6CCF2", "operator": "==", "right": true},
+                        {"left":  "LZB_IsOverspeedBraking.bIsOvepeedBraking", "operator": "==", "right": true},
+                        {"left":  "LZB_IsEmergencyBraking.IsEmergencyBraking", "operator": "==", "right": true}
+                    ]
+                },
+                "display": {
+                    "text": "S",
+                    "backgroundColor": "#FF0000",
+                    "color": "#ffffff"
+                }
+                }
+            ],
+            "default": {
+                "text": ""
+            }
+        },
+        
+        {
+            "type": "text_indicator",
+            "id": "lzb_overspeed_ind1",
+            "area": "ind5",
+            "value": "",
+            "fontFamily": "Arial",
+            "fontSize": "35px",
+            "conditions": [
+                {
+                "when": {
+                    "any": [
+                        {"left":  "LZB_OverspeedState.Value", "operator": "==", "right": "2"},
+                        {"left":  "LZB_OverspeedState.Value", "operator": "==", "right": "3"}                    ]
+                },
+                "display": {
+                    "text": "G",
+                    "backgroundColor": "#FF0000",
+                    "color": "#ffffff",
+                    "blinking": "background",
+                    "blinkingTextColorOn": "#ffffff",
+                    "blinkingTextColorOff": "#FF0000"
+                }
+                }
+            ],
+            "default": {
+                "text": ""
+            }
+        },
+        {
+            "type": "text_indicator",
+            "id": "lzb_overspeed_ind2",
+            "area": "ind5",
+            "value": "",
+            "fontFamily": "Arial",
+            "fontSize": "35px",
+            "conditions": [
+                {
+                "when": {"left":  "LZB_OverspeedState.Value", "operator": "==", "right": 1},
+                "display": {
+                    "text": "G",
+                    "backgroundColor": "#FF0000",
+                    "color": "#ffffff"
+                }
+                }
+            ],
+            "default": {
+                "text": ""
+            }
+        },
+
+        {
+            "type": "text_indicator",
+            "id": "pzd_mode_0",
+            "area": "ind3",
+            "value": "",
+            "fontFamily": "Arial",
+            "fontSize": "35px",
+            "conditions": [
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["PZB_ProgramMode.Value", "PZB_ProgramMode_v2.Value", "PZB_ProgramMode_v1.Value"], "operator": "==", "right": "1"},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "0"}
+                    ]
+                },
+                "display": {
+                    "text": "55",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff"
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["PZB_ProgramMode.Value", "PZB_ProgramMode_v2.Value", "PZB_ProgramMode_v1.Value"], "operator": "==", "right": "2"},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "0"}
+                    ]
+                },
+                "display": {
+                    "text": "70",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff"
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["PZB_ProgramMode.Value", "PZB_ProgramMode_v2.Value", "PZB_ProgramMode_v1.Value"], "operator": "==", "right": "3"},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "0"}
+                    ]
+                },
+                "display": {
+                    "text": "85",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff"
+                }
+                }
+            ],
+            "default": {
+                "text": ""
+            }
+        },
+        {
+            "type": "text_indicator",
+            "id": "pzd_mode_normal",
+            "area": "ind3",
+            "value": "",
+            "fontFamily": "Arial",
+            "fontSize": "35px",
+            "conditions": [
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["PZB_ProgramMode.Value", "PZB_ProgramMode_v2.Value", "PZB_ProgramMode_v1.Value"], "operator": "==", "right": "1"},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "10010"}
+                    ]
+                },
+                "display": {
+                    "text": "55",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff"
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["PZB_ProgramMode.Value", "PZB_ProgramMode_v2.Value", "PZB_ProgramMode_v1.Value"], "operator": "==", "right": "2"},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "10010"}
+                    ]
+                },
+                "display": {
+                    "text": "70",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff"
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["PZB_ProgramMode.Value", "PZB_ProgramMode_v2.Value", "PZB_ProgramMode_v1.Value"], "operator": "==", "right": "3"},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "10010"}
+                    ]
+                },
+                "display": {
+                    "text": "85",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff"
+                }
+                }
+            ],
+            "default": {
+                "text": ""
+            }
+        },
+        {
+            "type": "text_indicator",
+            "id": "pzd_mode_start_blink",
+            "area": "ind3",
+            "value": "",
+            "fontFamily": "Arial",
+            "fontSize": "35px",
+            "conditions": [
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["PZB_ProgramMode.Value", "PZB_ProgramMode_v2.Value", "PZB_ProgramMode_v1.Value"], "operator": "==", "right": "1"},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "10011"}
+                    ]
+                },
+                "display": {
+                    "text": "55",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff",
+                    "blinking": "background",
+                    "blinkingTextColorOn": "#ffffff",
+                    "blinkingTextColorOff": "#B6B6B6"
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["PZB_ProgramMode.Value", "PZB_ProgramMode_v2.Value", "PZB_ProgramMode_v1.Value"], "operator": "==", "right": "2"},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "10011"}
+                    ]
+                },
+                "display": {
+                    "text": "70",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff",
+                    "blinking": "background",
+                    "blinkingTextColorOn": "#ffffff",
+                    "blinkingTextColorOff": "#B6B6B6"
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["PZB_ProgramMode.Value", "PZB_ProgramMode_v2.Value", "PZB_ProgramMode_v1.Value"], "operator": "==", "right": "3"},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "10011"}
+                    ]
+                },
+                "display": {
+                    "text": "85",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff",
+                    "blinking": "background",
+                    "blinkingTextColorOn": "#ffffff",
+                    "blinkingTextColorOff": "#B6B6B6"
+                }
+                }
+            ],
+            "default": {
+                "text": ""
+            }
+        },
+        
+        {
+            "type": "text_indicator",
+            "id": "pzd_mode_magnet_blink",
+            "area": "ind3",
+            "value": "",
+            "fontFamily": "Arial",
+            "fontSize": "35px",
+            "conditions": [
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["PZB_ProgramMode.Value", "PZB_ProgramMode_v2.Value", "PZB_ProgramMode_v1.Value"], "operator": "==", "right": "1"},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "10001"}
+                    ]
+                },
+                "display": {
+                    "text": "55",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff",
+                    "blinking": "background",
+                    "blinkingTextColorOn": "#ffffff",
+                    "blinkingTextColorOff": "#B6B6B6"
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["PZB_ProgramMode.Value", "PZB_ProgramMode_v2.Value", "PZB_ProgramMode_v1.Value"], "operator": "==", "right": "1"},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "1"}
+                    ]
+                },
+                "display": {
+                    "text": "55",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff",
+                    "blinking": "background",
+                    "blinkingTextColorOn": "#ffffff",
+                    "blinkingTextColorOff": "#B6B6B6"
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["PZB_ProgramMode.Value", "PZB_ProgramMode_v2.Value", "PZB_ProgramMode_v1.Value"], "operator": "==", "right": "1"},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "10"}
+                    ]
+                },
+                "display": {
+                    "text": "55",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff",
+                    "blinking": "background",
+                    "blinkingTextColorOn": "#ffffff",
+                    "blinkingTextColorOff": "#B6B6B6"
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["PZB_ProgramMode.Value", "PZB_ProgramMode_v2.Value", "PZB_ProgramMode_v1.Value"], "operator": "==", "right": "1"},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "10111"}
+                    ]
+                },
+                "display": {
+                    "text": "55",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff",
+                    "blinking": "background",
+                    "blinkingTextColorOn": "#ffffff",
+                    "blinkingTextColorOff": "#B6B6B6"
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["PZB_ProgramMode.Value", "PZB_ProgramMode_v2.Value", "PZB_ProgramMode_v1.Value"], "operator": "==", "right": "1"},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "111"}
+                    ]
+                },
+                "display": {
+                    "text": "55",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff",
+                    "blinking": "background",
+                    "blinkingTextColorOn": "#ffffff",
+                    "blinkingTextColorOff": "#B6B6B6"
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["PZB_ProgramMode.Value", "PZB_ProgramMode_v2.Value", "PZB_ProgramMode_v1.Value"], "operator": "==", "right": "1"},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "101"}
+                    ]
+                },
+                "display": {
+                    "text": "55",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff",
+                    "blinking": "background",
+                    "blinkingTextColorOn": "#ffffff",
+                    "blinkingTextColorOff": "#B6B6B6"
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["PZB_ProgramMode.Value", "PZB_ProgramMode_v2.Value", "PZB_ProgramMode_v1.Value"], "operator": "==", "right": "1"},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "10101"}
+                    ]
+                },
+                "display": {
+                    "text": "55",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff",
+                    "blinking": "background",
+                    "blinkingTextColorOn": "#ffffff",
+                    "blinkingTextColorOff": "#B6B6B6"
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["PZB_ProgramMode.Value", "PZB_ProgramMode_v2.Value", "PZB_ProgramMode_v1.Value"], "operator": "==", "right": "2"},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "10001"}
+                    ]
+                },
+                "display": {
+                    "text": "70",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff",
+                    "blinking": "background",
+                    "blinkingTextColorOn": "#ffffff",
+                    "blinkingTextColorOff": "#B6B6B6"
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["PZB_ProgramMode.Value", "PZB_ProgramMode_v2.Value", "PZB_ProgramMode_v1.Value"], "operator": "==", "right": "2"},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "1"}
+                    ]
+                },
+                "display": {
+                    "text": "70",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff",
+                    "blinking": "background",
+                    "blinkingTextColorOn": "#ffffff",
+                    "blinkingTextColorOff": "#B6B6B6"
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["PZB_ProgramMode.Value", "PZB_ProgramMode_v2.Value", "PZB_ProgramMode_v1.Value"], "operator": "==", "right": "2"},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "10"}
+                    ]
+                },
+                "display": {
+                    "text": "70",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff",
+                    "blinking": "background",
+                    "blinkingTextColorOn": "#ffffff",
+                    "blinkingTextColorOff": "#B6B6B6"
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["PZB_ProgramMode.Value", "PZB_ProgramMode_v2.Value", "PZB_ProgramMode_v1.Value"], "operator": "==", "right": "2"},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "10111"}
+                    ]
+                },
+                "display": {
+                    "text": "70",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff",
+                    "blinking": "background",
+                    "blinkingTextColorOn": "#ffffff",
+                    "blinkingTextColorOff": "#B6B6B6"
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["PZB_ProgramMode.Value", "PZB_ProgramMode_v2.Value", "PZB_ProgramMode_v1.Value"], "operator": "==", "right": "2"},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "111"}
+                    ]
+                },
+                "display": {
+                    "text": "70",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff",
+                    "blinking": "background",
+                    "blinkingTextColorOn": "#ffffff",
+                    "blinkingTextColorOff": "#B6B6B6"
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["PZB_ProgramMode.Value", "PZB_ProgramMode_v2.Value", "PZB_ProgramMode_v1.Value"], "operator": "==", "right": "2"},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "101"}
+                    ]
+                },
+                "display": {
+                    "text": "70",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff",
+                    "blinking": "background",
+                    "blinkingTextColorOn": "#ffffff",
+                    "blinkingTextColorOff": "#B6B6B6"
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["PZB_ProgramMode.Value", "PZB_ProgramMode_v2.Value", "PZB_ProgramMode_v1.Value"], "operator": "==", "right": "2"},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "10101"}
+                    ]
+                },
+                "display": {
+                    "text": "70",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff",
+                    "blinking": "background",
+                    "blinkingTextColorOn": "#ffffff",
+                    "blinkingTextColorOff": "#B6B6B6"
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["PZB_ProgramMode.Value", "PZB_ProgramMode_v2.Value", "PZB_ProgramMode_v1.Value"], "operator": "==", "right": "3"},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "10001"}
+                    ]
+                },
+                "display": {
+                    "text": "85",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff",
+                    "blinking": "background",
+                    "blinkingTextColorOn": "#ffffff",
+                    "blinkingTextColorOff": "#B6B6B6"
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["PZB_ProgramMode.Value", "PZB_ProgramMode_v2.Value", "PZB_ProgramMode_v1.Value"], "operator": "==", "right": "3"},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "1"}
+                    ]
+                },
+                "display": {
+                    "text": "85",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff",
+                    "blinking": "background",
+                    "blinkingTextColorOn": "#ffffff",
+                    "blinkingTextColorOff": "#B6B6B6"
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["PZB_ProgramMode.Value", "PZB_ProgramMode_v2.Value", "PZB_ProgramMode_v1.Value"], "operator": "==", "right": "3"},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "10"}
+                    ]
+                },
+                "display": {
+                    "text": "85",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff",
+                    "blinking": "background",
+                    "blinkingTextColorOn": "#ffffff",
+                    "blinkingTextColorOff": "#B6B6B6"
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["PZB_ProgramMode.Value", "PZB_ProgramMode_v2.Value", "PZB_ProgramMode_v1.Value"], "operator": "==", "right": "3"},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "10111"}
+                    ]
+                },
+                "display": {
+                    "text": "85",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff",
+                    "blinking": "background",
+                    "blinkingTextColorOn": "#ffffff",
+                    "blinkingTextColorOff": "#B6B6B6"
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["PZB_ProgramMode.Value", "PZB_ProgramMode_v2.Value", "PZB_ProgramMode_v1.Value"], "operator": "==", "right": "3"},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "111"}
+                    ]
+                },
+                "display": {
+                    "text": "85",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff",
+                    "blinking": "background",
+                    "blinkingTextColorOn": "#ffffff",
+                    "blinkingTextColorOff": "#B6B6B6"
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["PZB_ProgramMode.Value", "PZB_ProgramMode_v2.Value", "PZB_ProgramMode_v1.Value"], "operator": "==", "right": "3"},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "101"}
+                    ]
+                },
+                "display": {
+                    "text": "85",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff",
+                    "blinking": "background",
+                    "blinkingTextColorOn": "#ffffff",
+                    "blinkingTextColorOff": "#B6B6B6"
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["PZB_ProgramMode.Value", "PZB_ProgramMode_v2.Value", "PZB_ProgramMode_v1.Value"], "operator": "==", "right": "3"},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "10101"}
+                    ]
+                },
+                "display": {
+                    "text": "85",
+                    "backgroundColor": "#0000FF",
+                    "color": "#ffffff",
+                    "blinking": "background",
+                    "blinkingTextColorOn": "#ffffff",
+                    "blinkingTextColorOff": "#B6B6B6"
+                }
+                }
+            ],
+            "default": {
+                "text": ""
+            }
+        },
+        {
+            "type": "text_indicator",
+            "id": "magnet_1000_blink",
+            "area": "ind4",
+            "value": "",
+            "fontFamily": "Arial",
+            "fontSize": "20px",
+            "conditions": [
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "10000111"}
+                    ]
+                },
+                "display": {
+                    "text": "1000\n   Hz",
+                    "backgroundColor": "#FFD700",
+                    "color": "#000000",
+                    "blinking": "background",
+                    "blinkingTextColorOn": "#000000",
+                    "blinkingTextColorOff": "#FFD700"
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "10000001"}
+                    ]
+                },
+                "display": {
+                    "text": "1000\n   Hz",
+                    "backgroundColor": "#FFD700",
+                    "color": "#000000",
+                    "blinking": "background",
+                    "blinkingTextColorOn": "#000000",
+                    "blinkingTextColorOff": "#FFD700"
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "10000000"}
+                    ]
+                },
+                "display": {
+                    "text": "1000\n   Hz",
+                    "backgroundColor": "#FFD700",
+                    "color": "#000000",
+                    "blinking": "background",
+                    "blinkingTextColorOn": "#000000",
+                    "blinkingTextColorOff": "#FFD700"            
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "10010111"}
+                    ]
+                },
+                "display": {
+                    "text": "1000\n   Hz",
+                    "backgroundColor": "#FFD700",
+                    "color": "#000000",
+                    "blinking": "background",
+                    "blinkingTextColorOn": "#000000",
+                    "blinkingTextColorOff": "#FFD700"
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "10010011"}
+                    ]
+                },
+                "display": {
+                    "text": "1000\n   Hz",
+                    "backgroundColor": "#FFD700",
+                    "color": "#000000",
+                    "blinking": "background",
+                    "blinkingTextColorOn": "#000000",
+                    "blinkingTextColorOff": "#FFD700"
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "10001"}
+                    ]
+                },
+                "display": {
+                    "text": "1000\n   Hz",
+                    "backgroundColor": "#FFD700",
+                    "color": "#000000"         
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "1"}
+                    ]
+                },
+                "display": {
+                    "text": "1000\n   Hz",
+                    "backgroundColor": "#FFD700",
+                    "color": "#000000"         
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "111"}
+                    ]
+                },
+                "display": {
+                    "text": "500\n  Hz",
+                    "backgroundColor": "#FF0000",
+                    "color": "#ffffff"  
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "101"}
+                    ]
+                },
+                "display": {
+                    "text": "500\n  Hz",
+                    "backgroundColor": "#FF0000",
+                    "color": "#ffffff"  
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "10111"}
+                    ]
+                },
+                "display": {
+                    "text": "500\n  Hz",
+                    "backgroundColor": "#FF0000",
+                    "color": "#ffffff"  
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "10000101"}
+                    ]
+                },
+                "display": {
+                    "text": "500\n  Hz",
+                    "backgroundColor": "#FF0000",
+                    "color": "#ffffff"  
+                }
+                },
+                {
+                "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": true},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false},
+                        {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "10101"}
+                    ]
+                },
+                "display": {
+                    "text": "500\n  Hz",
+                    "backgroundColor": "#FF0000",
+                    "color": "#ffffff"  
+                }
+                }
+            ],
+            "default": {
+                "text": ""
+            }
+        },
+
+        {
+            "type": "text_indicator",
+            "id": "sifa_ind_off",
+            "area": "ind13",
+            "value": "",
+            "fontFamily": "Arial",
+            "fontSize": "15px",
+            "conditions": [
+                {
+                "when":{"left": ["Sifa_Active.Value", "Sifa_Active_legacy.Value"], "operator": "==", "right": false},
+                "display": {
+                    "text": "SIFA",
+                    "backgroundColor": "#FFD700",
+                    "color": "#000000",
+                    "strikethrough": false,
+                    "strikethroughColor": "#000000",
+                    "strikethroughWidth": 4
+                }
+                }
+            ],
+            "default": {
+                "text": ""
+            }
+        },
+        {
+            "type": "text_indicator",
+            "id": "sifa_ind_on",
+            "area": "ind13",
+            "value": "",
+            "fontFamily": "Arial",
+            "fontSize": "15px",
+            "conditions": [
+                {
+                "when": {
+                    "any": [
+                        {"left": "Sifa_WarningStateVisual.Value", "operator": "==", "right": true},
+                        {"left": "Sifa_WarningStateAuditory.Value", "operator": "==", "right": true},
+                        {"left": "Sifa_WarningStateVisual_legacy.ReturnValue", "operator": "==", "right": true},
+                        {"left": "Sifa_WarningStateAuditory_legacy.ReturnValue", "operator": "==", "right": true}
+                    ]
+                },
+                "display": {
+                    "text": "SIFA",
+                    "backgroundColor": "#FFFFFF",
+                    "color": "#000000",
+                    "strikethrough": false,
+                    "strikethroughColor": "#000000",
+                    "strikethroughWidth": 4
+                }
+                }
+            ],
+            "default": {
+                "text": ""
+            }
+        },
+        {
+            "type": "text_indicator",
+            "id": "doors_open",
+            "area": "ind11",
+            "value": "",
+            "fontFamily": "Arial",
+            "fontSize": "25px",
+            "conditions": [
+                {
+                "when":{"left": "doors_unlocked.ReturnValue", "operator": "==", "right": true},
+                "display": {
+                    "text": "T",
+                    "backgroundColor": "#FFFFFF",
+                    "color": "#000000",
+                    "strikethrough": false,
+                    "strikethroughColor": "#000000",
+                    "strikethroughWidth": 4
+                }
+                }
+            ],
+            "default": {
+                "text": ""
+            }
+        },
+        {
+            "type": "text_indicator",
+            "id": "wheel_slip",
+            "area": "ind12",
+            "value": "",
+            "fontFamily": "Arial",
+            "fontSize": "25px",
+            "conditions": [
+                {
+                "when":{"left": "is_slipping.IsSlipping", "operator": "==", "right": true},
+                "display": {
+                    "text": "SG",
+                    "backgroundColor": "#FFD700",
+                    "color": "#000000",
+                    "strikethrough": false,
+                    "strikethroughColor": "#000000",
+                    "strikethroughWidth": 4
+                }
+                }
+            ],
+            "default": {
+                "text": ""
+            }
+        },
+        {
+            "type": "text_indicator",
+            "id": "mcb_off",
+            "area": "ind10",
+            "value": "",
+            "fontFamily": "Arial",
+            "fontSize": "18px",
+            "alignment": {
+            "horizontal": "center",
+            "vertical": "bottom"
+            },
+            "conditions": [
+                {
+                "when":{"left": "mcb_state.IsCircuitBreakerOpen", "operator": "==", "right": true},
+                "display": {
+                    "text": "  H\nAUS",
+                    "backgroundColor": "#222222",
+                    "color": "#ffffff",
+                    "strikethrough": false,
+                    "strikethroughColor": "#000000",
+                    "strikethroughWidth": 4
+                }
+                }
+            ],
+            "default": {
+                "text": ""
+            }
+        },
+
+        {
+            "type": "text_display",
+            "id": "time_display",
+            "value": "tod_data.WorldTimeISO8601_time_only",
+            "hide_value_when_empty": true,
+            "area": "time",
+            "alignment": {
+                "horizontal": "center",
+                "vertical": "bottom"
+                },
+            "styles": {
+              "value": {
+                  "fontFamily": "Arial",
+                  "fontSize": "16px",
+                  "bold": true,
+                  "italic": false,
+                  "underline": false
+                    }
+                 }
+        },
+        {
+            "type": "text_display",
+            "id": "date",
+            "value": "tod_data.WorldTimeISO8601_date_only",
+            "hide_value_when_empty": true,
+            "area": "date",
+            "alignment": {
+                "horizontal": "center",
+                "vertical": "bottom"
+                }, 
+            "styles": {
+              "value": {
+                  "fontFamily": "Arial",
+                  "fontSize": "16px",
+                  "bold": true,
+                  "italic": false,
+                  "underline": false
+                    }
+                 }
+        },
+
+        {
+            "type": "list",
+            "id": "event_log1",
+            "fontFamily": "Arial",
+            "fontSize": "18px",
+            "maxRows": 3,
+            "rowHeight": "33%",
+            "area": "list1",
+            "removeIfNotMet": true,
+            "conditions": [
+                {
+                    "when":  {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "10011"},
+                    "display": {
+                        "text": "V-Überwachung: 45 km/h",
+                        "backgroundColor": "#FFD700",
+                        "color": "#000000",
+                        "bold": false
+                    }
+                },
+                {
+                    "when":  {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "10001"},
+                    "display": {
+                        "text": "V-Überwachung: 45 km/h",
+                        "backgroundColor": "#FFD700",
+                        "color": "#000000",
+                        "bold": false
+                    }
+                },
+                {
+                    "when":  {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "10101"},
+                    "display": {
+                        "text": "V-Überwachung: 25 km/h",
+                        "backgroundColor": "#FFD700",
+                        "color": "#000000",
+                        "bold": false
+                    }
+                },
+                {
+                    "when": {
+                    "all": [
+                        {"left": ["PZB_IsActive.Value", "PZB_IsActive_v2.Value", "PZB_IsActive_v1.Value"], "operator": "==", "right": false},
+                        {"left": ["LZB_IsActive.Value", "LZB_IsActive_legacy.Value"], "operator": "==", "right": false}
+                    ]},
+                    "display": {
+                        "text": "PZD und LZB Störbetrieb active",
+                        "backgroundColor": "#FFD700",
+                        "color": "#000000",
+                        "bold": false
+                    }
+                },
+                {
+                    "when": {"left": ["Sifa_Active.Value", "Sifa_Active_legacy.Value"], "operator": "==", "right": false},
+                    "display": {
+                        "text": "SIFA Störbetrieb active",
+                        "backgroundColor": "#FFD700",
+                        "color": "#000000",
+                        "bold": false
+                    }
+                }
+            ]
+        },
+        {
+            "type": "list",
+            "id": "event_log2",
+            "fontFamily": "Arial",
+            "fontSize": "18px",
+            "maxRows": 3,
+            "rowHeight": "33%",
+            "area": "list2",
+            "removeIfNotMet": true,
+            "conditions": [
+                {
+                    "when":  {"left": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"], "operator": "==", "right": "10011"},
+                    "display": {
+                        "text": "V-Überwachung: 45 km/h",
+                        "backgroundColor": "#FFD700",
+                        "color": "#000000",
+                        "bold": false
+                    }
+                }
+            ]
+        },
+
+      {
+        "type": "text_display",
+        "id": "ind19",
+        "value": ["PZB_InfluenceCode.Value", "PZB_InfluenceCode_v2.Value", "PZB_InfluenceCode_v1.Value"],
+        "area": "ind19"
+      },  
+       
+      {
+        "type": "text_display",
+        "id": "empt1",
+        "value": "",
+        "area": "empt1"
+      },
+      {
+        "type": "text_display",
+        "id": "empt2",
+        "value": "",
+        "area": "empt2"
+      },
+      {
+        "type": "text_display",
+        "id": "time",
+        "value": "",
+        "area": "time"
+      },
+      {
+        "type": "text_display",
+        "id": "empt3",
+        "value": "",
+        "area": "empt3"
+      },
+      
+      {
+        "type": "text_display",
+        "id": "ind2",
+        "value": "",
+        "area": "extra2"
+      },
+      {
+        "type": "text_display",
+        "id": "ind3",
+        "value": "",
+        "area": "extra"
+      },
+      {
+        "type": "text_display",
+        "id": "ind7",
+        "value": "",
+        "area": "extra1"
+      },
+      {
+        "type": "text_display",
+        "id": "ind8",
+        "value": "",
+        "area": "ind8"
+      },
+      {
+        "type": "text_display",
+        "id": "ind9",
+        "value": "",
+        "area": "ind9"
+      },
+      {
+        "type": "text_display",
+        "id": "ind10",
+        "value": "",
+        "area": "list1"
+      },
+      {
+        "type": "text_display",
+        "id": "ind11",
+        "area": "list2"
+      },
+      {
+        "type": "text_display",
+        "id": "ind14",
+        "area": "ind14"
+      },
+      {
+        "type": "text_display",
+        "id": "ind17",
+        "area": "ind17"
+      },
+      {
+        "type": "text_display",
+        "id": "list1",
+        "area": "ind19"
+      },
+      {
+        "type": "text_display",
+        "id": "list2",
+        "area": "ind20"
+      },
+      {
+        "type": "text_display",
+        "id": "list3",
+        "area": "ind21"
+      },
+      {
+        "type": "text_display",
+        "id": "list4",
+        "area": "list4"
+      },
+      {
+        "type": "text_display",
+        "id": "list5",
+        "area": "list5"
+      },
+      {
+        "type": "text_display",
+        "id": "list6",
+        "area": "list6"
+      },
+      {
+        "type": "text_display",
+        "id": "ind15",
+        "area": "ind15"
+      }
+    ],
+    "buttons": {
+        "top": {"aus": {"action": ""},
+        "S": {"action": "page_navigate","target": "settings"},
+        "i": {
+          "action": "page_navigate",
+          "target": "info"
+        },
+        "St": {
+          "action": "toggle",
+          "target": "status"
+        },
+        "V>0": {
+          "action": "condition_check",
+          "value": "speed_ms",
+          "condition": ">",
+          "compare": 0
+        },
+        "V=0": {
+          "action": "condition_check",
+          "value": "speed_ms",
+          "condition": "==",
+          "compare": 0
+        },
+        "brightness": {
+          "action": "adjust_brightness",
+          "step": 5
+        },
+        "contrast": {
+          "action": "toggle_night_mode"
+        },
+        "UD": {
+          "action": "adjust_contrast",
+          "step": 5
+        }
+      },
+      "right": {
+        "c": {
+          "action": "config_mode"
+        },
+        "left": {
+          "action": "scroll",
+          "direction": "left"
+        },
+        "right": {
+          "action": "scroll",
+          "direction": "right"
+        },
+        "up": {
+          "action": "scroll",
+          "direction": "up"
+        },
+        "down": {
+          "action": "scroll",
+          "direction": "down"
+        },
+        "E": {
+          "action": "confirm"
+        }
+      },
+      "bottom": {
+        "1": {
+          "action": "page_navigate",
+          "target": "dashboard"
+        },
+        "2": {
+          "action": "input_number",
+          "value": 2
+        },
+        "3": {
+          "action": "input_number",
+          "value": 3
+        },
+        "4": {
+          "action": "input_number",
+          "value": 4
+        },
+        "5": {
+          "action": "input_number",
+          "value": 5
+        },
+        "6": {
+          "action": "input_number",
+          "value": 6
+        },
+        "7": {
+          "action": "input_number",
+          "value": 7
+        },
+        "8": {
+          "action": "input_number",
+          "value": 8
+        },
+        "9": {
+          "action": "input_number",
+          "value": 9
+        },
+        "0": {
+          "action": "page_back"
+        }
+      }
+    },
+    "menu_labels": {
+      "1": "",
+      "2": "",
+      "3": "",
+      "4": "",
+      "5": "",
+      "6": "",
+      "7": "",
+      "8": "",
+      "9": "",
+      "0": "Back"
+    }
+  }
+}

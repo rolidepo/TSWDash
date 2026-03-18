@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timetable JSON Editor</title>
+    <style>
+        :root {
+            --bg: #0a1020;
+            --panel: #101a32;
+            --panel-2: #16233f;
+            --border: #2b3b63;
+            --text: #e7eefc;
+            --muted: #9eb0d3;
+            --primary: #3b82f6;
+            --primary-2: #2563eb;
+            --success: #10b981;
+            --warn: #f59e0b;
+            --danger: #ef4444;
+            --shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Inter, Segoe UI, Arial, sans-serif;
+            color: var(--text);
+            background: radial-gradient(circle at 22% -12%, #1d4ed8 0%, #0a1020 30%, #050913 100%);
+            min-height: 100vh;
+        }
+
+        .wrap {
+            max-width: 1700px;
+            margin: 0 auto;
+            padding: 14px;
+        }
+
+        h1 {
+            margin: 0 0 10px;
+            font-size: 23px;
+        }
+
+        .panel {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: linear-gradient(180deg, rgba(22, 35, 63, 0.9), rgba(16, 26, 50, 0.95));
+            box-shadow: var(--shadow);
+            margin-bottom: 10px;
+            overflow: visible;
+        }
+
+        .panel-title {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+            font-weight: 700;
+            font-size: 14px;
+            color: #cddbf5;
+            background: rgba(11, 18, 32, 0.72);
+        }
+
+        .panel-body {
+            padding: 10px;
+            overflow: visible;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        input,
+        select,
+        button {
+            width: 100%;
+            border: 1px solid var(--border);
+            background: var(--panel-2);
+            color: var(--text);
+            border-radius: 9px;
+            padding: 8px 9px;
+            font-size: 13px;
+            margin: 0;
+            height: 36px;
+        }
+
+        button {
+            cursor: pointer;
+            border-color: var(--primary);
+            background: var(--primary);
+            font-weight: 600;
+            transition: .14s ease;
+        }
+
+        button:hover { background: var(--primary-2); border-color: var(--primary-2); }
+        button.secondary { background: #475569; border-color: #475569; }
+        button.success { background: var(--success); border-color: var(--success); }
+        button.warn { background: var(--warn); border-color: var(--warn); }
+
+        .train-info-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 9px;
+        }
+
+        .field-card {
+            border: 1px solid var(--border);
+            background: rgba(11, 18, 32, 0.55);
+            border-radius: 10px;
+            padding: 8px;
+        }
+
+        .hint {
+            margin-top: 8px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .company-dropdown {
+            position: relative;
+            z-index: 30;
+        }
+
+        .company-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            height: 36px;
+        }
+
+        .company-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            overflow: hidden;
+        }
+
+        .logo-frame {
+            width: 72px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2px;
+            flex: 0 0 auto;
+        }
+
+        .logo-frame img {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            display: block;
+        }
+
+        .company-menu {
+            position: absolute;
+            top: 41px;
+            left: 0;
+            right: 0;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: rgba(8, 14, 28, 0.98);
+            max-height: min(56vh, 360px);
+            overflow-y: auto;
+            z-index: 25;
+            box-shadow: var(--shadow);
+            display: none;
+        }
+
+        .company-menu.open { display: block; }
+
+        .company-option {
+            width: 100%;
+            border: 0;
+            border-bottom: 1px solid #24365e;
+            border-radius: 0;
+            background: transparent;
+            color: var(--text);
+            height: auto;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .company-option .logo-frame {
+            width: 84px;
+            height: 32px;
+        }
+
+        .company-option:hover {
+            background: rgba(59, 130, 246, 0.16);
+        }
+
+        .toolbar {
+            display: grid;
+            grid-template-columns: 1fr 180px 180px;
+            gap: 8px;
+            align-items: end;
+            margin-bottom: 10px;
+        }
+
+        .loadbar {
+            display: grid;
+            grid-template-columns: 1fr 180px 180px;
+            gap: 8px;
+            align-items: end;
+            margin-bottom: 10px;
+        }
+
+        .meta {
+            font-size: 12px;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 8px;
+            background: rgba(11, 18, 32, 0.5);
+            min-height: 36px;
+            display: flex;
+            align-items: center;
+        }
+
+        .table-wrap {
+            max-height: 56vh;
+            overflow: auto;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        thead th {
+            text-align: left;
+            font-size: 12px;
+            color: var(--muted);
+            padding: 9px 8px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(8, 14, 28, 0.96);
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        tbody td {
+            font-size: 13px;
+            border-bottom: 1px solid #25375f;
+            padding: 7px 8px;
+            vertical-align: middle;
+        }
+
+        .row-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .tiny-btn {
+            height: 32px;
+            padding: 0;
+            font-size: 15px;
+            line-height: 1;
+        }
+
+        .stop-cell {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .stop-cell input[type="checkbox"] {
+            width: 17px;
+            height: 17px;
+            margin: 0;
+            accent-color: #60a5fa;
+        }
+
+        .footer-actions {
+            margin-top: 10px;
+            display: grid;
+            grid-template-columns: 220px 180px 1fr;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .status {
+            position: fixed;
+            top: 12px;
+            right: 12px;
+            display: none;
+            max-width: 420px;
+            z-index: 9999;
+            border-radius: 10px;
+            padding: 10px 12px;
+            color: #fff;
+            font-weight: 700;
+            box-shadow: var(--shadow);
+        }
+
+        .status.show { display: block; }
+        .status.info { background: #2563eb; }
+        .status.success { background: #059669; }
+        .status.error { background: #dc2626; }
+
+        @media (max-width: 1450px) {
+            .train-info-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 1000px) {
+            .train-info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .toolbar,
+            .loadbar,
+            .footer-actions {
+                grid-template-columns: 1fr;
+            }
+
+            thead th:nth-child(6),
+            tbody td:nth-child(6) {
+                min-width: 110px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <h1>Timetable JSON Editor</h1>
+
+    <div class="panel">
+        <div class="panel-title">Schedule Files</div>
+        <div class="panel-body">
+            <div class="loadbar">
+                <div>
+                    <label for="existingSchedule">Existing schedule</label>
+                    <select id="existingSchedule">
+                        <option value="">-- Select existing schedule --</option>
+                    </select>
+                </div>
+                <button type="button" class="secondary" id="refreshSchedulesBtn">Refresh List</button>
+                <button type="button" class="secondary" id="loadScheduleBtn">Load For Editing</button>
+            </div>
+            <div class="hint">Load a saved file from <code>timetable/schedule</code> to edit and save again.</div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-title">train_info</div>
+        <div class="panel-body">
+            <div class="train-info-grid">
+                <div class="field-card">
+                    <label>company</label>
+                    <div class="company-dropdown" id="companyDropdown">
+                        <button type="button" class="secondary company-trigger" id="companyTrigger">
+                            <span class="company-label" id="companyTriggerLabel">Select company</span>
+                            <span>v</span>
+                        </button>
+                        <div class="company-menu" id="companyMenu"></div>
+                    </div>
+                </div>
+
+                <div class="field-card">
+                    <label for="train_number">train_number</label>
+                    <input id="train_number" type="text" maxlength="25" />
+                </div>
+
+                <div class="field-card">
+                    <label for="destination">destination</label>
+                    <input id="destination" type="text" maxlength="256" />
+                </div>
+
+                <div class="field-card">
+                    <label for="type">type</label>
+                    <select id="type">
+                        <option value="">-- Select type --</option>
+                    </select>
+                </div>
+
+                <div class="field-card">
+                    <label for="priority">priority</label>
+                    <select id="priority">
+                        <option value="">-- Select priority --</option>
+                    </select>
+                </div>
+
+                <div class="field-card">
+                    <label for="max_speed_kph">max_speed_kph</label>
+                    <input id="max_speed_kph" type="number" min="0" step="1" />
+                </div>
+
+                <div class="field-card">
+                    <label for="timetable_length_km">timetable_length_km</label>
+                    <input id="timetable_length_km" type="number" min="0" step="0.1" />
+                </div>
+
+                <div class="field-card">
+                    <label for="route_code">route_code</label>
+                    <select id="route_code">
+                        <option value="">-- Select route code --</option>
+                    </select>
+                </div>
+
+                <div class="field-card">
+                    <label for="service_timetable">service_timetable</label>
+                    <select id="service_timetable">
+                        <option value="">-- Select service timetable --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="hint">Fill all train_info fields first. Then edit timetable_data and save.</div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-title">timetable_data</div>
+        <div class="panel-body">
+            <div class="toolbar">
+                <div id="stationMeta" class="meta">No service timetable loaded</div>
+                <button type="button" class="secondary" onclick="addStopRow()">+ Add Stop Row</button>
+                <button type="button" class="secondary" onclick="resetStops()">Reset Rows</button>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th style="width: 36%;">station</th>
+                        <th style="width: 9%;">stop</th>
+                        <th style="width: 17%;">ETA</th>
+                        <th style="width: 17%;">ETD</th>
+                        <th style="width: 8%;">+</th>
+                        <th style="width: 13%;">-</th>
+                    </tr>
+                    </thead>
+                    <tbody id="stopsTbody"></tbody>
+                </table>
+            </div>
+
+            <div class="footer-actions">
+                <button type="button" class="warn" onclick="calculateTimes()">Calculate timetable</button>
+                <button type="button" class="success" onclick="saveTimetable()">Save</button>
+                <div class="meta" id="saveMeta">Filename: not ready</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="status" class="status"></div>
+
+<script>
+    const state = {
+        template: null,
+        trainInfoData: null,
+        companiesByValue: {},
+        selectedCompany: null,
+        serviceStations: [],
+        serviceEntries: [],
+        stationById: {},
+        rows: []
+    };
+
+    function showStatus(message, type = 'info') {
+        const el = document.getElementById('status');
+        el.textContent = message;
+        el.className = `status show ${type}`;
+        setTimeout(() => { el.className = 'status'; }, 3500);
+    }
+
+    function safeText(value) {
+        return String(value || '').trim();
+    }
+
+    function deepCopy(value) {
+        return JSON.parse(JSON.stringify(value));
+    }
+
+    function parseNumeric(value) {
+        if (value === '' || value === null || value === undefined) return null;
+        const n = Number(value);
+        return Number.isFinite(n) ? n : null;
+    }
+
+    function parseHms(value) {
+        const text = safeText(value);
+        if (!text) return null;
+        const match = text.match(/^(\d{1,2}):(\d{2}):(\d{2})$/);
+        if (!match) return null;
+        const h = Number(match[1]);
+        const m = Number(match[2]);
+        const s = Number(match[3]);
+        if (m > 59 || s > 59) return null;
+        return h * 3600 + m * 60 + s;
+    }
+
+    function formatHms(totalSeconds) {
+        let seconds = Math.max(0, Math.round(totalSeconds));
+        const h = Math.floor(seconds / 3600);
+        seconds -= h * 3600;
+        const m = Math.floor(seconds / 60);
+        const s = seconds - m * 60;
+        return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function roundUpToMinute(totalSeconds) {
+        if (!Number.isFinite(totalSeconds)) return 0;
+        return Math.ceil(totalSeconds / 60) * 60;
+    }
+
+    function formatTimeInput(rawValue) {
+        const digits = String(rawValue || '').replace(/\D/g, '').slice(0, 6);
+        if (!digits) return '';
+        if (digits.length <= 2) return digits;
+        if (digits.length <= 4) return `${digits.slice(0, 2)}:${digits.slice(2)}`;
+        return `${digits.slice(0, 2)}:${digits.slice(2, 4)}:${digits.slice(4, 6)}`;
+    }
+
+    function haversineKm(lat1, lon1, lat2, lon2) {
+        const r = 6371;
+        const toRad = (deg) => deg * Math.PI / 180;
+        const dLat = toRad(lat2 - lat1);
+        const dLon = toRad(lon2 - lon1);
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+            + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2))
+            * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return r * c;
+    }
+
+    function estimateTravelSeconds(distanceKm, maxSpeedKph) {
+        if (!(distanceKm > 0) || !(maxSpeedKph > 0)) return 0;
+
+        const slowdownFactor = 1.15;
+
+        const distanceM = distanceKm * 1000;
+        const vMax = maxSpeedKph / 3.6;
+        const accel = 0.55;
+        const brake = 0.65;
+
+        const accelDistance = (vMax * vMax) / (2 * accel);
+        const brakeDistance = (vMax * vMax) / (2 * brake);
+        const minDistanceForCruise = accelDistance + brakeDistance;
+
+        if (distanceM > minDistanceForCruise) {
+            const accelTime = vMax / accel;
+            const cruiseDistance = distanceM - minDistanceForCruise;
+            const cruiseTime = cruiseDistance / vMax;
+            const brakeTime = vMax / brake;
+            return (accelTime + cruiseTime + brakeTime) * slowdownFactor;
+        }
+
+        const peakSpeed = Math.sqrt((2 * distanceM * accel * brake) / (accel + brake));
+        return ((peakSpeed / accel) + (peakSpeed / brake)) * slowdownFactor;
+    }
+
+    function parseStationEntryIndex(stationId) {
+        const text = safeText(stationId);
+        if (!text) return null;
+        const head = text.split(':', 1)[0];
+        const n = Number(head);
+        return Number.isInteger(n) ? n : null;
+    }
+
+    function parseSpeedLimitValue(value) {
+        const n = Number(value);
+        return Number.isFinite(n) && n > 0 ? n : null;
+    }
+
+    function getAverageSpeedLimitBetweenStations(stationIdA, stationIdB) {
+        if (!Array.isArray(state.serviceEntries) || !state.serviceEntries.length) return null;
+
+        const a = parseStationEntryIndex(stationIdA);
+        const b = parseStationEntryIndex(stationIdB);
+        if (a === null || b === null) return null;
+
+        const startIndex = Math.min(a, b);
+        const endIndex = Math.max(a, b);
+        const rangeEntries = state.serviceEntries.filter((entry) => {
+            const idx = Number(entry.index);
+            return Number.isInteger(idx) && idx >= startIndex && idx <= endIndex;
+        });
+
+        if (!rangeEntries.length) return null;
+
+        const entriesByKm = rangeEntries
+            .map((entry) => ({
+                km: Number(entry.km),
+                speed: parseSpeedLimitValue(entry.speed_limit)
+            }))
+            .filter((entry) => Number.isFinite(entry.km) && entry.speed !== null)
+            .sort((left, right) => left.km - right.km);
+
+        let weightedDistance = 0;
+        let weightedSpeedSum = 0;
+        for (let i = 0; i < entriesByKm.length - 1; i += 1) {
+            const current = entriesByKm[i];
+            const next = entriesByKm[i + 1];
+            const deltaKm = next.km - current.km;
+            if (!(deltaKm > 0)) continue;
+            weightedDistance += deltaKm;
+            weightedSpeedSum += current.speed * deltaKm;
+        }
+
+        if (weightedDistance > 0) {
+            return weightedSpeedSum / weightedDistance;
+        }
+
+        const speedSamples = rangeEntries
+            .map((entry) => parseSpeedLimitValue(entry.speed_limit))
+            .filter((speed) => speed !== null);
+
+        if (!speedSamples.length) return null;
+        const total = speedSamples.reduce((sum, speed) => sum + speed, 0);
+        return total / speedSamples.length;
+    }
+
+    function getTrainInfoFromForm() {
+        return {
+            company: state.selectedCompany ? state.selectedCompany.value : '',
+            train_number: safeText(document.getElementById('train_number').value),
+            destination: safeText(document.getElementById('destination').value),
+            type: safeText(document.getElementById('type').value),
+            priority: safeText(document.getElementById('priority').value),
+            max_speed_kph: parseNumeric(document.getElementById('max_speed_kph').value),
+            timetable_length_km: parseNumeric(document.getElementById('timetable_length_km').value),
+            route_code: safeText(document.getElementById('route_code').value),
+            service_timetable: safeText(document.getElementById('service_timetable').value)
+        };
+    }
+
+    function isTrainInfoComplete() {
+        const trainInfo = getTrainInfoFromForm();
+        const requiredKeys = [
+            'company',
+            'train_number',
+            'destination',
+            'type',
+            'priority',
+            'max_speed_kph',
+            'timetable_length_km',
+            'route_code',
+            'service_timetable'
+        ];
+
+        return requiredKeys.every((key) => {
+            const value = trainInfo[key];
+            if (value === null || value === undefined) return false;
+            if (typeof value === 'string') return value.trim().length > 0;
+            return true;
+        });
+    }
+
+    function updateSaveMeta() {
+        const trainInfo = getTrainInfoFromForm();
+        const el = document.getElementById('saveMeta');
+        if (!isTrainInfoComplete()) {
+            el.textContent = 'Filename: not ready';
+            return;
+        }
+
+        const sanitize = (text) => safeText(text).replace(/[^a-zA-Z0-9_-]/g, '_').replace(/_+/g, '_').replace(/^_+|_+$/g, '');
+        const fileName = `${sanitize(trainInfo.route_code)}_${sanitize(trainInfo.company)}_${sanitize(trainInfo.train_number)}.json`;
+        el.textContent = `Filename: ${fileName}`;
+    }
+
+    function closeCompanyMenu() {
+        document.getElementById('companyMenu').classList.remove('open');
+    }
+
+    function openCompanyMenu() {
+        document.getElementById('companyMenu').classList.add('open');
+    }
+
+    function renderCompanyTrigger() {
+        const triggerLabel = document.getElementById('companyTriggerLabel');
+        if (!state.selectedCompany) {
+            triggerLabel.textContent = 'Select company';
+            return;
+        }
+
+        const imagePath = `/picto-icons/${encodeURIComponent(state.selectedCompany.picto || '')}`;
+        triggerLabel.innerHTML = `<span class="logo-frame"><img src="${imagePath}" alt=""></span><span>${state.selectedCompany.label || state.selectedCompany.value}</span>`;
+    }
+
+    function updateTypeOptions() {
+        const typeSelect = document.getElementById('type');
+        const oldValue = typeSelect.value;
+        typeSelect.innerHTML = '<option value="">-- Select type --</option>';
+
+        if (!state.selectedCompany || !Array.isArray(state.selectedCompany.types)) {
+            return;
+        }
+
+        state.selectedCompany.types.forEach((item) => {
+            const option = document.createElement('option');
+            option.value = String(item);
+            option.textContent = String(item);
+            typeSelect.appendChild(option);
+        });
+
+        if ([...typeSelect.options].some((opt) => opt.value === oldValue)) {
+            typeSelect.value = oldValue;
+        }
+    }
+
+    function selectCompany(companyValue) {
+        state.selectedCompany = state.companiesByValue[companyValue] || null;
+        renderCompanyTrigger();
+        updateTypeOptions();
+        updateSaveMeta();
+        closeCompanyMenu();
+    }
+
+    function populateCompanyMenu(companies) {
+        const menu = document.getElementById('companyMenu');
+        menu.innerHTML = '';
+        state.companiesByValue = {};
+
+        (companies || []).forEach((company) => {
+            if (!company || !company.value) return;
+            state.companiesByValue[company.value] = company;
+
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'company-option';
+            const imagePath = `/picto-icons/${encodeURIComponent(company.picto || '')}`;
+            btn.innerHTML = `<span class="logo-frame"><img src="${imagePath}" alt=""></span><span>${company.label || company.value}</span>`;
+            btn.addEventListener('click', () => selectCompany(company.value));
+            menu.appendChild(btn);
+        });
+    }
+
+    function populateSimpleSelect(selectId, values, useLabelValue = false) {
+        const select = document.getElementById(selectId);
+        const current = select.value;
+        while (select.options.length > 1) select.remove(1);
+
+        (values || []).forEach((item) => {
+            const option = document.createElement('option');
+            if (useLabelValue) {
+                option.value = String(item.value || '');
+                option.textContent = String(item.label || item.value || '');
+            } else {
+                option.value = String(item);
+                option.textContent = String(item);
+            }
+            if (option.value) select.appendChild(option);
+        });
+
+        if ([...select.options].some((opt) => opt.value === current)) {
+            select.value = current;
+        }
+    }
+
+    function populateExistingSchedules(items) {
+        const select = document.getElementById('existingSchedule');
+        const current = select.value;
+        while (select.options.length > 1) select.remove(1);
+
+        (items || []).forEach((item) => {
+            if (!item || !item.filename) return;
+            const option = document.createElement('option');
+            option.value = String(item.filename);
+            const meta = [item.route_code, item.company, item.train_number].filter((v) => safeText(v));
+            option.textContent = meta.length ? `${item.filename} (${meta.join(' / ')})` : item.filename;
+            select.appendChild(option);
+        });
+
+        if ([...select.options].some((opt) => opt.value === current)) {
+            select.value = current;
+        }
+    }
+
+    async function refreshExistingSchedules() {
+        try {
+            const response = await fetch('/api/timetable-editor/schedules');
+            if (!response.ok) throw new Error('Could not list existing schedules');
+            const data = await response.json();
+            populateExistingSchedules(data.schedules || []);
+        } catch (error) {
+            showStatus(error.message, 'error');
+        }
+    }
+
+    function setTrainInfoForm(trainInfo) {
+        const info = trainInfo || {};
+
+        const companyValue = safeText(info.company);
+        if (companyValue && state.companiesByValue[companyValue]) {
+            selectCompany(companyValue);
+        } else {
+            state.selectedCompany = null;
+            renderCompanyTrigger();
+            updateTypeOptions();
+        }
+
+        document.getElementById('train_number').value = safeText(info.train_number);
+        document.getElementById('destination').value = safeText(info.destination);
+        document.getElementById('max_speed_kph').value = info.max_speed_kph ?? '';
+        document.getElementById('timetable_length_km').value = info.timetable_length_km ?? '';
+        document.getElementById('priority').value = safeText(info.priority);
+        document.getElementById('route_code').value = safeText(info.route_code);
+
+        const desiredType = safeText(info.type);
+        if (desiredType && ![...document.getElementById('type').options].some((opt) => opt.value === desiredType)) {
+            const typeSelect = document.getElementById('type');
+            const option = document.createElement('option');
+            option.value = desiredType;
+            option.textContent = desiredType;
+            typeSelect.appendChild(option);
+        }
+        document.getElementById('type').value = desiredType;
+    }
+
+    function findStationIdByName(stationName, usedIds) {
+        const name = safeText(stationName);
+        if (!name) return '';
+
+        for (const station of state.serviceStations) {
+            if (station.station === name && !usedIds.has(station.id)) {
+                usedIds.add(station.id);
+                return station.id;
+            }
+        }
+
+        return '';
+    }
+
+    async function loadExistingSchedule() {
+        const filename = document.getElementById('existingSchedule').value;
+        if (!filename) {
+            showStatus('Select an existing schedule first', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/timetable-editor/load-schedule/${encodeURIComponent(filename)}`);
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to load schedule');
+            }
+
+            setTrainInfoForm(data.train_info || {});
+
+            const serviceTimetable = safeText((data.train_info || {}).service_timetable);
+            document.getElementById('service_timetable').value = serviceTimetable;
+            await loadServiceStations(serviceTimetable);
+
+            const rows = Array.isArray(data.timetable_data) ? data.timetable_data : [];
+            const usedIds = new Set();
+            let unresolvedStations = 0;
+            state.rows = rows.map((item) => {
+                const stationName = safeText(item.station);
+                const stationId = findStationIdByName(stationName, usedIds);
+                if (stationName && !stationId) unresolvedStations += 1;
+                const stationObj = state.stationById[stationId] || {};
+
+                return {
+                    stationId,
+                    station: stationId ? stationObj.station : stationName,
+                    stop: item.stop === true,
+                    ETA: formatTimeInput(item.ETA),
+                    ETD: formatTimeInput(item.ETD),
+                    ATA: safeText(item.ATA),
+                    ATD: safeText(item.ATD),
+                    diff: safeText(item.diff),
+                    stpDurr: safeText(item.stpDurr),
+                    kmMark: item.kmMark !== undefined && item.kmMark !== null
+                        ? String(item.kmMark)
+                        : (stationObj.km !== undefined && stationObj.km !== null ? String(stationObj.km) : '')
+                };
+            });
+
+            if (!state.rows.length) {
+                state.rows = [emptyRow()];
+            }
+
+            rerenderRows();
+            updateSaveMeta();
+
+            if (unresolvedStations > 0) {
+                showStatus(`Loaded ${filename}. ${unresolvedStations} station(s) were not found in selected service timetable.`, 'info');
+                return;
+            }
+
+            showStatus(`Loaded ${filename} for editing`, 'success');
+        } catch (error) {
+            showStatus(error.message, 'error');
+        }
+    }
+
+    async function loadServiceStations(filename) {
+        state.serviceStations = [];
+        state.serviceEntries = [];
+        state.stationById = {};
+        if (!filename) {
+            document.getElementById('stationMeta').textContent = 'No service timetable loaded';
+            rerenderRows();
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/timetable-editor/stations/${encodeURIComponent(filename)}`);
+            if (!response.ok) throw new Error('Could not load station list from service timetable');
+            const data = await response.json();
+            state.serviceStations = Array.isArray(data.stations) ? data.stations : [];
+            state.serviceEntries = Array.isArray(data.entries) ? data.entries : [];
+            state.stationById = {};
+            state.serviceStations.forEach((station) => {
+                state.stationById[station.id] = station;
+            });
+            document.getElementById('stationMeta').textContent = `${state.serviceStations.length} station entries loaded from ${filename}`;
+
+            // Drop selections that no longer exist in new service timetable.
+            state.rows = state.rows.map((row) => {
+                if (!row.stationId || state.stationById[row.stationId]) return row;
+                return { ...row, stationId: '', station: '', ETA: '', ETD: '' };
+            });
+
+            rerenderRows();
+        } catch (error) {
+            document.getElementById('stationMeta').textContent = 'Failed to load station list';
+            showStatus(error.message, 'error');
+        }
+    }
+
+    function emptyRow() {
+        return {
+            stationId: '',
+            station: '',
+            stop: true,
+            ETA: '',
+            ETD: '',
+            ATA: '',
+            ATD: '',
+            diff: '',
+            stpDurr: '',
+            kmMark: ''
+        };
+    }
+
+    function addStopRow(afterIndex = null) {
+        if (afterIndex === null || afterIndex === undefined) {
+            state.rows.push(emptyRow());
+        } else {
+            state.rows.splice(afterIndex + 1, 0, emptyRow());
+        }
+        rerenderRows();
+    }
+
+    function removeStopRow(index) {
+        if (state.rows.length <= 1) {
+            state.rows[0] = emptyRow();
+        } else {
+            state.rows.splice(index, 1);
+        }
+        rerenderRows();
+    }
+
+    function resetStops() {
+        state.rows = [emptyRow()];
+        rerenderRows();
+    }
+
+    function selectedStationIdsExcept(rowIndex) {
+        const used = new Set();
+        state.rows.forEach((row, idx) => {
+            if (idx === rowIndex) return;
+            if (row.stationId) used.add(row.stationId);
+        });
+        return used;
+    }
+
+    function buildStationSelectForRow(row, rowIndex) {
+        const select = document.createElement('select');
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = '-- Select station --';
+        select.appendChild(placeholder);
+
+        const blocked = selectedStationIdsExcept(rowIndex);
+        state.serviceStations.forEach((station) => {
+            if (blocked.has(station.id)) return;
+            const option = document.createElement('option');
+            option.value = station.id;
+            option.textContent = station.station;
+            select.appendChild(option);
+        });
+
+        if (row.stationId && [...select.options].some((opt) => opt.value === row.stationId)) {
+            select.value = row.stationId;
+        }
+
+        select.addEventListener('change', () => {
+            const stationId = select.value;
+            const stationObj = state.stationById[stationId] || null;
+            row.stationId = stationId;
+            row.station = stationObj ? stationObj.station : '';
+            row.kmMark = stationObj && stationObj.km !== undefined && stationObj.km !== null ? String(stationObj.km) : '';
+            rerenderRows();
+        });
+
+        return select;
+    }
+
+    function rerenderRows() {
+        const tbody = document.getElementById('stopsTbody');
+        tbody.innerHTML = '';
+
+        if (!state.rows.length) state.rows = [emptyRow()];
+
+        state.rows.forEach((row, index) => {
+            const tr = document.createElement('tr');
+
+            const stationTd = document.createElement('td');
+            stationTd.appendChild(buildStationSelectForRow(row, index));
+            tr.appendChild(stationTd);
+
+            const stopTd = document.createElement('td');
+            stopTd.className = 'stop-cell';
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = row.stop === true;
+            checkbox.addEventListener('change', () => {
+                row.stop = checkbox.checked;
+            });
+            stopTd.appendChild(checkbox);
+            tr.appendChild(stopTd);
+
+            const etaTd = document.createElement('td');
+            const etaInput = document.createElement('input');
+            etaInput.type = 'text';
+            etaInput.inputMode = 'numeric';
+            etaInput.placeholder = 'hh:mm:ss';
+            etaInput.value = row.ETA || '';
+            etaInput.maxLength = 8;
+            etaInput.addEventListener('input', () => {
+                const formatted = formatTimeInput(etaInput.value);
+                etaInput.value = formatted;
+                row.ETA = formatted;
+            });
+            etaTd.appendChild(etaInput);
+            tr.appendChild(etaTd);
+
+            const etdTd = document.createElement('td');
+            const etdInput = document.createElement('input');
+            etdInput.type = 'text';
+            etdInput.inputMode = 'numeric';
+            etdInput.placeholder = 'hh:mm:ss';
+            etdInput.value = row.ETD || '';
+            etdInput.maxLength = 8;
+            etdInput.addEventListener('input', () => {
+                const formatted = formatTimeInput(etdInput.value);
+                etdInput.value = formatted;
+                row.ETD = formatted;
+            });
+            etdTd.appendChild(etdInput);
+            tr.appendChild(etdTd);
+
+            const addTd = document.createElement('td');
+            const addBtn = document.createElement('button');
+            addBtn.type = 'button';
+            addBtn.className = 'tiny-btn';
+            addBtn.textContent = '+';
+            addBtn.addEventListener('click', () => addStopRow(index));
+            addTd.appendChild(addBtn);
+            tr.appendChild(addTd);
+
+            const removeTd = document.createElement('td');
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'tiny-btn secondary';
+            removeBtn.textContent = '-';
+            removeBtn.addEventListener('click', () => removeStopRow(index));
+            removeTd.appendChild(removeBtn);
+            tr.appendChild(removeTd);
+
+            tbody.appendChild(tr);
+        });
+    }
+
+    function calculateTimes() {
+        const trainMaxSpeed = parseNumeric(document.getElementById('max_speed_kph').value);
+        if (!(trainMaxSpeed > 0)) {
+            showStatus('Set train_info.max_speed_kph before calculating', 'error');
+            return;
+        }
+
+        let passThroughUpdated = 0;
+        let stopUpdated = 0;
+
+        for (let i = 1; i < state.rows.length; i += 1) {
+            const prev = state.rows[i - 1];
+            const curr = state.rows[i];
+
+            if (!prev.stationId || !curr.stationId) continue;
+
+            const prevStation = state.stationById[prev.stationId];
+            const currStation = state.stationById[curr.stationId];
+            if (!prevStation || !currStation) continue;
+
+            const prevTimeSeconds = parseHms(prev.ETD) ?? parseHms(prev.ETA);
+            if (prevTimeSeconds === null) continue;
+
+            const lat1 = Number(prevStation.latitude);
+            const lon1 = Number(prevStation.longitude);
+            const lat2 = Number(currStation.latitude);
+            const lon2 = Number(currStation.longitude);
+            if (![lat1, lon1, lat2, lon2].every(Number.isFinite)) continue;
+
+            const distanceKm = haversineKm(lat1, lon1, lat2, lon2);
+            const avgRouteSpeedLimit = getAverageSpeedLimitBetweenStations(prev.stationId, curr.stationId);
+            const segmentMaxSpeed = avgRouteSpeedLimit && avgRouteSpeedLimit > 0
+                ? Math.min(trainMaxSpeed, avgRouteSpeedLimit)
+                : trainMaxSpeed;
+            if (!(segmentMaxSpeed > 0)) continue;
+
+            const travelSeconds = estimateTravelSeconds(distanceKm, segmentMaxSpeed);
+            const etaSeconds = roundUpToMinute(prevTimeSeconds + travelSeconds);
+
+            if (curr.stop === false) {
+                curr.ETD = formatHms(etaSeconds);
+                passThroughUpdated += 1;
+                continue;
+            }
+
+            if (curr.stop === true) {
+                const etaWasEmpty = parseHms(curr.ETA) === null;
+                const etdWasEmpty = parseHms(curr.ETD) === null;
+
+                if (etaWasEmpty) {
+                    curr.ETA = formatHms(etaSeconds);
+                }
+
+                if (etdWasEmpty) {
+                    const etaForDeparture = parseHms(curr.ETA);
+                    if (etaForDeparture !== null) {
+                        curr.ETD = formatHms(etaForDeparture + 60);
+                    }
+                }
+
+                if (etaWasEmpty || etdWasEmpty) {
+                    stopUpdated += 1;
+                }
+            }
+        }
+
+        rerenderRows();
+        if (passThroughUpdated === 0 && stopUpdated === 0) {
+            showStatus('No rows could be auto-calculated. Check station order and previous ETD/ETA.', 'info');
+            return;
+        }
+
+        showStatus(`Calculated ${passThroughUpdated} pass-through and ${stopUpdated} stop row(s)`, 'success');
+    }
+
+    function buildOutputPayload() {
+        const templateCopy = deepCopy(state.template || {});
+        const trainInfo = getTrainInfoFromForm();
+
+        const outputTrainInfo = {
+            ...(templateCopy.train_info || {}),
+            ...trainInfo
+        };
+
+        const timetableRows = state.rows
+            .filter((row) => row.stationId && row.station)
+            .map((row) => {
+                const stationObj = state.stationById[row.stationId] || {};
+                return {
+                    station: row.station,
+                    stop: row.stop === true,
+                    ETA: row.ETA || '',
+                    ETD: row.ETD || '',
+                    ATA: row.ATA || '',
+                    ATD: row.ATD || '',
+                    diff: row.diff || '',
+                    stpDurr: row.stpDurr || '',
+                    kmMark: row.kmMark || (stationObj.km !== undefined && stationObj.km !== null ? String(stationObj.km) : '')
+                };
+            });
+
+        return {
+            train_info: outputTrainInfo,
+            timetable_data: timetableRows
+        };
+    }
+
+    async function saveTimetable() {
+        if (!isTrainInfoComplete()) {
+            showStatus('Fill all train_info values first', 'error');
+            return;
+        }
+
+        const selectedRows = state.rows.filter((row) => row.stationId && row.station);
+        if (!selectedRows.length) {
+            showStatus('Add at least one timetable_data row', 'error');
+            return;
+        }
+
+        const payload = buildOutputPayload();
+
+        try {
+            const response = await fetch('/api/timetable-editor/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to save timetable');
+            }
+            showStatus(`Saved ${data.filename}`, 'success');
+        } catch (error) {
+            showStatus(error.message, 'error');
+        }
+    }
+
+    async function bootstrap() {
+        try {
+            const [templateResp, trainInfoResp, serviceResp] = await Promise.all([
+                fetch('/api/timetable-editor/template'),
+                fetch('/api/timetable-editor/train-info-data'),
+                fetch('/api/timetable-editor/service-timetables')
+            ]);
+
+            if (!templateResp.ok) throw new Error('Failed loading timetable editor template');
+            if (!trainInfoResp.ok) throw new Error('Failed loading train info data');
+            if (!serviceResp.ok) throw new Error('Failed loading service timetables');
+
+            state.template = await templateResp.json();
+            state.trainInfoData = await trainInfoResp.json();
+            const serviceData = await serviceResp.json();
+
+            populateCompanyMenu(state.trainInfoData.companies || []);
+            populateSimpleSelect('priority', state.trainInfoData.priorities || []);
+            populateSimpleSelect('route_code', state.trainInfoData.route_codes || [], true);
+            populateSimpleSelect('service_timetable', serviceData.files || []);
+            await refreshExistingSchedules();
+
+            state.rows = [emptyRow()];
+            rerenderRows();
+            updateSaveMeta();
+
+            showStatus('Timetable editor ready', 'success');
+        } catch (error) {
+            showStatus(error.message, 'error');
+        }
+    }
+
+    document.getElementById('companyTrigger').addEventListener('click', () => {
+        const menu = document.getElementById('companyMenu');
+        if (menu.classList.contains('open')) closeCompanyMenu();
+        else openCompanyMenu();
+    });
+
+    document.addEventListener('click', (event) => {
+        const holder = document.getElementById('companyDropdown');
+        if (!holder.contains(event.target)) {
+            closeCompanyMenu();
+        }
+    });
+
+    ['train_number', 'destination', 'max_speed_kph', 'timetable_length_km'].forEach((id) => {
+        document.getElementById(id).addEventListener('input', updateSaveMeta);
+    });
+
+    ['priority', 'route_code', 'type'].forEach((id) => {
+        document.getElementById(id).addEventListener('change', updateSaveMeta);
+    });
+
+    document.getElementById('service_timetable').addEventListener('change', async (event) => {
+        await loadServiceStations(event.target.value);
+        updateSaveMeta();
+    });
+
+    document.getElementById('refreshSchedulesBtn').addEventListener('click', async () => {
+        await refreshExistingSchedules();
+        showStatus('Schedule list refreshed', 'info');
+    });
+
+    document.getElementById('loadScheduleBtn').addEventListener('click', async () => {
+        await loadExistingSchedule();
+    });
+
+    bootstrap();
+</script>
+</body>
+</html>

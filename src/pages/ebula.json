@@ -1,0 +1,374 @@
+{
+  "ebula": {
+    "title": "",
+    "layout": "dashboard",
+    "show_speedometer": true,
+    "template": "mfd",
+    "layout_grid": {
+      "columns": "auto auto auto auto auto auto auto",
+      "rows": "6% 4% 84% 6%",
+      "areas": [
+        "train_number destination destination destination destination date time",
+        "ab ab empty empty empty next_stop next_stop",
+        "ebula_table ebula_table ebula_table ebula_table ebula_table ebula_table ebula_table",
+        "empty2 empty2 empty2 empty2 diff elecuse elecgen"
+      ],
+      "gap": "0px"
+    },
+    "font_sizes": {
+      "title": "14px",
+      "value": "18px",
+      "unit": "12px"
+    },
+    "components": [
+        {
+            "type": "ebula_data_table",
+            "id": "ebula",
+            "fontSize": "18px",
+            "area": "ebula_table"
+        },
+      {
+            "type": "text_display",
+            "id": "train_num",
+            "value": "tt_train_number",
+            "hide_title_when_empty": true,
+            "hide_value_when_empty": true,
+            "area": "train_number",
+            "alignment": {
+            "horizontal": "center",
+            "vertical": "bottom"
+            },
+            "styles": {
+              "value": {
+                  "fontFamily": "Arial",
+                  "fontSize": "18px",
+                  "bold": true,
+                  "italic": false,
+                  "underline": false
+                    }
+                 }
+      },
+      {
+            "type": "text_display",
+            "id": "dest",
+            "value": "tt_destination",
+            "hide_title_when_empty": true,
+            "hide_value_when_empty": true,
+            "area": "destination",
+            "alignment": {
+            "horizontal": "center",
+            "vertical": "bottom"
+            },
+            "styles": {
+              "value": {
+                  "fontFamily": "Arial",
+                  "fontSize": "18px",
+                  "bold": true,
+                  "italic": false,
+                  "underline": false
+                    }
+                 }
+      },
+      {
+            "type": "text_display",
+            "id": "time_display",
+            "value": "tod_data.WorldTimeISO8601_time_only",
+            "hide_title_when_empty": true,
+            "hide_value_when_empty": true,
+            "area": "time",
+            "alignment": {
+            "horizontal": "center",
+            "vertical": "bottom"
+            },
+            "styles": {
+              "value": {
+                  "fontFamily": "Arial",
+                  "fontSize": "18px",
+                  "bold": true,
+                  "italic": false,
+                  "underline": false
+                    }
+                 }
+      },
+      {
+            "type": "text_display_v2",
+            "id": "ab_text",
+            "value": "{tt_timetable_length_km}km; {tt_max_speed_kph}km/h",
+            "decimals": 0,
+            "hide_title_when_empty": true,
+            "hide_value_when_empty": true,
+            "area": "ab",
+            "alignment": {
+            "horizontal": "center",
+            "vertical": "bottom"
+            },
+            "styles": {
+              "value": {
+                  "fontFamily": "Arial",
+                  "fontSize": "14px",
+                  "bold": false,
+                  "italic": false,
+                  "underline": false
+                    }
+                 }
+      },
+      {
+            "type": "text_display",
+            "id": "date",
+            "value": "tod_data.WorldTimeISO8601_date_only",
+            "hide_title_when_empty": true,
+            "hide_value_when_empty": true,
+            "area": "date",
+            "alignment": {
+            "horizontal": "center",
+            "vertical": "bottom"
+            },
+            "styles": {
+              "value": {
+                  "fontFamily": "Arial",
+                  "fontSize": "18px",
+                  "bold": true,
+                  "italic": false,
+                  "underline": false
+                    }
+                 }
+        },
+        {
+            "type": "text_display",
+            "id": "empt1",
+            "value": "",
+            "area": "empty",
+            "hide_title_when_empty": true,
+            "hide_value_when_empty": true,
+            "alignment": {
+            "horizontal": "center",
+            "vertical": "bottom"
+            }
+        },
+        {
+            "type": "text_display_v2",
+            "id": "nextstop",
+            "value": "Nächser Halt: {next_stop_station}",
+            "decimals": 0,
+            "hide_title_when_empty": true,
+            "hide_value_when_empty": true,
+            "area": "next_stop",
+            "alignment": {
+            "horizontal": "center",
+            "vertical": "center"
+              },
+            "styles": {
+              "value": {
+                  "fontFamily": "Arial",
+                  "fontSize": "14px",
+                  "bold": false,
+                  "italic": false,
+                  "underline": false
+                    }
+                 }
+        },
+        {
+            "type": "text_display",
+            "id": "empt2",
+            "value": "",
+            "area": "empty2",
+            "alignment": {
+            "horizontal": "center",
+            "vertical": "bottom"
+            }
+        },
+        {
+            "type": "text_display_v2",
+            "id": "current_diff",
+            "value": "{current_diff} min.",
+            "hide_title_when_empty": false,
+            "hide_value_when_empty": true,
+            "area": "diff",
+            "alignment": {
+            "horizontal": "center",
+            "vertical": "bottom"
+            },
+            "styles": {
+              "value": {
+                  "fontFamily": "Arial",
+                  "fontSize": "18px",
+                  "bold": false,
+                  "italic": false,
+                  "underline": false
+                    }
+                 }
+        },
+        {
+            "type": "text_display",
+            "id": "use_kwh",
+            "value": "GNT_active",
+            "hide_title_when_empty": true,
+            "hide_value_when_empty": true,
+            "decimals": 0,
+            "area": "elecuse",
+            "unit": "",
+            "clickable": true,
+              "onClick": {
+              "action": "open_schedule_browser"
+            },
+            "alignment": {
+            "horizontal": "center",
+            "vertical": "bottom"
+            }
+      },
+      {
+            "type": "text_display",
+            "id": "gen_kwh",
+            "value": "kwh_gen.Value",
+            "hide_title_when_empty": true,
+            "hide_value_when_empty": true,
+            "decimals": 0,
+            "area": "elecgen",
+            "unit": "kWh",
+            "clickable": true,
+              "onClick": {
+              "action": "delete_loaded_schedule"
+            },
+            "alignment": {
+            "horizontal": "center",
+            "vertical": "bottom"
+            }
+        }
+
+    ],
+
+    "buttons": {
+      "top": {
+        "aus": {
+          "action": "power_off"
+        },
+        "S": {
+          "action": "page_navigate",
+          "target": "settings"
+        },
+        "i": {
+          "action": "page_navigate",
+          "target": "info"
+        },
+        "St": {
+          "action": "toggle",
+          "target": "status"
+        },
+        "V>0": {
+          "action": "condition_check",
+          "value": "speed_ms",
+          "condition": ">",
+          "compare": 0
+        },
+        "V=0": {
+          "action": "condition_check",
+          "value": "speed_ms",
+          "condition": "==",
+          "compare": 0
+        },
+        "brightness": {
+          "action": "adjust_brightness",
+          "step": 5
+        },
+        "contrast": {
+          "action": "toggle_night_mode"
+        },
+        "UD": {
+          "action": "adjust_contrast",
+          "step": 5
+        }
+      },
+      "right": {
+        "c": {
+          "action": "config_mode"
+        },
+        "left": {
+          "action": "scroll",
+          "direction": "left"
+        },
+        "right": {
+          "action": "scroll",
+          "direction": "right"
+        },
+        "up": {
+          "action": "scroll",
+          "direction": "up"
+        },
+        "down": {
+          "action": "scroll",
+          "direction": "down"
+        },
+        "E": {
+          "action": "confirm"
+        }
+      },
+      "bottom": {
+        "1": {
+          "action": "page_navigate",
+          "target": "diagnostics"
+        },
+        "2": {
+          "action": "append_support_data"
+        },
+        "3": {
+          "action": "toggleEbulaDebug()",
+          "value": 3
+        },
+        "4": {
+          "action": "save_completed_schedule"
+        },
+        "5": {
+          "action": "toggle_runtime_variable",
+          "variable": "GNT_active"
+        },
+        "6": {
+          "action": "toggle_runtime_variable",
+          "variable": "alt_timetable"
+        },
+        "7": {
+          "action": "toggle_runtime_variable",
+          "variable": "speed_unit_mph"
+        },
+        "8": {
+          "action": "delete_loaded_schedule"
+        },
+        "9": {
+          "action": "open_schedule_browser"
+        },
+        "0": {
+          "action": "page_back"
+        }
+      }
+    },
+    "menu_labels": {
+      "1": "1",
+      "2": "2",
+      "3": "3",
+      "4": "Save",
+      "5": {
+        "text": "GNT",
+        "visible_when": {
+          "variable": "st_has_gnt",
+          "equals": true
+        }
+      },
+      "6": {
+        "text": "ALT",
+        "visible_when": {
+          "variable": "st_has_alt",
+          "equals": true
+        }
+      },
+      "7": {
+        "text": "MPH",
+        "visible_when": {
+          "variable": "speed_unit_mph",
+          "equals": true
+        }
+      },
+      "8": "Delete",
+      "9": "Select",
+      "0": "G"
+    }
+  }
+}

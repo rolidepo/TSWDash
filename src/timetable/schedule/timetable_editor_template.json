@@ -1,0 +1,28 @@
+{
+"train_info": {
+"company": "DB",
+"train_number": "10906",
+"destination": "RE9 Siegen Hbf - Aachen Hbf",
+"type": "Regional Express",
+"priority": "2",
+"max_speed_kph": 160,
+"timetable_length_km": 70,
+"driven_distance_km": 0,
+"route_code": "FTF",
+"service_timetable": "FTF_1.json",
+"completed_timetable": false,
+"gnt_enabled": false
+
+},
+"timetable_data": [
+{"station": "Köln Hbf", "stop": true, "ETA": "", "ETD": "08:48:00", "ATA": "", "ATD": "", "diff": "", "stpDurr": "", "kmMark":""},
+{"station": "K-Ehrenfeld Pbf", "stop": true, "ETA": "08:52:00", "ETD": "08:53:00", "ATA": "", "ATD": "", "diff": "", "stpDurr": "", "kmMark":""},
+{"station": "Horrem", "stop": true, "ETA": "09:01:00", "ETD": "09:02:00", "ATA": "", "ATD": "", "diff": "", "stpDurr": "", "kmMark":""},
+{"station": "Düren", "stop": true, "ETA": "09:12:00", "ETD": "09:13:00", "ATA": "", "ATD": "", "diff": "", "stpDurr": "", "kmMark":""},
+{"station": "Langerwehe", "stop": true, "ETA": "09:19:00", "ETD": "09:20:00", "ATA": "", "ATD": "", "diff": "", "stpDurr": "", "kmMark":""},
+{"station": "Eschweiler Hbf", "stop": true, "ETA": "09:25:00", "ETD": "09:26:00", "ATA": "", "ATD": "", "diff": "", "stpDurr": "", "kmMark":""},
+{"station": "Stolberg (Rheini) Hbf", "stop": true, "ETA": "09:29:00", "ETD": "09:30:00", "ATA": "", "ATD": "", "diff": "", "stpDurr": "", "kmMark":""},
+{"station": "Bft AC-Rothe Erde Gbf", "stop": true, "ETA": "09:36:00", "ETD": "09:37:00", "ATA": "", "ATD": "", "diff": "", "stpDurr": "", "kmMark":""},
+{"station": "Aachen Hbf", "stop": true, "ETA": "09:40:00", "ETD": "", "ATA": "", "ATD": "", "diff": "", "stpDurr": "", "kmMark":""}
+]
+}

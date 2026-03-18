@@ -1,0 +1,132 @@
+{
+  "speed_ms.Speed_ms": {
+    "multiply": 3.6,
+    "add": 0,
+    "unit": "km/h"
+  },
+  "rpm": {
+    "multiply": 1,
+    "add": 0,
+    "unit": "RPM"
+  },
+  "brake_pressure_1": {
+    "multiply": 1,
+    "add": 0,
+    "unit": "Pa",
+    "compare_critical": 400000
+  },
+  "tractive_effort.TractiveEffort_N": {
+    "multiply": 0.001,
+    "add": 0,
+    "unit": "kN",
+    "compare_critical": 5000
+  },
+  "tractive_effort.BrakeEffort_N": {
+    "multiply": 0.001,
+    "add": 0,
+    "unit": "kN",
+    "compare_critical": 5000
+  },
+  "TargetTractiveEffort.ReturnValue": {
+    "multiply": 0.001,
+    "add": 0,
+    "unit": "kN",
+    "compare_critical": 5000
+  },
+  "TargetDynamicBrakeEffort.ReturnValue": {
+    "multiply": 0.001,
+    "add": 0,
+    "unit": "kN",
+    "compare_critical": 5000
+  },
+  "TargetTractiveEffort_legacy.Result": {
+    "multiply": 0.001,
+    "add": 0,
+    "unit": "kN",
+    "compare_critical": 5000
+  },
+   "TargetDynamicBrakeEffort_legacy.Result": {
+    "multiply": 0.001,
+    "add": 0,
+    "unit": "kN",
+    "compare_critical": 5000
+  },
+  "tractive_effort_legacy.Result": {
+    "multiply": 0.001,
+    "add": 0,
+    "unit": "kN",
+    "compare_critical": 5000
+  },
+  "brake_effort_legacy.Result": {
+    "multiply": 0.001,
+    "add": 0,
+    "unit": "kN",
+    "compare_critical": 5000
+  },
+  "TargetTractiveRequestedEffort.ReturnValue": {
+    "multiply": 0.001,
+    "add": 0,
+    "unit": "kN",
+    "compare_critical": 5000
+  },
+  "TargetDynamicRequestedEffort.ReturnValue": {
+    "multiply": 0.001,
+    "add": 0,
+    "unit": "kN",
+    "compare_critical": 5000
+  },
+   "vehicle_info.Output.maxTractiveEffortN_5_51382DF64252D2E36D1AADAA50733891": {
+    "multiply": 0.001,
+    "add": 0,
+    "unit": "kN",
+    "compare_critical": 5000
+  },
+   "vehicle_info.Output.maxDynamicBrakingEffortN_9_25684CCD4FC8E712D16C33B881F47F52": {
+    "multiply": 0.001,
+    "add": 0,
+    "unit": "kN",
+    "compare_critical": 5000
+  },
+  "vehicle_info.Output.maxPermissibleSpeedMS_11_C87720DD4A008EF058465FB17C9C5125": {
+    "multiply": 3.6,
+    "add": 20,
+    "unit": "km/h"
+  },
+  "temperature": {
+    "multiply": 1,
+    "add": 0,
+    "unit": "°C",
+    "min": -40,
+    "max": 80
+  },
+  "LZB_maxPermisibleSpeed_ms.Value": {
+    "multiply": 3.6,
+    "add": 0
+  },
+  "LZB_expectedTargetSpeed_ms.Value": {
+    "multiply": 3.6,
+    "add": 0
+  },
+   "AFB_TargetSpeed_ms.Value": {
+    "multiply": 3.6,
+    "add": 0
+  },
+    "AFB_CurrentSpeedSetPoint.Value": {
+    "multiply": 3.6,
+    "add": 0
+  },
+  "tod_data.WorldTimeISO8601_time_only": {
+    "source": "tod_data.LocalTimeISO8601",
+    "substring": {
+      "start": 11,
+      "end": -10
+    }
+  },
+  "tod_data.WorldTimeISO8601_date_only": {
+    "source": "tod_data.LocalTimeISO8601",
+    "substring": {
+      "start": 0,
+      "end": -19
+    }
+  }
+}

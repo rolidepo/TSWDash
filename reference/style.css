@@ -1,0 +1,382 @@
+:root {
+    /* --- NEW CORE COLOR SCHEME --- */
+    --color-light-gray: #E0E0E0; /* Light color for Day BG, Night Text/Border */
+    --color-dark-blue: #1A3E5F;  /* Dark color for Day Text/Border, Night BG */
+    
+    /* Day Mode (Default): Light background, Dark text/borders */
+    --current-screen-bg: var(--color-light-gray);
+    --current-screen-text-color: var(--color-dark-blue); /* Renamed for clarity */
+    --current-screen-border-color: var(--color-dark-blue); /* Renamed for clarity */
+    
+	/* STATIC BUTTON COLORS (Do not change with contrast mode) */
+    --button-bg-color: #292626; 
+    --button-text-color: white;   
+    --button-border-color: white; 
+    
+    /* Brightness Steps (These will be shades of the SCREEN text color) */
+    --color-step-1: var(--color-dark-blue);; /* Dimmest / Lightest Blue */
+    --color-step-2: #335473;
+    --color-step-3: #5C7A99;
+    --color-step-4: #859FB7;
+    --color-step-5: #9DB3C7/* Brightest / Darkest Blue */
+
+    /* Initial glow color will now be the current SCREEN text color */
+    --current-glow-color: var(--current-screen-text-color);
+    --current-text-color: var(--current-screen-text-color); /* Kept for compatibility */
+    
+    /* Dimensions */
+    --border-thickness: 4vh; 
+    --button-size: calc(var(--border-thickness) * 1.6); 
+    --button-radius: 6px;
+    
+    /* Glow reduction (More subtle shadows for the light theme) */
+    --glow-intensity: 1px;
+    --glow-text-shadow: 0 0 var(--glow-intensity) var(--current-glow-color);
+    --glow-box-shadow: 0 0 var(--glow-intensity) rgba(0, 0, 0, 0.4), inset 0 0 var(--glow-intensity) var(--current-glow-color);
+    
+    /* Label Font Control Variables */
+    --label-font-size: 0.8em; 
+    --label-font-weight: 500; 
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+    background-color: #333333; /* Darker background for more contrast */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden; 
+}
+
+/* 1. FIXED 16:9 RATIO AND BORDER STYLING (3D Effect) */
+.display-container {
+    /* Use vh to make it responsive based on screen height */
+    width: min(calc(100vh * 16 / 9), 100vw);
+    height: 100vh;
+    
+    background-color: #222; /* Dark grey for the frame */
+    
+    /* 3D Border look: Inner and Outer shadows and a gradient */
+    box-shadow: 
+        0 0 15px rgba(0, 0, 0, 0.9), /* Outer shadow */
+        inset 0 0 20px #000, /* Deep inner shadow for depth */
+        0 10px 20px rgba(0, 0, 0, 0.8);
+    
+    /* Subtle gradient for a non-flat look */
+    background-image: linear-gradient(135deg, #333 0%, #111 100%);
+    
+    padding: var(--border-thickness);
+    border-radius: 12px;
+}
+
+.display-grid {
+    display: grid;
+    /* Grid Layout: Left Border (min-content), Main Screen (1fr), Right Border (min-content) */
+    grid-template-columns: min-content 1fr min-content; 
+    /* Grid Layout: Top Border (min-content), Main Screen (1fr), Bottom Border (min-content) */
+    grid-template-rows: min-content 1fr min-content min-content; /* Added row for LED bar */
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+/* 2. MAIN SCREEN (Grid area 2/2) */
+.main-screen {
+    grid-area: 2 / 2 / 3 / 3; 
+    background-color: var(--current-screen-bg);
+    
+    /* Subtle border to clearly separate screen from frame */
+    border: 2px solid var(--current-screen-border-color);  
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2); 
+    
+    /*background-image: url('assets/backgrounds/main_screen_bg.png'); 
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;*/
+    
+    /* Screen content display settings */
+    color: var(--current-screen-text-color); 
+    text-shadow: var(--glow-text-shadow);
+    padding: 15px;
+    overflow: auto;
+    
+    /* --- FLEXBOX FOR LABEL ALIGNMENT --- */
+    display: flex;
+    flex-direction: column; /* Stack content and labels */
+    justify-content: space-between; /* Push labels to the bottom */
+
+	transition: all 0.5s ease; /* Smooth transition for color changes */
+}
+
+/* --- NIGHT MODE STYLES (ONLY AFFECT SCREEN AND SCREEN VARIABLES) --- */
+.main-screen.night-mode {
+    /* Night Mode: Dark background, Light text/borders */
+    --current-screen-bg: var(--color-dark-blue);
+    --current-screen-text-color: var(--color-light-gray);
+    --current-screen-border-color: var(--color-light-gray);
+    
+    /* FIX: Adjust brightness steps for night mode (shades of light gray for contrast) */
+    --color-step-5: #999999; /* Darkest visible step (dim) */
+    --color-step-4: #B3B3B3;
+    --color-step-3: var(--color-light-gray); /* E0E0E0 - Medium step */
+    --color-step-2: #F0F0F0;
+    --color-step-1: #FFFFFF; /* Brightest step */
+    
+    /* Ensure all dependent SCREEN properties update */
+    color: var(--current-screen-text-color);
+    border-color: var(--current-screen-border-color);
+    background-color: var(--current-screen-bg);
+    text-shadow: var(--glow-text-shadow);
+    
+    background-image: none; 
+}
+
+/* 3. BORDERS */
+.top-border {
+    grid-area: 1 / 2 / 2 / 3; 
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 0 5px 0; 
+    background-color: transparent;
+}
+.bottom-border {
+    grid-area: 3 / 2 / 4 / 3; /* Positioned just below main screen */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0 0 0;
+    background-color: transparent;
+}
+.left-border {
+    grid-area: 2 / 1 / 3 / 2; 
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; 
+    align-items: center;
+    padding: 5px 5px 0 0; 
+    background-color: transparent;
+}
+.right-border {
+    grid-area: 2 / 3 / 3 / 4; 
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; 
+    align-items: center;
+    padding: 0 5px;
+    background-color: transparent;
+}
+
+/* 4. BUTTON STYLING (Now using STATIC button colors) */
+
+
+/* LED Bar (Grid area 4/2) - Placed below the bottom buttons in the grid */
+.led-bar {
+    grid-area: 4 / 2 / 5 / 3;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: #111;
+    padding: 5px 0;
+    border-top: 2px solid #333;
+}
+
+
+/* 4. BUTTON STYLING (Reduced Glow, Top-Left Text Alignment) *//*
+.btn {
+    height: var(--button-size);
+    width: var(--button-size);
+    border: 2px solid var(--current-text-color);
+    border-radius: var(--button-radius);
+    background-color: #333; /* Dark button background *//*
+    color: var(--current-text-color);
+    font-size: calc(var(--button-size) * 0.3);
+    cursor: pointer;
+    
+    /* Key change: Top-left text alignment *//*
+    text-align: left;
+    display: flex; /* Use flex to align content within the button *//*
+    align-items: flex-start; /* Align content to the top *//*
+    padding: 3px 5px; /* Padding for top-left position *//*
+    line-height: 1.2; /* Better line spacing *//*
+    
+    /* Reduced Text glow and Box glow *//*
+    text-shadow: var(--glow-text-shadow);
+    box-shadow: var(--glow-box-shadow);
+    transition: all 0.3s ease; 
+    
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+    position: relative;
+}
+*/
+.btn {
+    height: var(--button-size);
+    width: var(--button-size);
+    /* Use static button colors */
+    border: 2px solid white; 
+    border-radius: var(--button-radius);
+    background-color: #292626; 
+    color: white; 
+    
+    font-size: calc(var(--button-size) * 0.3);
+    cursor: pointer;
+    
+    text-align: left;
+    display: flex; 
+    align-items: flex-start; 
+    padding: 3px 5px; 
+    line-height: 1.2; 
+    
+    /* Buttons still use the glow color, which changes with brightness */
+    text-shadow: var(--glow-text-shadow); 
+    box-shadow: var(--glow-box-shadow);
+    transition: all 0.3s ease; 
+    
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+    position: relative;
+}
+
+.btn:active {
+    background-color: black; 
+    opacity: 0.8;
+    box-shadow: 0 0 1px var(--current-glow-color), inset 0 0 1px var(--current-glow-color);
+}
+
+.icon-btn {
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    font-weight: bold;
+}
+
+/* Specific styling for the power symbol in the "Aus" button */
+.power-symbol {
+    font-size: calc(var(--button-size) * 0.3);
+    margin-left: 5px;
+}
+
+/* 4.1 TOP BUTTONS */
+.top-border .double-width {
+    width: calc(var(--button-size) * 2);
+}
+
+/* 4.4 LEFT LEDS */
+.indicator-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: calc(var(--border-thickness) * 0.2);
+}
+
+.led-label {
+    font-size: calc(var(--button-size) * 0.25);
+    color: white;
+    text-shadow: 0 0 3px var(--current-glow-color);
+    margin-bottom: 2px;
+}
+
+.led-light {
+    width: calc(var(--button-size) * 0.5);
+    height: calc(var(--button-size) * 0.5);
+    border-radius: 50%;
+    border: 1px solid #999;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
+    background-color: #444; /* Off state color */
+    transition: background-color 0.3s;
+}
+
+/* LED Color States */
+.led-light[data-state="green"] {
+    background-color: #0f0;
+    box-shadow: 0 0 10px #0f0, inset 0 0 5px rgba(0, 0, 0, 0.5);
+}
+.led-light[data-state="red"] {
+    background-color: #f00;
+    box-shadow: 0 0 10px #f00, inset 0 0 5px rgba(0, 0, 0, 0.5);
+}
+.led-light[data-state="yellow"] {
+    background-color: #ff0;
+    box-shadow: 0 0 10px #ff0, inset 0 0 5px rgba(0, 0, 0, 0.5);
+}
+.led-light[data-state="blue"] {
+    background-color: #00f;
+    box-shadow: 0 0 10px #00f, inset 0 0 5px rgba(0, 0, 0, 0.5);
+}
+.led-light[data-state="orange"] {
+    background-color: #F80;
+    box-shadow: 0 0 10px #F80, inset 0 0 5px rgba(0, 0, 0, 0.5);
+}
+.led-light[data-state="pink"] {
+    background-color: #FB00FF;
+    box-shadow: 0 0 10px #FB00FF, inset 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+/* Blinking effect via a class added by JS */
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.blinking {
+    animation: blink 1s step-end infinite;
+}
+
+/* --- BUTTON LABEL STYLING (inside #main-screen) --- */
+
+#button-label-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-between; /* Distribute space to match button width */
+    align-items: flex-end;
+    
+    /* ALIGNMENT FIX: 
+       The main-screen has 15px of padding, which pushes content away from the edge.
+       We use a negative margin and padding adjustment to align the labels flush with the bottom.
+    */
+    margin-bottom: 0px; /* Pulls container down past the screen's bottom padding */
+	margin-left: -10px;
+    padding: 0 0 0 0; /* Remove horizontal padding, but keep the vertical alignment fix */
+    
+    pointer-events: none; /* Crucial: allows screen content/links to be clicked through labels */
+    z-index: 10;
+}
+
+.label-container-item {
+    flex: 1; /* Distribute space equally among the 10 slots */
+    text-align: center;
+    min-width: 0;
+    max-width: 4%; /* Each slot is 10% wide */
+	
+}
+
+
+
+.button-label {
+    /* Base style for the floating label */
+    display: inline-block; 
+    color: var(--current-text-color);
+    
+    /* FONT CONTROL: Use the new CSS variables */
+    font-size: calc(var(--label-font-size) *1.5);
+    font-weight: calc(var(--label-font-weight) *1.5); 
+    
+    text-shadow: none; 
+    
+    border-radius: 3px;
+    padding: 2px 4px;
+}
+
+/* Label next to Right Buttons - Hide them as requested */
+.right-border .button-label {
+    display: none; 
+}

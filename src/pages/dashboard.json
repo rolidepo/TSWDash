@@ -1,0 +1,343 @@
+{
+  "dashboard": {
+    "title": "",
+    "layout": "dashboard",
+    "show_speedometer": true,
+    "template": "mfd",
+    "layout_grid": {
+      "columns": "1.2fr 1fr",
+      "rows": "auto 1fr auto",
+      "areas": [
+        "speed rpm3 rpm3",
+        "speed lzb lzb",
+        "rpm2 lzb lzb",
+        "rpm brake brake"
+      ],
+      "gap": "0px"
+    },
+    "font_sizes": {
+      "title": "14px",
+      "value": "12px",
+      "unit": "12px"
+    },
+    "components": [
+      {
+        "type": "speedometer",
+        "id": "speed_gauge",
+        "title": "Speed",
+        "value": "speed_ms.Speed_ms",
+        "min": 0,
+        "max": "LZB_LocoMaxSpeed.value",
+        "unit": "km/h",
+        "size": 350,
+        "area": "speed"
+      },
+      {
+        "type": "progress_bar",
+        "id": "brake_bar",
+        "title": "Brake Pressure",
+        "value": "brake_pressure_1",
+        "min": 0,
+        "max": 500000,
+        "unit": "Pa",
+        "color": "#ff6b6b",
+        "area": "brake",
+        "alignment": {
+          "horizontal": "center",
+          "vertical": "center"
+        },
+        "styles": {
+          "title": {
+            "fontSize": "14px",
+            "bold": true,
+            "italic": false,
+            "underline": false
+          },
+          "value": {
+            "fontSize": "20px",
+            "bold": true,
+            "italic": false,
+            "underline": false
+          },
+          "unit": {
+            "fontSize": "12px",
+            "bold": false,
+            "italic": true,
+            "underline": false
+          }
+        }
+      },
+      {
+        "type": "vertical_bar",
+        "id": "traction_effort",
+        "title": "Traction Effort",
+        "value": "tractive_effort_TractiveEffort_N",
+        "min": 0,
+        "max": 400,
+        "unit": "kN",
+        "indicators": [100, 200, 300, 400],
+        "area": "rpm",
+        "alignment": {
+          "horizontal": "center",
+          "vertical": "center"
+        }
+      },
+      {
+        "type": "text_display",
+        "id": "braking_effort_display",
+        "unit_position": "inline",
+        "value": "player_info.currentServiceName",
+        "decimals": 0,
+        "unit": "kN",
+        "area": "rpm2",
+        "alignment": {
+          "horizontal": "right",
+          "vertical": "bottom"
+        },
+        "styles": {
+          "title": {
+            "fontSize": "12px",
+            "bold": false,
+            "italic": false,
+            "underline": true
+          },
+          "value": {
+            "fontSize": "12px",
+            "bold": true,
+            "italic": false,
+            "underline": true
+          },
+          "unit": {
+            "fontSize": "11px",
+            "bold": false,
+            "italic": true,
+            "underline": false
+          }
+        }
+      },
+      {
+        "type": "seven_segment",
+        "id": "lzb_distance_display",
+        "value": "LZB_target_speed_distance.Value",
+        "area": "rpm3",
+        "max": "50",
+        "alignment": {
+          "horizontal": "left",
+          "vertical": "top"
+        },
+        "visible_when": {
+          "variable": "LZB_IsActive.Value",
+          "equals": true
+        }
+      },
+      {
+        "type": "scaled_vertical_bar",
+        "id": "lzb_distance_bar",
+        "value": "LZB_target_speed_distance.Value",
+        "area": "lzb",
+        "visible_when": {
+          "variable": "LZB_IsActive.Value",
+          "equals": true
+        }
+      },
+      {
+        "type": "text_indicator",
+        "id": "lzb_status",
+        "area": "lzb",
+        "value": "test indicator",
+        "fontFamily": "Orbitron",
+        "fontSize": "14px",
+        "color": "#ffffff",
+        "backgroundColor": "",
+        "conditions": [
+            {
+            "when": { "left": ["value1", "value1_legacy"], "operator": "==", "right": true },
+            "display": {
+                "text": "Active",
+                "color": "#ffffff",
+                "backgroundColor": "#000000",
+                "bold": true
+            }
+            },
+            {
+            "when": { "left": "value2", "operator": "==", "right": true },
+            "display": {
+                "text": "Standby",
+                "color": "#ffd400"
+            }
+            },
+            {
+            "when": { "left": "value1", "operator": ">", "right": ["max_speed", "max_speed_legacy"] },
+            "display": {
+                "value": ["value3", "value3_legacy"],
+                "color": "#ffffff",
+                "backgroundColor": "#cc0000"
+            }
+            }
+        ],
+        "default": {
+            "text": "Test indicator1"
+        }
+            },
+        {
+        "type": "text_indicator",
+        "id": "lzb_status",
+        "area": "rpm3",
+        "value": "test indicator2",
+        "fontFamily": "Orbitron",
+        "fontSize": "14px",
+        "color": "#ffffff",
+        "backgroundColor": "",
+        "conditions": [
+            {
+            "when": { "left": ["value1", "value1_legacy"], "operator": "==", "right": true },
+            "display": {
+                "text": "Active",
+                "color": "#ffffff",
+                "backgroundColor": "#000000",
+                "bold": true
+            }
+            },
+            {
+            "when": { "left": "value2", "operator": "==", "right": true },
+            "display": {
+                "text": "Standby",
+                "color": "#ffd400"
+            }
+            },
+            {
+            "when": { "left": "value1", "operator": ">", "right": ["max_speed", "max_speed_legacy"] },
+            "display": {
+                "value": ["value3", "value3_legacy"],
+                "color": "#ffffff",
+                "backgroundColor": "#cc0000"
+            }
+            }
+        ],
+        "default": {
+            "text": "Test indicator2"
+        }
+    }
+    ],
+
+    "buttons": {
+      "top": {
+        "aus": {
+          "action": "power_off"
+        },
+        "S": {
+          "action": "page_navigate",
+          "target": "settings"
+        },
+        "i": {
+          "action": "page_navigate",
+          "target": "info"
+        },
+        "St": {
+          "action": "toggle",
+          "target": "status"
+        },
+        "V>0": {
+          "action": "condition_check",
+          "value": "speed_ms",
+          "condition": ">",
+          "compare": 0
+        },
+        "V=0": {
+          "action": "condition_check",
+          "value": "speed_ms",
+          "condition": "==",
+          "compare": 0
+        },
+        "brightness": {
+          "action": "adjust_brightness",
+          "step": 5
+        },
+        "contrast": {
+          "action": "toggle_night_mode"
+        },
+        "UD": {
+          "action": "adjust_contrast",
+          "step": 5
+        }
+      },
+      "right": {
+        "c": {
+          "action": "config_mode"
+        },
+        "left": {
+          "action": "scroll",
+          "direction": "left"
+        },
+        "right": {
+          "action": "scroll",
+          "direction": "right"
+        },
+        "up": {
+          "action": "scroll",
+          "direction": "up"
+        },
+        "down": {
+          "action": "scroll",
+          "direction": "down"
+        },
+        "E": {
+          "action": "confirm"
+        }
+      },
+      "bottom": {
+        "1": {
+          "action": "page_navigate",
+          "target": "diagnostics"
+        },
+        "2": {
+          "action": "input_number",
+          "value": 2
+        },
+        "3": {
+          "action": "input_number",
+          "value": 3
+        },
+        "4": {
+          "action": "input_number",
+          "value": 4
+        },
+        "5": {
+          "action": "input_number",
+          "value": 5
+        },
+        "6": {
+          "action": "input_number",
+          "value": 6
+        },
+        "7": {
+          "action": "input_number",
+          "value": 7
+        },
+        "8": {
+          "action": "input_number",
+          "value": 8
+        },
+        "9": {
+          "action": "input_number",
+          "value": 9
+        },
+        "0": {
+          "action": "page_back"
+        }
+      }
+    },
+    "menu_labels": {
+      "1": "1",
+      "2": "2",
+      "3": "3",
+      "4": "4",
+      "5": "5",
+      "6": "6",
+      "7": "7",
+      "8": "8",
+      "9": "9",
+      "0": "0"
+    }
+  }
+}

@@ -1,0 +1,152 @@
+{
+  "info": {
+    "title": "Information",
+    "layout": "info",
+    "template": "mfd",
+    "components": [
+      {
+        "type": "text_display",
+        "id": "temperature",
+        "title": "Temperature",
+        "value": "temperature",
+        "decimals": 1,
+        "unit": "°C"
+      },
+      {
+        "type": "text_display",
+        "id": "voltage",
+        "title": "Voltage",
+        "value": "voltage",
+        "decimals": 1,
+        "unit": "V"
+      },
+      {
+        "type": "text_display",
+        "id": "amperage",
+        "title": "Current",
+        "value": "amperage",
+        "decimals": 1,
+        "unit": "A"
+      }
+    ],
+    "buttons": {
+      "top": {
+        "aus": {
+          "action": "power_off"
+        },
+        "S": {
+          "action": "page_navigate",
+          "target": "settings"
+        },
+        "i": {
+          "action": "page_navigate",
+          "target": "info"
+        },
+        "St": {
+          "action": "toggle",
+          "target": "status"
+        },
+        "V>0": {
+          "action": "condition_check",
+          "value": "speed_ms",
+          "condition": ">",
+          "compare": 0
+        },
+        "V=0": {
+          "action": "condition_check",
+          "value": "speed_ms",
+          "condition": "==",
+          "compare": 0
+        },
+        "brightness": {
+          "action": "adjust_brightness",
+          "step": 5
+        },
+        "contrast": {
+          "action": "toggle_night_mode"
+        },
+        "UD": {
+          "action": "adjust_contrast",
+          "step": 5
+        }
+      },
+      "right": {
+        "c": {
+          "action": "config_mode"
+        },
+        "left": {
+          "action": "scroll",
+          "direction": "left"
+        },
+        "right": {
+          "action": "scroll",
+          "direction": "right"
+        },
+        "up": {
+          "action": "scroll",
+          "direction": "up"
+        },
+        "down": {
+          "action": "scroll",
+          "direction": "down"
+        },
+        "E": {
+          "action": "confirm"
+        }
+      },
+      "bottom": {
+        "1": {
+          "action": "page_navigate",
+          "target": "diagnostics"
+        },
+        "2": {
+          "action": "input_number",
+          "value": 2
+        },
+        "3": {
+          "action": "input_number",
+          "value": 3
+        },
+        "4": {
+          "action": "input_number",
+          "value": 4
+        },
+        "5": {
+          "action": "input_number",
+          "value": 5
+        },
+        "6": {
+          "action": "input_number",
+          "value": 6
+        },
+        "7": {
+          "action": "input_number",
+          "value": 7
+        },
+        "8": {
+          "action": "input_number",
+          "value": 8
+        },
+        "9": {
+          "action": "input_number",
+          "value": 9
+        },
+        "0": {
+          "action": "page_back"
+        }
+      }
+    },
+    "menu_labels": {
+      "1": "",
+      "2": "",
+      "3": "",
+      "4": "",
+      "5": "",
+      "6": "",
+      "7": "",
+      "8": "",
+      "9": "",
+      "0": ""
+    }
+  }
+}

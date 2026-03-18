@@ -1,0 +1,30 @@
+# Python cache and virtual environments
+__pycache__/
+*.py[cod]
+*.pyd
+*.pyo
+.venv/
+venv/
+env/
+
+# Build and packaging artifacts
+build/
+dist/
+*.spec
+
+# IDE/editor files
+.vscode/
+.idea/
+*.swp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+
+# Runtime/generated data (keep source templates/routes in repo)
+src/timetable/completed/

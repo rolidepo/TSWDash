@@ -1,0 +1,73 @@
+{
+  "train_info": {
+    "company": "Deutsche Bahn",
+    "completed_timetable": false,
+    "destination": "Test",
+    "driven_distance_km": 0,
+    "gnt_enabled": false,
+    "max_speed_kph": 120,
+    "priority": "Normal",
+    "route_code": "SKA",
+    "service_timetable": "FTF_1.json",
+    "timetable_length_km": 55,
+    "train_number": "255555",
+    "type": "S-bahn"
+  },
+  "timetable_data": [
+    {
+      "station": "Frankfurt (Main) Hbf",
+      "stop": true,
+      "ETA": "08:00:00",
+      "ETD": "08:00:00",
+      "ATA": "",
+      "ATD": "",
+      "diff": "",
+      "stpDurr": "",
+      "kmMark": "0"
+    },
+    {
+      "station": "Frankfurt (Main) Süd",
+      "stop": false,
+      "ETA": "08:02:02",
+      "ETD": "08:02:02",
+      "ATA": "",
+      "ATD": "",
+      "diff": "",
+      "stpDurr": "",
+      "kmMark": "4.2"
+    },
+    {
+      "station": "Hanau Hbf Nordseite",
+      "stop": false,
+      "ETA": "08:11:43",
+      "ETD": "08:11:43",
+      "ATA": "",
+      "ATD": "",
+      "diff": "",
+      "stpDurr": "",
+      "kmMark": "22.8"
+    },
+    {
+      "station": "Wirtheim",
+      "stop": false,
+      "ETA": "08:25:40",
+      "ETD": "08:25:40",
+      "ATA": "",
+      "ATD": "",
+      "diff": "",
+      "stpDurr": "",
+      "kmMark": "50"
+    },
+    {
+      "station": "Fulda",
+      "stop": true,
+      "ETA": "08:45:07",
+      "ETD": "08:45:07",
+      "ATA": "",
+      "ATD": "",
+      "diff": "",
+      "stpDurr": "",
+      "kmMark": "110.1"
+    }
+  ]
+}

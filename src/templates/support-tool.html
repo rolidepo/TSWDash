@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TSW Timetable Support Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #1e1e1e;
+            color: #d0d0d0;
+            padding: 15px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 15px;
+            margin-top: 0;
+            font-size: 22px;
+            color: #ffffff;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .control-group {
+            background: #2d2d2d;
+            padding: 12px;
+            border: 1px solid #444;
+            border-radius: 4px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+            color: #aaaaaa;
+            font-size: 13px;
+        }
+
+        .control-group input,
+        .control-group button,
+        .control-group select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 6px;
+            background: #3d3d3d;
+            border: 1px solid #555;
+            color: #d0d0d0;
+            font-size: 13px;
+            border-radius: 3px;
+        }
+
+        .control-group button {
+            cursor: pointer;
+            background: #0e639c;
+            border: 1px solid #0e639c;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .control-group button:hover {
+            background: #1177bb;
+        }
+
+        .control-group button:active {
+            background: #0a4a7c;
+        }
+
+        .control-group button.secondary {
+            background: #555;
+            border: 1px solid #666;
+        }
+
+        .control-group button.secondary:hover {
+            background: #666;
+        }
+
+        .info-panel {
+            background: #2d2d2d;
+            padding: 12px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .info-panel p {
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+
+        .info-panel code {
+            background: #1e1e1e;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #4ec9b0;
+        }
+
+        .index-navigator {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+            margin-bottom: 0;
+        }
+
+        .index-navigator button {
+            padding: 12px;
+            background: #0e639c;
+            border: 1px solid #0e639c;
+            color: #d0d0d0;
+            cursor: pointer;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .index-navigator button:hover {
+            background: #1177bb;
+        }
+
+        .entry-display {
+            background: #2d2d2d;
+            padding: 15px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+        }
+
+        .entry-display h3 {
+            margin-bottom: 10px;
+            margin-top: 0;
+            font-size: 16px;
+            color: #ffffff;
+        }
+
+        .entry-fields {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .field {
+            background: #1e1e1e;
+            padding: 8px;
+            border: 1px solid #444;
+            border-radius: 3px;
+            font-size: 13px;
+        }
+
+        .field-label {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 3px;
+            text-transform: uppercase;
+        }
+
+        .field-value {
+            font-family: 'Courier New', monospace;
+            color: #4ec9b0;
+            word-break: break-all;
+            font-size: 13px;
+        }
+
+        .field.highlight {
+            background: #1a3a52;
+            border-color: #0e639c;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .action-buttons button {
+            padding: 16px 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 3px;
+            border: 1px solid;
+            min-height: 50px;
+            transition: all 0.15s;
+        }
+
+        .action-buttons button:active {
+            transform: scale(0.98);
+        }
+
+        .action-buttons .update-btn {
+            background: #10b981;
+            border-color: #059669;
+            color: #ffffff;
+            grid-column: 1 / -1;
+            font-size: 18px;
+        }
+
+        .action-buttons .update-btn:hover {
+            background: #059669;
+        }
+
+        .action-buttons .skip-btn {
+            background: #6b7280;
+            border-color: #4b5563;
+            color: #ffffff;
+        }
+
+        .action-buttons .skip-btn:hover {
+            background: #4b5563;
+        }
+
+        .status-message {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 12px 20px;
+            border-radius: 3px;
+            font-weight: bold;
+            display: none;
+            z-index: 9999;
+            max-width: 300px;
+            word-wrap: break-word;
+        }
+
+        .status-message.success {
+            background: #10b981;
+            color: #ffffff;
+            display: block;
+        }
+
+        .status-message.error {
+            background: #ef4444;
+            color: #ffffff;
+            display: block;
+        }
+
+        .status-message.info {
+            background: #3b82f6;
+            color: #ffffff;
+            display: block;
+        }
+
+        .current-index {
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: #4ec9b0;
+            margin-bottom: 5px;
+        }
+
+        .km-display {
+            text-align: center;
+            font-size: 20px;
+            color: #ffffff;
+            background: #1a3a52;
+            padding: 8px;
+            border-radius: 3px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .file-list {
+            background: #2d2d2d;
+            padding: 15px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .file-item {
+            padding: 8px;
+            margin-bottom: 5px;
+            background: #1e1e1e;
+            border: 1px solid #444;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .file-item:hover {
+            background: #3d3d3d;
+        }
+
+        .file-item.selected {
+            background: #0e639c;
+            border-color: #0e639c;
+            font-weight: bold;
+        }
+
+        .keyboard-help {
+            background: #2d2d2d;
+            padding: 12px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 12px;
+            display: none;
+        }
+
+        .keyboard-help h4 {
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+
+        .keyboard-help ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .keyboard-help li {
+            margin-bottom: 5px;
+            color: #aaaaaa;
+        }
+
+        .keyboard-help code {
+            background: #1e1e1e;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #4ec9b0;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>TSW Timetable Support Tool</h1>
+
+        <div class="controls">
+            <div class="control-group">
+                <label>Route Timetable File</label>
+                <select id="fileSelect">
+                    <option value="">-- Select a timetable file --</option>
+                </select>
+                <button onclick="loadFileList()">Refresh List</button>
+            </div>
+
+            <div class="control-group">
+                <label>Current Geolocation</label>
+                <div style="background: #1e1e1e; padding: 10px; border-radius: 3px; margin-bottom: 8px;">
+                    <div style="font-size: 12px; color: #888; margin-bottom: 4px;">Latitude</div>
+                    <div id="currentLat" style="font-family: monospace; color: #4ec9b0; margin-bottom: 8px;">--</div>
+                    <div style="font-size: 12px; color: #888; margin-bottom: 4px;">Longitude</div>
+                    <div id="currentLon" style="font-family: monospace; color: #4ec9b0;">--</div>
+                </div>
+                <button onclick="refreshPlayerLocation()">Refresh Location</button>
+            </div>
+        </div>
+
+        <div class="status-message" id="statusMessage"></div>
+
+        <div class="keyboard-help">
+            <h4>⌨️ Keyboard Shortcuts</h4>
+            <ul>
+                <li><code>Y</code> - Update current index with player location</li>
+                <li><code>N</code> - Skip to next index</li>
+                <li><code>P</code> - Go to previous index</li>
+                <li><code>→</code> - Next index</li>
+                <li><code>←</code> - Previous index</li>
+                <li><code>S</code> - Save file</li>
+            </ul>
+        </div>
+
+        <div class="file-list" id="fileListContainer" style="display: none;">
+            <h4 style="margin-bottom: 10px;">Available Timetable Files</h4>
+            <div id="fileListItems"></div>
+        </div>
+
+        <div class="entry-display" id="entryDisplay" style="display: none;">
+            <div class="current-index" id="currentIndex">Index: --</div>
+            <div class="km-display" id="kmDisplay">KM: --</div>
+            <h3>Timetable Entry</h3>
+            <div class="entry-fields" id="entryFields"></div>
+            <div class="action-buttons">
+                <button class="update-btn" onclick="updateWithPlayerLocation()">📍 Update (Y)</button>
+                <button class="skip-btn" onclick="nextIndex()">⏭️ Skip (N)</button>
+            </div>
+            <div class="index-navigator">
+                <button onclick="previousIndex()">◀️ Previous</button>
+                <button onclick="nextIndex()">Next ▶️</button>
+            </div>
+            <button class="secondary" onclick="saveFile()" style="width: 100%; margin-top: 8px; padding: 12px;">💾 Save File (S)</button>
+        </div>
+
+        <div class="info-panel" id="infoPanel" style="display: none;">
+            <h3>File Information</h3>
+            <p>Route: <code id="routeName">--</code></p>
+            <p>Total Entries: <code id="totalEntries">0</code></p>
+            <p>File Path: <code id="filePath" style="word-break: break-all;">--</code></p>
+        </div>
+    </div>
+
+    <script>
+        let currentFile = null;
+        let currentFileData = null;
+        let currentIndex = 0;
+        let dirtyFlag = false;
+
+        // Load available files on startup
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFileList();
+            document.addEventListener('keydown', handleKeyboard);
+        });
+
+        async function loadFileList() {
+            try {
+                const response = await fetch('/api/support-data/list-files');
+                if (!response.ok) throw new Error('Failed to load file list');
+                
+                const data = await response.json();
+                const fileSelect = document.getElementById('fileSelect');
+                fileSelect.innerHTML = '<option value="">-- Select a timetable file --</option>';
+                
+                data.files.forEach(filename => {
+                    const option = document.createElement('option');
+                    option.value = filename;
+                    option.textContent = filename;
+                    fileSelect.appendChild(option);
+                });
+
+                showStatus('File list loaded', 'info');
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function loadFile(filename) {
+            if (!filename) {
+                hideDisplay();
+                currentFile = null;
+                currentFileData = null;
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/service-timetables/load/${filename}`);
+                if (!response.ok) throw new Error('Failed to load file');
+                
+                currentFileData = await response.json();
+                currentFile = filename;
+                currentIndex = 0;
+                dirtyFlag = false;
+
+                showDisplay();
+                displayEntry(currentIndex);
+                showStatus(`Loaded: ${filename}`, 'info');
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        function displayEntry(index) {
+            if (!currentFileData || !currentFileData.timetable_entries) return;
+
+            if (index < 0 || index >= currentFileData.timetable_entries.length) {
+                showStatus('Index out of range', 'error');
+                return;
+            }
+
+            currentIndex = index;
+            const entry = currentFileData.timetable_entries[index];
+
+            // Update current index display
+            document.getElementById('currentIndex').textContent = `Index: ${index}`;
+            document.getElementById('kmDisplay').textContent = `KM: ${entry.km}`;
+
+            // Display fields
+            const fieldsContainer = document.getElementById('entryFields');
+            fieldsContainer.innerHTML = '';
+
+            const isLatLonField = (key) => key === 'latitude' || key === 'longitude';
+
+            Object.entries(entry).forEach(([key, value]) => {
+                const field = document.createElement('div');
+                field.className = 'field' + (isLatLonField(key) ? ' highlight' : '');
+
+                const label = document.createElement('div');
+                label.className = 'field-label';
+                label.textContent = key;
+
+                const valueDiv = document.createElement('div');
+                valueDiv.className = 'field-value';
+                valueDiv.textContent = value === null ? 'null' : value;
+
+                field.appendChild(label);
+                field.appendChild(valueDiv);
+                fieldsContainer.appendChild(field);
+            });
+
+            // Update info panel
+            if (currentFileData.route_info) {
+                document.getElementById('routeName').textContent = currentFileData.route_info.route_name || 'Unknown';
+            }
+            document.getElementById('totalEntries').textContent = currentFileData.timetable_entries.length;
+            document.getElementById('filePath').textContent = `/timetable/route/${currentFile}`;
+        }
+
+        async function refreshPlayerLocation() {
+            try {
+                const response = await fetch('/api/data');
+                const data = await response.json();
+                const gameData = data.data || {};
+
+                const lat = gameData['player_info.geoLocation.latitude'];
+                const lon = gameData['player_info.geoLocation.longitude'];
+
+                if (lat === undefined || lon === undefined) {
+                    showStatus('Player location not available', 'error');
+                    document.getElementById('currentLat').textContent = '--';
+                    document.getElementById('currentLon').textContent = '--';
+                    return;
+                }
+
+                document.getElementById('currentLat').textContent = lat.toFixed(10);
+                document.getElementById('currentLon').textContent = lon.toFixed(10);
+                showStatus('Location refreshed', 'info');
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function updateWithPlayerLocation() {
+            if (!currentFileData) return;
+
+            try {
+                // Fetch current player location
+                const response = await fetch('/api/data');
+                const data = response.ok ? await response.json() : null;
+                const gameData = data?.data || {};
+
+                const lat = gameData['player_info.geoLocation.latitude'];
+                const lon = gameData['player_info.geoLocation.longitude'];
+
+                if (lat === undefined || lon === undefined) {
+                    showStatus('Player location not available', 'error');
+                    return;
+                }
+
+                if (isNaN(lat) || isNaN(lon)) {
+                    showStatus('Invalid latitude/longitude values', 'error');
+                    return;
+                }
+
+                // Update the entry with fetched location
+                const entry = currentFileData.timetable_entries[currentIndex];
+                entry.latitude = lat;
+                entry.longitude = lon;
+                dirtyFlag = true;
+
+                // Update display
+                document.getElementById('currentLat').textContent = lat.toFixed(10);
+                document.getElementById('currentLon').textContent = lon.toFixed(10);
+
+                showStatus(`✓ Index ${currentIndex} (KM ${entry.km}) updated`, 'success');
+                displayEntry(currentIndex);
+                
+                // Auto-advance to next index after 500ms
+                setTimeout(() => {
+                    if (currentIndex < currentFileData.timetable_entries.length - 1) {
+                        displayEntry(currentIndex + 1);
+                    }
+                }, 500);
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        function nextIndex() {
+            if (!currentFileData) return;
+            if (currentIndex < currentFileData.timetable_entries.length - 1) {
+                displayEntry(currentIndex + 1);
+            } else {
+                showStatus('Already at last index', 'error');
+            }
+        }
+
+        function previousIndex() {
+            if (!currentFileData) return;
+            if (currentIndex > 0) {
+                displayEntry(currentIndex - 1);
+            } else {
+                showStatus('Already at first index', 'error');
+            }
+        }
+
+        function goToIndexInput() {
+            const input = prompt('Enter index number:');
+            if (input !== null) {
+                const index = parseInt(input, 10);
+                if (!isNaN(index) && index >= 0 && index < currentFileData.timetable_entries.length) {
+                    displayEntry(index);
+                } else {
+                    showStatus('Invalid index', 'error');
+                }
+            }
+        }
+
+        async function saveFile() {
+            if (!currentFile || !currentFileData || !dirtyFlag) {
+                showStatus('No changes to save', 'info');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/support-data/save-timetable/${currentFile}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(currentFileData)
+                });
+
+                if (!response.ok) throw new Error('Failed to save file');
+
+                dirtyFlag = false;
+                showStatus(`✓ File saved: ${currentFile}`, 'success');
+            } catch (error) {
+                showStatus(`Error saving file: ${error.message}`, 'error');
+            }
+        }
+
+        function handleKeyboard(event) {
+            if (!currentFileData) return;
+
+            const key = event.key.toUpperCase();
+
+            if (key === 'Y') {
+                event.preventDefault();
+                updateWithPlayerLocation();
+            } else if (key === 'N') {
+                event.preventDefault();
+                nextIndex();
+            } else if (key === 'P') {
+                event.preventDefault();
+                previousIndex();
+            } else if (key === 'S') {
+                event.preventDefault();
+                saveFile();
+            } else if (event.key === 'ArrowRight') {
+                event.preventDefault();
+                nextIndex();
+            } else if (event.key === 'ArrowLeft') {
+                event.preventDefault();
+                previousIndex();
+            }
+        }
+
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('statusMessage');
+            statusEl.textContent = message;
+            statusEl.className = `status-message ${type}`;
+            setTimeout(() => {
+                statusEl.className = 'status-message';
+            }, 3000);
+        }
+
+        function showDisplay() {
+            document.getElementById('entryDisplay').style.display = 'block';
+            document.getElementById('infoPanel').style.display = 'block';
+        }
+
+        function hideDisplay() {
+            document.getElementById('entryDisplay').style.display = 'none';
+            document.getElementById('infoPanel').style.display = 'none';
+        }
+
+        // File select change handler
+        document.getElementById('fileSelect').addEventListener('change', (e) => {
+            loadFile(e.target.value);
+        });
+    </script>
+</body>
+</html>
