@@ -29,6 +29,9 @@ Thumbs.db
 # Runtime/generated data (keep source templates/routes in repo)
 src/timetable/completed/
 
+# Local reference assets (do not publish)
+reference/
+
 # Root documentation markdown files
 /*.md
 !/README.md
