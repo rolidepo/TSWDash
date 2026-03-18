@@ -28,3 +28,8 @@ Thumbs.db
 
 # Runtime/generated data (keep source templates/routes in repo)
 src/timetable/completed/
+
+# Root documentation markdown files
+/*.md
+!/README.md
+!/src/templates/picto_icons/README.md
